@@ -1,25 +1,32 @@
-import React from "react";
+import React, { useState } from "react";
 
-function EditorTabs() {
+interface EditorTabsProps {
+	files: string[];
+	activeFile: string | undefined;
+	setActiveFile: (value: string | undefined) => void;
+	tabs: string[];
+	setTabs: (value: string[]) => void;
+}
+
+function EditorTabs({ files, activeFile, setActiveFile, tabs, setTabs }: EditorTabsProps) {
+	
+	const onCloseButton = (e: React.MouseEvent<HTMLElement>, fileToClose: string) => {
+		e.stopPropagation(); 
+		setTabs(tabs.filter(fileForClose => fileForClose !== fileToClose))
+		if (activeFile === fileToClose) setActiveFile(undefined);
+	}
+
 	return (
 		<div className="editorTabs">
-			<div className="tab activeTab">
-				<i className="tabIcon fa-regular fa-file-lines"></i>
-				<p className="tabFilename">indfgddex.html</p>
-				<p className="tabCloseButton">⨉</p>
-			</div>
-
-			<div className="tab">
-				<i className="tabIcon fa-regular fa-file-lines"></i>
-				<p className="tabFilename">style.css</p>
-				<p className="tabCloseButton">⨉</p>
-			</div>
-
-			<div className="tab">
-				<i className="tabIcon fa-regular fa-file-lines"></i>
-				<p className="tabFilename">index.html</p>
-				<p className="tabCloseButton">⨉</p>
-			</div>
+			{
+				tabs.map((fileName: string) => (
+					<div className={activeFile === fileName ? "tab activeTab" : "tab" } onClick={()=>setActiveFile(fileName)} >
+						<i className="tabIcon fa-regular fa-file-lines"></i>
+						<p className="tabFilename">{fileName}</p>
+					<p className="tabCloseButton" onClick={ (e) => onCloseButton(e, fileName) }>⨉</p>
+				</div>					
+				))
+			}
 		</div>
 	);
 }

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Sidebar from "./components/Sidebar";
 import Filesbar from "./components/Filesbar";
 import EditorTabs from "./components/EditorTabs";
@@ -25,7 +25,16 @@ const files = ["index.html", "style.css", "logo.svg"];
 function App() {
 	const [activeSidebarButton, setActiveSidebarButton] = useState<ButtonId>("FILES");
 
-	const [activeFile, setActiveFile] = useState("index.html");
+	const [activeFile, setActiveFile] = useState<string | undefined>(files[0]);
+	const [tabs, setTabs] = useState([files[0]]);
+
+	useEffect(() => {
+		if (!activeFile) return
+		if (!tabs.includes(activeFile)) {
+			setTabs([...tabs, activeFile]);
+		}
+	}, [activeFile])
+
 
 	return (
 		<div className="wrapper">
@@ -34,15 +43,21 @@ function App() {
 				activeButton={activeSidebarButton}
 				setActiveSidebarButton={setActiveSidebarButton}
 			/>
-			<Filesbar 
-				title="Dmitriy's notes" 
-				files={files} 
+			<Filesbar
+				title="Dmitriy's notes"
+				files={files}
 				activeFile={activeFile}
 				setActiveFile={setActiveFile}
 			/>
 
 			<div className="editorWrapper">
-				<EditorTabs />
+				<EditorTabs
+					files={files}
+					activeFile={activeFile}
+					setActiveFile={setActiveFile}
+					tabs={tabs}
+					setTabs={setTabs}
+				/>
 				<TextEditor />
 			</div>
 		</div>
