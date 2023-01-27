@@ -1,26 +1,52 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import Sidebar from "./components/Sidebar";
+import Filesbar from "./components/Filesbar";
+import EditorTabs from "./components/EditorTabs";
+import TextEditor from "./components/TextEditor";
+import { ButtonId, sidebarButton } from "./types";
+
+const sidebarButtons: sidebarButton[] = [
+	{
+		id: "FILES",
+		icon: "fa-regular fa-file",
+	},
+	{
+		id: "SEARCH",
+		icon: "fa-solid fa-magnifying-glass",
+	},
+	{
+		id: "USER",
+		icon: "fa-regular fa-user",
+	},
+];
+
+const files = ["index.html", "style.css", "logo.svg"];
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+	const [activeSidebarButton, setActiveSidebarButton] = useState<ButtonId>("FILES");
+
+	const [activeFile, setActiveFile] = useState("index.html");
+
+	return (
+		<div className="wrapper">
+			<Sidebar
+				sidebarButtons={sidebarButtons}
+				activeButton={activeSidebarButton}
+				setActiveSidebarButton={setActiveSidebarButton}
+			/>
+			<Filesbar 
+				title="Dmitriy's notes" 
+				files={files} 
+				activeFile={activeFile}
+				setActiveFile={setActiveFile}
+			/>
+
+			<div className="editorWrapper">
+				<EditorTabs />
+				<TextEditor />
+			</div>
+		</div>
+	);
 }
 
 export default App;
