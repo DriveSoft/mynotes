@@ -25,6 +25,7 @@ const files = ["index.html", "style.css", "logo.svg"];
 function App() {
 	const [activeSidebarButton, setActiveSidebarButton] = useState<ButtonId>("FILES");
 
+	const [fileList, setFileList] = useState(files);
 	const [activeFile, setActiveFile] = useState<string | undefined>(files[0]);
 	const [tabs, setTabs] = useState([files[0]]);
 
@@ -45,7 +46,8 @@ function App() {
 			/>
 			<Filesbar
 				title="Dmitriy's notes"
-				files={files}
+				fileList={fileList}
+				setFileList={setFileList}
 				activeFile={activeFile}
 				setActiveFile={setActiveFile}
 			/>
@@ -58,7 +60,7 @@ function App() {
 					tabs={tabs}
 					setTabs={setTabs}
 				/>
-				<TextEditor />
+				<TextEditor tabs={tabs} activeFile={activeFile} />
 			</div>
 		</div>
 	);

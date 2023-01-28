@@ -20,7 +20,7 @@ function EditorTabs({ files, activeFile, setActiveFile, tabs, setTabs }: EditorT
 		<div className="editorTabs">
 			{
 				tabs.map((fileName: string) => (
-					<div className={activeFile === fileName ? "tab activeTab" : "tab" } onClick={()=>setActiveFile(fileName)} >
+					<div key={fileName} className={activeFile === fileName ? "tab activeTab" : "tab" } onClick={()=>setActiveFile(fileName)} >
 						<i className="tabIcon fa-regular fa-file-lines"></i>
 						<p className="tabFilename">{fileName}</p>
 					<p className="tabCloseButton" onClick={ (e) => onCloseButton(e, fileName) }>⨉</p>
