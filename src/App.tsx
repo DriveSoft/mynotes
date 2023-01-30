@@ -21,6 +21,11 @@ const sidebarButtons: sidebarButton[] = [
 ];
 
 const files = ["index.html", "style.css", "logo.svg"];
+// const defaultFiles: files = {
+// 	"idsfdf": "index.html",
+// 	"idrtrth": "style.css",
+// 	"iddffhd": "logo.svg"
+// }
 
 function App() {
 	const [activeSidebarButton, setActiveSidebarButton] = useState<ButtonId>("FILES");

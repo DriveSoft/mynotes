@@ -15,45 +15,45 @@ function Filesbar({
 	activeFile,
 	setActiveFile,
 }: FilesbarProps) {
-	const [focused, setFocused] = useState(false)
-	const [showInputNewFile, setShowInputNewFile] = useState(false)
-	const [newFileName, setNewFileName] = useState("")
-	const [newFileError, setNewFileError] = useState("")
+	const [focused, setFocused] = useState(false);
+	const [showInputNewFile, setShowInputNewFile] = useState(false);
+	const [newFileName, setNewFileName] = useState("");
+	const [newFileError, setNewFileError] = useState("");
 
 	const errorFileExists = (fileName: string) =>
 		`A file or folder ${fileName} already exists at this location. Please choose a different name.`;
 
 	const onKeyDownNewFile = (e: React.KeyboardEvent<HTMLInputElement>) => {
-		if (e.key === "Enter" && newFileError === '') {
+		if (e.key === "Enter" && newFileError === "") {
 			if (newFileName !== "") {
-				setFileList([...fileList, newFileName])
-				setNewFileName("")
-				setShowInputNewFile(false)
+				setFileList([...fileList, newFileName]);
+				setNewFileName("");
+				setShowInputNewFile(false);
 			}
 		}
 
 		if (e.key === "Escape") {
-			setShowInputNewFile(false)
-			setNewFileName('')
-			setNewFileError('')
-		}		
+			setShowInputNewFile(false);
+			setNewFileName("");
+			setNewFileError("");
+		}
 	};
 
 	const onChangeNewFile = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value;
-		setNewFileName(value)
+		setNewFileName(value);
 		if (value !== "") {
 			fileList.includes(value)
 				? setNewFileError(errorFileExists(value))
-				: setNewFileError("")
+				: setNewFileError("");
 		}
 	};
 
 	const onBlurNewFile = () => {
-		setShowInputNewFile(false)
-		setNewFileName('')
-		setNewFileError('')
-	}
+		setShowInputNewFile(false);
+		setNewFileName("");
+		setNewFileError("");
+	};
 
 	return (
 		<div
@@ -74,7 +74,7 @@ function Filesbar({
 					></i>
 				</div>
 
-				<ul>
+				{/* <ul>
 					{fileList.map((item: string) => (
 						<li
 							className={
@@ -91,7 +91,27 @@ function Filesbar({
 							{item}
 						</li>
 					))}
-				</ul>
+				</ul> */}
+
+				{fileList.map((item: string) => (
+					<div
+						className={
+							activeFile === item && focused
+								? "fileItem selectedFocusedFile"
+								: activeFile === item
+								? "fileItem selectedFile"
+								: "fileItem"
+						}
+						key={item}
+					>
+						<i className="fa-regular fa-file-lines"></i>
+						<input readOnly
+							type="text"
+							onClick={() => setActiveFile(item)}
+							value={item}																	
+						/>
+					</div>
+				))}
 			</div>
 
 			{showInputNewFile && (
@@ -99,7 +119,11 @@ function Filesbar({
 					<div className="wrapperNewFile">
 						<i className="fa-regular fa-file-lines"></i>
 						<input
-							className={newFileError ? "inputNewFile inputNewFileError" : "inputNewFile"}
+							className={
+								newFileError
+									? "inputNewFile inputNewFileError"
+									: "inputNewFile"
+							}
 							autoFocus
 							value={newFileName}
 							onChange={onChangeNewFile}
