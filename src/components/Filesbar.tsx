@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import ContexMenu from "./ContexMenu"
 import uuid from 'react-uuid';
 import { files } from "../types";
 
@@ -19,8 +20,11 @@ function Filesbar({
 }: FilesbarProps) {
 	const [focused, setFocused] = useState(false);
 	const [showInputNewFile, setShowInputNewFile] = useState(false);
+	const [renameFileName, setRenameFileName] = useState("");
 	const [newFileName, setNewFileName] = useState("");
 	const [newFileError, setNewFileError] = useState("");
+
+	const [showMenu, setShowMenu] = useState({show: false, x: 0, y: 0, fileId: ''});
 
 	const errorFileExists = (fileName: string) =>
 		`A file or folder ${fileName} already exists at this location. Please choose a different name.`;
@@ -29,7 +33,7 @@ function Filesbar({
 		if (e.key === "Enter" && newFileError === "") {
 			if (newFileName !== "") {
 				const fileId = uuid();
-				setFileList({...fileList, [fileId]: newFileName});
+				setFileList({...fileList, [fileId]: renameFileName});
 				setNewFileName("");
 				setShowInputNewFile(false);
 			}
@@ -39,7 +43,7 @@ function Filesbar({
 			setShowInputNewFile(false);
 			setNewFileName("");
 			setNewFileError("");
-		}
+		}	
 	};
 
 	const onChangeNewFile = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -59,6 +63,15 @@ function Filesbar({
 		setNewFileError("");
 	};
 
+	const onContextMenu = (e: React.MouseEvent<HTMLDivElement>, fileId: string) => {
+		e.preventDefault();
+		setShowMenu({...showMenu, show: true, x: e.pageX, y: e.pageY, fileId: fileId});
+	}
+
+	const onClickItem = (fileId: string, itemId: string) => {
+		console.log(fileId, itemId)
+	}
+
 	return (
 		<div
 			className="filesbar"
@@ -66,7 +79,8 @@ function Filesbar({
 			onFocus={() => setFocused(true)}
 			onBlur={() => {
 				setFocused(false);
-			}}
+			}}	
+			onContextMenu={(e) => onContextMenu(e, '')}		
 		>
 			<span>EXPLORER</span>
 			<div className="files">
@@ -80,6 +94,7 @@ function Filesbar({
 
 				{Object.keys(fileList).map((fileId) => (
 					<div
+						onContextMenu={(e) => { e.stopPropagation(); onContextMenu(e, fileId)}}
 						className={
 							activeFile === fileId && focused
 								? "fileItem selectedFocusedFile"
@@ -90,36 +105,17 @@ function Filesbar({
 						key={fileId}
 					>
 						<i className="fa-regular fa-file-lines"></i>
-						<input
+						<input							
 							readOnly
 							type="text"
 							onClick={() => setActiveFile(fileId)}
 							value={fileList[fileId]}
+							onChange={(e) => setRenameFileName(e.target.value)}
 						/>
 					</div>
 				))
 				}
 
-				{/* {fileList.map((item: string) => (
-					<div
-						className={
-							activeFile === item && focused
-								? "fileItem selectedFocusedFile"
-								: activeFile === item
-								? "fileItem selectedFile"
-								: "fileItem"
-						}
-						key={item}
-					>
-						<i className="fa-regular fa-file-lines"></i>
-						<input
-							readOnly
-							type="text"
-							onClick={() => setActiveFile(item)}
-							value={item}
-						/>
-					</div>
-				))} */}
 			</div>
 
 			{showInputNewFile && (
@@ -148,6 +144,8 @@ function Filesbar({
 					)}
 				</>
 			)}
+
+			{ showMenu.show && <ContexMenu showMenu={showMenu} onClickItem={onClickItem} setShowMenu={setShowMenu} /> }
 		</div>
 	);
 }

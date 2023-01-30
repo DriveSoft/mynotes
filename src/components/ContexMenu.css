@@ -1,0 +1,25 @@
+.containerMenu {
+    position: fixed;
+    border: 1px solid #353535;
+    background-color: #252525;
+    border-radius: 5px;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 14px;
+    color: white;
+}
+
+.containerMenu ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.containerMenu li {
+    padding: 4px 25px 4px 25px;
+    cursor: pointer;
+}  
+
+.containerMenu li:hover {
+    background-color: hsl(204, 100%, 20%);
+}  
+
