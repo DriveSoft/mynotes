@@ -1,9 +1,11 @@
 import React, { useState } from "react";
+import uuid from 'react-uuid';
+import { files } from "../types";
 
 interface FilesbarProps {
 	title?: string;
-	fileList: string[];
-	setFileList: (value: string[]) => void;
+	fileList: files;
+	setFileList: (value: files) => void;
 	activeFile?: string;
 	setActiveFile: (value: string) => void;
 }
@@ -26,7 +28,8 @@ function Filesbar({
 	const onKeyDownNewFile = (e: React.KeyboardEvent<HTMLInputElement>) => {
 		if (e.key === "Enter" && newFileError === "") {
 			if (newFileName !== "") {
-				setFileList([...fileList, newFileName]);
+				const fileId = uuid();
+				setFileList({...fileList, [fileId]: newFileName});
 				setNewFileName("");
 				setShowInputNewFile(false);
 			}
@@ -43,7 +46,8 @@ function Filesbar({
 		const value = e.target.value;
 		setNewFileName(value);
 		if (value !== "") {
-			fileList.includes(value)
+			const ifNotExists = Object.keys(fileList).every(fileId => fileList[fileId] !== value)
+			!ifNotExists
 				? setNewFileError(errorFileExists(value))
 				: setNewFileError("");
 		}
@@ -74,26 +78,29 @@ function Filesbar({
 					></i>
 				</div>
 
-				{/* <ul>
-					{fileList.map((item: string) => (
-						<li
-							className={
-								activeFile === item && focused
-									? "selectedFocusedFile "
-									: "" + activeFile === item
-									? "selectedFile"
-									: ""
-							}
-							onClick={() => setActiveFile(item)}
-							key={item}
-						>
-							<i className="fa-regular fa-file-lines"></i>
-							{item}
-						</li>
-					))}
-				</ul> */}
+				{Object.keys(fileList).map((fileId) => (
+					<div
+						className={
+							activeFile === fileId && focused
+								? "fileItem selectedFocusedFile"
+								: activeFile === fileId
+								? "fileItem selectedFile"
+								: "fileItem"
+						}
+						key={fileId}
+					>
+						<i className="fa-regular fa-file-lines"></i>
+						<input
+							readOnly
+							type="text"
+							onClick={() => setActiveFile(fileId)}
+							value={fileList[fileId]}
+						/>
+					</div>
+				))
+				}
 
-				{fileList.map((item: string) => (
+				{/* {fileList.map((item: string) => (
 					<div
 						className={
 							activeFile === item && focused
@@ -105,13 +112,14 @@ function Filesbar({
 						key={item}
 					>
 						<i className="fa-regular fa-file-lines"></i>
-						<input readOnly
+						<input
+							readOnly
 							type="text"
 							onClick={() => setActiveFile(item)}
-							value={item}																	
+							value={item}
 						/>
 					</div>
-				))}
+				))} */}
 			</div>
 
 			{showInputNewFile && (

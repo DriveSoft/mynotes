@@ -3,7 +3,8 @@ import Sidebar from "./components/Sidebar";
 import Filesbar from "./components/Filesbar";
 import EditorTabs from "./components/EditorTabs";
 import TextEditor from "./components/TextEditor";
-import { ButtonId, sidebarButton } from "./types";
+import uuid from 'react-uuid';
+import { files, ButtonId, sidebarButton } from "./types";
 
 const sidebarButtons: sidebarButton[] = [
 	{
@@ -20,19 +21,18 @@ const sidebarButtons: sidebarButton[] = [
 	},
 ];
 
-const files = ["index.html", "style.css", "logo.svg"];
-// const defaultFiles: files = {
-// 	"idsfdf": "index.html",
-// 	"idrtrth": "style.css",
-// 	"iddffhd": "logo.svg"
-// }
+const defaultFiles: files = {
+	[uuid()]: "index.html",
+	[uuid()]: "style.css",
+	[uuid()]: "logo.svg"
+}
 
 function App() {
 	const [activeSidebarButton, setActiveSidebarButton] = useState<ButtonId>("FILES");
 
-	const [fileList, setFileList] = useState(files);
-	const [activeFile, setActiveFile] = useState<string | undefined>(files[0]);
-	const [tabs, setTabs] = useState([files[0]]);
+	const [fileList, setFileList] = useState(defaultFiles);
+	const [activeFile, setActiveFile] = useState<string | undefined>(Object.keys(defaultFiles)[0]);
+	const [tabs, setTabs] = useState([Object.keys(defaultFiles)[0]]);
 
 	useEffect(() => {
 		if (!activeFile) return
@@ -59,7 +59,7 @@ function App() {
 
 			<div className="editorWrapper">
 				<EditorTabs
-					files={files}
+					fileList={fileList}
 					activeFile={activeFile}
 					setActiveFile={setActiveFile}
 					tabs={tabs}

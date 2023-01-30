@@ -1,14 +1,15 @@
-import React, { useState } from "react";
+import React from "react";
+import { files } from "../types";
 
 interface EditorTabsProps {
-	files: string[];
+	fileList: files;
 	activeFile: string | undefined;
 	setActiveFile: (value: string | undefined) => void;
 	tabs: string[];
 	setTabs: (value: string[]) => void;
 }
 
-function EditorTabs({ files, activeFile, setActiveFile, tabs, setTabs }: EditorTabsProps) {
+function EditorTabs({ fileList, activeFile, setActiveFile, tabs, setTabs }: EditorTabsProps) {
 	
 	const onCloseButton = (e: React.MouseEvent<HTMLElement>, fileToClose: string) => {
 		e.stopPropagation(); 
@@ -19,11 +20,11 @@ function EditorTabs({ files, activeFile, setActiveFile, tabs, setTabs }: EditorT
 	return (
 		<div className="editorTabs">
 			{
-				tabs.map((fileName: string) => (
-					<div key={fileName} className={activeFile === fileName ? "tab activeTab" : "tab" } onClick={()=>setActiveFile(fileName)} >
+				tabs.map((fileId: string) => (
+					<div key={fileId} className={activeFile === fileId ? "tab activeTab" : "tab" } onClick={()=>setActiveFile(fileId)} >
 						<i className="tabIcon fa-regular fa-file-lines"></i>
-						<p className="tabFilename">{fileName}</p>
-					<p className="tabCloseButton" onClick={ (e) => onCloseButton(e, fileName) }>⨉</p>
+						<p className="tabFilename">{fileList[fileId]}</p>
+					<p className="tabCloseButton" onClick={ (e) => onCloseButton(e, fileId) }>⨉</p>
 				</div>					
 				))
 			}
