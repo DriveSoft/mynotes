@@ -1,0 +1,42 @@
+.editorTabs {
+    display: flex;
+    width: 100%;
+    height: 32px;
+    background-color: #252525;
+  }
+  
+  .editorTabs .tab {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #2d2d2d; 
+    cursor: pointer;   
+    min-width: 120px;
+    font-size: 14px;
+    color: hsl(60, 0%, 70%);  
+    border-right: 1px solid #1e1e1e;
+  }
+  
+  .activeTab {
+    color: white !important;
+    background-color: #1e1e1e !important;
+  }
+  
+  .tab .tabIcon {
+    padding: 0 4px 0 8px;
+  }
+  
+  .tab .tabFilename {
+    padding: 0 5px 0 5px;
+    flex: 1;
+    margin-top: 12px;
+  }
+  
+  .tab .tabCloseButton {
+    padding: 0 4px 1px 4px;
+    border-radius: 5px;
+    margin-right: 4px;
+  }
+  .tab .tabCloseButton:hover {
+    background-color: hsl(0, 0%, 24%); 
+  }

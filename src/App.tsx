@@ -6,20 +6,7 @@ import TextEditor from "./components/TextEditor";
 import uuid from 'react-uuid';
 import { files, ButtonId, sidebarButton } from "./types";
 
-const sidebarButtons: sidebarButton[] = [
-	{
-		id: "FILES",
-		icon: "fa-regular fa-file",
-	},
-	{
-		id: "SEARCH",
-		icon: "fa-solid fa-magnifying-glass",
-	},
-	{
-		id: "USER",
-		icon: "fa-regular fa-user",
-	},
-];
+
 
 const defaultFiles: files = {
 	[uuid()]: "index.html",
@@ -45,7 +32,6 @@ function App() {
 	return (
 		<div className="wrapper">
 			<Sidebar
-				sidebarButtons={sidebarButtons}
 				activeButton={activeSidebarButton}
 				setActiveSidebarButton={setActiveSidebarButton}
 			/>

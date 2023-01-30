@@ -1,14 +1,28 @@
-import React from "react";
+import React from "react"
+import "./Sidebar.css"
 import { ButtonId, sidebarButton } from "../types";
 
+const sidebarButtons: sidebarButton[] = [
+	{
+		id: "FILES",
+		icon: "fa-regular fa-file",
+	},
+	{
+		id: "SEARCH",
+		icon: "fa-solid fa-magnifying-glass",
+	},
+	{
+		id: "USER",
+		icon: "fa-regular fa-user",
+	},
+];
+
 interface SidebarProps {
-	sidebarButtons: sidebarButton[];
 	activeButton: ButtonId;
 	setActiveSidebarButton: (value: ButtonId) => void;
 }
 
 function Sidebar({
-	sidebarButtons,
 	activeButton,
 	setActiveSidebarButton,
 }: SidebarProps) {

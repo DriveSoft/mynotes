@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState } from "react"
 import ContexMenu from "./ContexMenu"
-import uuid from 'react-uuid';
-import { files } from "../types";
+import uuid from 'react-uuid'
+import "./Filesbar.css"
+import { files } from "../types"
 
 interface FilesbarProps {
 	title?: string;

@@ -1,5 +1,6 @@
 import React from "react";
 import { files } from "../types";
+import './EditorTabs.css'
 
 interface EditorTabsProps {
 	fileList: files;
