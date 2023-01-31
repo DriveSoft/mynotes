@@ -8,8 +8,8 @@ interface FileItemProps {
 	focused?: boolean;
 	onClick: (fileId: string) => void;
 	onMenu: (e: React.MouseEvent<HTMLDivElement>, fileId: string) => void;
-    onFileRenamed: (fileId: string, success: boolean, newFilename: string) => void;
-	//onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+    onFileRenamed: (fileId: string, success: boolean, newFilename: string, inputEl: any) => void;
+	onChangeValidator: (fileId: string, fileName: string, inputEl: any) => boolean;
 }
 
 function FileItem({
@@ -20,35 +20,44 @@ function FileItem({
 	focused,
 	onClick,
 	onMenu,
-    onFileRenamed
+    onFileRenamed,
+    onChangeValidator
 }: FileItemProps) {
 	const [renameFilename, setRenameFilename] = useState(fileName)
-    const [error, setError] = useState('')
+    const [isValid, setIsValid] = useState(true)
 
     const inputEl = useRef(null)
 
 	const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-		if (e.key === "Enter" && error === "") {
+		if (e.key === "Enter" && isValid) {
 			if (renameFilename !== "") {
-                onFileRenamed(fileId, true, renameFilename)
+                onFileRenamed(fileId, true, renameFilename, inputEl)
 			}
 		}
 
 		if (e.key === "Escape") {
 			setRenameFilename(fileName);
-            onFileRenamed(fileId, false, '')
+            onFileRenamed(fileId, false, '', inputEl)
 		}
 	};
 
     const onBlur = () => {
         setRenameFilename(fileName);
-        onFileRenamed(fileId, false, '')
+        onFileRenamed(fileId, false, '', inputEl)
     }
+
+    const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value
+        setRenameFilename(value)
+        setIsValid(onChangeValidator(fileId, value, inputEl))     
+    }
+
 
     useEffect(()=>{
         //@ts-ignore
         if (editable && inputEl) inputEl?.current?.select();
     }, [editable])
+
 
 	return (
 		<div
@@ -72,10 +81,10 @@ function FileItem({
 					type="text"
 					onClick={() => onClick(fileId)}
 					value={renameFilename}
-					onChange={(e) => setRenameFilename(e.target.value)}
+					onChange={onChange}
 					onKeyDown={onKeyDown}
 					onBlur={onBlur}
-					style={{ cursor: "auto" }}
+					style={{ cursor: "auto", zIndex: "2" }}
 					ref={inputEl}
 				/>
 			) : (
