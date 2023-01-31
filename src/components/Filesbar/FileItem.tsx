@@ -3,23 +3,29 @@ import React, { useState, useEffect, useRef } from "react";
 interface FileItemProps {
 	fileId: string;
 	fileName: string;
-	editable?: boolean;
+	//editable?: boolean;
 	selected: boolean;
 	focused?: boolean;
-	onClick: (fileId: string) => void;
+    //isNewFile?: boolean;
+    mode?: 'NEW_FILE' | 'RENAME_FILE';
+	onClick?: (fileId: string) => void;
 	onMenu: (e: React.MouseEvent<HTMLDivElement>, fileId: string) => void;
-    onFileRenamed: (fileId: string, success: boolean, newFilename: string, inputEl: any) => void;
+    onFileCreated?: (success: boolean, filename: string, inputEl: any) => void;
+    onFileRenamed?: (fileId: string, success: boolean, newFilename: string, inputEl: any) => void;
 	onChangeValidator: (fileId: string, fileName: string, inputEl: any) => boolean;
 }
 
 function FileItem({
 	fileId,
 	fileName,
-	editable,
+	//editable,
 	selected,
 	focused,
+    //isNewFile,
+    mode,
 	onClick,
 	onMenu,
+    onFileCreated,
     onFileRenamed,
     onChangeValidator
 }: FileItemProps) {
@@ -31,19 +37,22 @@ function FileItem({
 	const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
 		if (e.key === "Enter" && isValid) {
 			if (renameFilename !== "") {
-                onFileRenamed(fileId, true, renameFilename, inputEl)
+                mode === 'RENAME_FILE' && onFileRenamed && onFileRenamed(fileId, true, renameFilename, inputEl)
+                mode === 'NEW_FILE' && onFileCreated && onFileCreated(true, renameFilename, inputEl)
 			}
 		}
 
 		if (e.key === "Escape") {
 			setRenameFilename(fileName);
-            onFileRenamed(fileId, false, '', inputEl)
+            mode === 'RENAME_FILE' && onFileRenamed && onFileRenamed(fileId, false, '', inputEl)
+            mode === 'NEW_FILE' && onFileCreated && onFileCreated(false, '', inputEl)
 		}
 	};
 
     const onBlur = () => {
         setRenameFilename(fileName);
-        onFileRenamed(fileId, false, '', inputEl)
+        mode === 'RENAME_FILE' && onFileRenamed && onFileRenamed(fileId, false, '', inputEl)
+        mode === 'NEW_FILE' && onFileCreated && onFileCreated(false, '', inputEl)
     }
 
     const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -55,8 +64,9 @@ function FileItem({
 
     useEffect(()=>{
         //@ts-ignore
-        if (editable && inputEl) inputEl?.current?.select();
-    }, [editable])
+        //if ((editable || isNewFile) && inputEl) inputEl?.current?.select();
+        if (mode && inputEl) inputEl?.current?.select();
+    }, [mode])
 
 
 	return (
@@ -76,10 +86,10 @@ function FileItem({
 		>
 			<i className="fa-regular fa-file-lines"></i>
 
-			{editable ? (
+			{mode === 'RENAME_FILE' ? (
 				<input
 					type="text"
-					onClick={() => onClick(fileId)}
+					onClick={() => onClick && onClick(fileId)}
 					value={renameFilename}
 					onChange={onChange}
 					onKeyDown={onKeyDown}
@@ -87,11 +97,21 @@ function FileItem({
 					style={{ cursor: "auto", zIndex: "2" }}
 					ref={inputEl}
 				/>
-			) : (
+			) : mode === 'NEW_FILE' ? (
+				<input
+					type="text"
+					value={renameFilename}
+					onChange={onChange}
+					onKeyDown={onKeyDown}
+					onBlur={onBlur}
+					style={{ cursor: "auto", zIndex: "2" }}
+					ref={inputEl}
+				/>
+            ) : (
 				<input
 					readOnly
 					type="text"
-					onClick={() => onClick(fileId)}
+					onClick={() => onClick && onClick(fileId)}
 					value={fileName}
 					style={{ userSelect: "none" }}
 				/>

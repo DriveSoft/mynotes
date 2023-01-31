@@ -49,39 +49,6 @@ function Filesbar({
 	const errorFileExists = (fileName: string) =>
 		`A file or folder ${fileName} already exists at this location. Please choose a different name.`;
 
-	// const onKeyDownNewFile = (e: React.KeyboardEvent<HTMLInputElement>) => {
-	// 	if (e.key === "Enter" && newFileError === "") {
-	// 		if (newFileName !== "") {
-	// 			const fileId = uuid();
-	// 			setFileList({ ...fileList, [fileId]: newFileName });
-	// 			setNewFileName("");
-	// 			setShowInputNewFile(false);
-	// 		}
-	// 	}
-
-	// 	if (e.key === "Escape") {
-	// 		setShowInputNewFile(false);
-	// 		setNewFileName("");
-	// 		setNewFileError("");
-	// 	}
-	// };
-
-	// const onKeyDownRenameFile = (e: React.KeyboardEvent<HTMLInputElement>) => {
-	// 	if (e.key === "Enter" && newFileError === "") {
-	// 		if (renameFileName.newName !== "") {
-	// 			setFileList({
-	// 				...fileList,
-	// 				[renameFileName.fileId]: renameFileName.newName,
-	// 			});
-	// 			setRenameFileName({ fileId: "", newName: "" });
-	// 		}
-	// 	}
-
-	// 	if (e.key === "Escape") {
-	// 		setRenameFileName({ fileId: "", newName: "" });
-	// 	}
-	// };
-
 	const onFileRenamed = (
 		fileId: string,
 		success: boolean,
@@ -100,24 +67,21 @@ function Filesbar({
 		}
 	};
 
-	// const onChangeNewFile = (e: React.ChangeEvent<HTMLInputElement>) => {
-	// 	const value = e.target.value;
-	// 	setNewFileName(value);
-	// 	if (value !== "") {
-	// 		const ifNotExists = Object.keys(fileList).every(
-	// 			(fileId) => fileList[fileId] !== value
-	// 		);
-	// 		!ifNotExists
-	// 			? setNewFileError(errorFileExists(value))
-	// 			: setNewFileError("");
-	// 	}
-	// };
+	const onFileCreated = (success: boolean, filename: string, inputEl: any) => {
+		setError({ error: '', left: 0, top: 0, width: 0 });	
+		inputEl.current.style.outline = "1px solid #252525";
 
-	// const onBlurNewFile = () => {
-	// 	setShowInputNewFile(false);
-	// 	setNewFileName("");
-	// 	setNewFileError("");
-	// };
+		if (success) {
+			const newId = uuid()
+			setFileList({
+				...fileList,
+				[newId]: filename,
+			});
+			setActiveFile(newId)
+		}
+		
+		setShowInputNewFile(false)
+	}
 
 	const onContextMenu = (
 		e: React.MouseEvent<HTMLDivElement>,
@@ -134,6 +98,11 @@ function Filesbar({
 	};
 
 	const onClickItem = (fileId: string, itemId: string) => {
+		if (itemId === "NEW_FILE") {
+			setShowInputNewFile(true)
+		}
+				
+		
 		if (itemId === "EDIT_FILE") {
 			setRenameFileName({ fileId: fileId, newName: fileList[itemId] });
 			setTimeout(() => {
@@ -196,13 +165,29 @@ function Filesbar({
 				</div>
 
 				<div style={{ position: "relative" }}>
+
+					{ showInputNewFile && 
+						<FileItem
+							fileId={''}
+							fileName={''}
+							selected={false}
+							focused={focused}		
+							//isNewFile={true}	
+							mode='NEW_FILE'			
+							onMenu={(e, fileId) => onContextMenu(e, fileId)}
+							onFileCreated={onFileCreated}
+							onChangeValidator={onChangeValidator}
+							key={'newFile'}
+					/>
+					}
+
 					{Object.keys(fileList).map((fileId) => (
 						<FileItem
 							fileId={fileId}
 							fileName={fileList[fileId]}
 							selected={activeFile === fileId}
 							focused={focused}
-							editable={renameFileName.fileId === fileId}
+							mode={renameFileName.fileId === fileId ? 'RENAME_FILE' : undefined}
 							onClick={(fileId: string) => setActiveFile(fileId)}
 							onMenu={(e, fileId) => onContextMenu(e, fileId)}
 							onFileRenamed={onFileRenamed}
@@ -211,7 +196,7 @@ function Filesbar({
 						/>
 					))}
 
-					{renameFileName.fileId !== "" && (
+					{(renameFileName.fileId !== "" || showInputNewFile) && (
 						<div
 							style={{
 								position: "absolute",
@@ -226,33 +211,6 @@ function Filesbar({
 					)}
 				</div>
 			</div>
-
-			{/* {showInputNewFile && (
-				<>
-					<div className="wrapperNewFile">
-						<i className="fa-regular fa-file-lines"></i>
-						<input
-							className={
-								newFileError
-									? "inputNewFile inputNewFileError"
-									: "inputNewFile"
-							}
-							autoFocus
-							value={newFileName}
-							onChange={onChangeNewFile}
-							type="text"
-							onBlur={onBlurNewFile}
-							onKeyDown={onKeyDownNewFile}
-						/>
-					</div>
-
-					{newFileError && (
-						<div className="errorNewFile">
-							<span>{newFileError}</span>
-						</div>
-					)}
-				</>
-			)} */}
 
 			{showMenu.show && (
 				<ContexMenu
