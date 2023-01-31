@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Sidebar from "./components/Sidebar";
-import Filesbar from "./components/Filesbar";
+import Filesbar from "./components/Filesbar/Filesbar";
 import EditorTabs from "./components/EditorTabs";
 import TextEditor from "./components/TextEditor";
 import uuid from 'react-uuid';
