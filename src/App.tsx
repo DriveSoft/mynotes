@@ -7,6 +7,7 @@ import EditorTabs from "./components/EditorTabs"
 import TextEditor from "./components/TextEditor"
 import uuid from 'react-uuid';
 import { files, ButtonId, sidebarButton } from "./types"
+import { sortFiles } from "./utils"
 
 
 
@@ -22,6 +23,10 @@ function App() {
 	const [fileList, setFileList] = useState(defaultFiles);
 	const [activeFile, setActiveFile] = useState<string | undefined>(Object.keys(defaultFiles)[0]);
 	const [tabs, setTabs] = useState([Object.keys(defaultFiles)[0]]);
+
+	useEffect(() => {
+		setFileList(sortFiles(fileList));
+	}, [])
 
 	useEffect(() => {
 		if (!activeFile) return

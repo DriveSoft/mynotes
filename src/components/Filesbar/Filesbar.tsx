@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import ContexMenu from "../ContexMenu";
 import uuid from "react-uuid";
+import { sortFiles } from "../../utils"
 import FileItem from "./FileItem";
 import "./Filesbar.css";
 
@@ -59,11 +60,8 @@ function Filesbar({
 		inputEl.current.style.outline = "1px solid #252525";
 
 		setRenameFileName({ fileId: "", newName: "" });
-		if (success) {
-			setFileList({
-				...fileList,
-				[fileId]: newFilename,
-			});
+		if (success) {			
+			setFileList( sortFiles({ ...fileList, [fileId]: newFilename}) )
 		}
 	};
 
@@ -73,10 +71,7 @@ function Filesbar({
 
 		if (success) {
 			const newId = uuid()
-			setFileList({
-				...fileList,
-				[newId]: filename,
-			});
+			setFileList( sortFiles({ ...fileList, [newId]: filename}) )
 			setActiveFile(newId)
 		}
 		
