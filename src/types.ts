@@ -4,7 +4,8 @@ import { StrictMode } from "react";
 export const BUTTONS_ID = {
 	FILES: 'files',
 	SEARCH: 'search',
-	USER: 'user'
+	PROFILE: 'profile',
+	NONE: 'none'
 }
 export type ButtonId = keyof typeof BUTTONS_ID;
 

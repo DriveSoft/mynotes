@@ -12,7 +12,7 @@ const sidebarButtons: sidebarButton[] = [
 		icon: "fa-solid fa-magnifying-glass",
 	},
 	{
-		id: "USER",
+		id: "PROFILE",
 		icon: "fa-regular fa-user",
 	},
 ];
@@ -26,8 +26,13 @@ function Sidebar({
 	activeButton,
 	setActiveSidebarButton,
 }: SidebarProps) {
+	
 	const onButtonClick = (id: ButtonId) => {
-		setActiveSidebarButton(id);
+		if (activeButton === id) { 
+			setActiveSidebarButton('NONE');
+		} else {
+			setActiveSidebarButton(id);	
+		}
 	};
 
 	return (

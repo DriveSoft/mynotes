@@ -1,0 +1,12 @@
+.searchbar {
+    display: flex;
+    flex-direction: column;
+    background-color: #252525;
+    width: 280px;    
+    font-size: 11px;   
+  }
+
+  .searchbar span {
+    color: hsl(0, 0%, 86%);
+    padding: 14px 14px;
+  }

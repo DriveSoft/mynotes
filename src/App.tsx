@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from "react";
-import Sidebar from "./components/Sidebar";
-import Filesbar from "./components/Filesbar/Filesbar";
-import EditorTabs from "./components/EditorTabs";
-import TextEditor from "./components/TextEditor";
+import React, { useState, useEffect } from "react"
+import Sidebar from "./components/Sidebar"
+import Filesbar from "./components/Filesbar/Filesbar"
+import Searchbar from "./components/Searchbar"
+import Profilebar from "./components/Profilebar"
+import EditorTabs from "./components/EditorTabs"
+import TextEditor from "./components/TextEditor"
 import uuid from 'react-uuid';
-import { files, ButtonId, sidebarButton } from "./types";
+import { files, ButtonId, sidebarButton } from "./types"
 
 
 
@@ -35,13 +37,21 @@ function App() {
 				activeButton={activeSidebarButton}
 				setActiveSidebarButton={setActiveSidebarButton}
 			/>
-			<Filesbar
+
+		
+			{activeSidebarButton === 'FILES' && <Filesbar
 				title="Dmitriy's notes"
 				fileList={fileList}
 				setFileList={setFileList}
 				activeFile={activeFile}
 				setActiveFile={setActiveFile}
-			/>
+			/>} 
+			
+			
+			{activeSidebarButton === 'SEARCH' && <Searchbar />}		
+
+			{activeSidebarButton === 'PROFILE' && <Profilebar />}	
+					
 
 			<div className="editorWrapper">
 				<EditorTabs
