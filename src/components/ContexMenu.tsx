@@ -31,8 +31,10 @@ const ContexMenu = ({
 	];
 
 	useEffect(() => {
-		const handleClick = () =>
+		const handleClick = (e: any) => {			
+			if (e.target.className.indexOf("menuItemDisabled") > -1 ) return
 			setShowMenu((prev: any) => ({ ...prev, show: false }));
+		}	
 		document.addEventListener("click", handleClick);
 		return () => {
 			document.removeEventListener("click", handleClick);
@@ -48,7 +50,7 @@ const ContexMenu = ({
 				{menuData.map((item) => (
 					<li
 						key={item.id}
-                        style={{cursor: item.fileReq && showMenu.fileId === '' ? "default" : "pointer", color: item.fileReq && showMenu.fileId === '' ? "gray" : "white"  }}
+                        className={item.fileReq && showMenu.fileId === '' ? "menuItem menuItemDisabled" : "menuItem" }  						
 						onClick={() => !(item.fileReq && showMenu.fileId === '') && onClickItem(showMenu.fileId, item.id)}
 					>
 						{item.title}                        

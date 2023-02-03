@@ -22,11 +22,12 @@ function EditorTabs({ fileList, activeFile, setActiveFile, tabs, setTabs }: Edit
 		<div className="editorTabs">
 			{
 				tabs.map((fileId: string) => (
+					fileList[fileId] && ( 
 					<div key={fileId} className={activeFile === fileId ? "tab activeTab" : "tab" } onClick={()=>setActiveFile(fileId)} >
 						<i className="tabIcon fa-regular fa-file-lines"></i>
 						<p className="tabFilename">{fileList[fileId]}</p>
-					<p className="tabCloseButton" onClick={ (e) => onCloseButton(e, fileId) }>⨉</p>
-				</div>					
+						<p className="tabCloseButton" onClick={ (e) => onCloseButton(e, fileId) }>⨉</p>
+					</div>)								
 				))
 			}
 		</div>

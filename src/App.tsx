@@ -9,8 +9,6 @@ import uuid from 'react-uuid';
 import { files, ButtonId, sidebarButton } from "./types"
 import { sortFiles } from "./utils"
 
-
-
 const defaultFiles: files = {
 	[uuid()]: "index.html",
 	[uuid()]: "style.css",
@@ -35,6 +33,9 @@ function App() {
 		}
 	}, [activeFile])
 
+	useEffect(() => {
+
+	}, [fileList])
 
 	return (
 		<div className="wrapper">

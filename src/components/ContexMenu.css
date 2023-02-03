@@ -14,12 +14,17 @@
     margin: 0;
 }
 
-.containerMenu li {
+.menuItem {
     padding: 4px 25px 4px 25px;
     cursor: pointer;
-}  
+} 
 
-.containerMenu li:hover {
+.menuItem:hover {
     background-color: hsl(204, 100%, 20%);
 }  
+
+.menuItemDisabled {
+    cursor: default;
+    color: gray;
+}
 

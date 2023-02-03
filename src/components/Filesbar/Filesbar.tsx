@@ -57,7 +57,7 @@ function Filesbar({
 		inputEl: any
 	) => {
 		setError({ error: '', left: 0, top: 0, width: 0 });	
-		inputEl.current.style.outline = "1px solid #252525";
+		inputEl.current.style.outline = "";
 
 		setRenameFileName({ fileId: "", newName: "" });
 		if (success) {			
@@ -132,7 +132,7 @@ function Filesbar({
 				width: elRect.right - elRect.left + 2,
 			});
 		} else {
-			inputEl.current.style.outline = "1px solid #252525";
+			inputEl.current.style.outline = "";
 			setError({ error: '', left: 0, top: 0, width: 0 });			
 		}
 
