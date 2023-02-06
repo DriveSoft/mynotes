@@ -9,8 +9,8 @@ import { files } from "../../types";
 
 interface FilesbarProps {
 	title?: string;
-	fileList: files;
-	setFileList: (value: files) => void;
+	fileList: files[];
+	setFileList: (value: files[]) => void;
 	activeFile?: string;
 	setActiveFile: (value: string) => void;
 }
@@ -60,7 +60,13 @@ function Filesbar({
 
 		setRenameFileName({ fileId: "", newName: "" });
 		if (success) {			
-			setFileList( sortFiles({ ...fileList, [fileId]: newFilename}) )
+			setFileList( sortFiles(fileList.map(item => {
+				if (item.id === fileId) {
+					return {...item, fileName: newFilename}
+				} else {
+					return item
+				}
+			})) )
 		}
 	};
 
@@ -70,7 +76,8 @@ function Filesbar({
 
 		if (success) {
 			const newId = uuid()
-			setFileList( sortFiles({ ...fileList, [newId]: filename}) )
+			//setFileList( sortFiles({ ...fileList, [newId]: filename}) )
+			setFileList(sortFiles([...fileList, {id: newId, fileName: filename, content: ''}]))
 			setActiveFile(newId)
 		}
 		
@@ -96,9 +103,9 @@ function Filesbar({
 			setShowInputNewFile(true)
 		}
 				
-		
 		if (itemId === "EDIT_FILE") {
-			setRenameFileName({ fileId: fileId, newName: fileList[itemId] });
+			const fileName = fileList.find((item) => item.id === fileId)?.content || '';
+			setRenameFileName({fileId: fileId, newName: fileName })
 			setTimeout(() => {
 				//@ts-ignore
 				if (inputRenameRef) inputRenameRef?.current?.select();
@@ -106,9 +113,8 @@ function Filesbar({
 		}
 
 		if (itemId === "DELETE_FILE") {
-			const copyFileList = { ...fileList };
-			delete copyFileList[fileId];
-			setFileList(copyFileList);
+			const newFileList = fileList.filter(item => item.id !== fileId)
+			setFileList(newFileList);
 		}
 	};
 
@@ -117,9 +123,8 @@ function Filesbar({
 		fileName: string,
 		inputEl: any
 	): boolean => {
-		const result = Object.keys(fileList).every(
-			(key) => fileList[key] !== fileName || key === fileId
-		);
+
+		const result = fileList.every(item => item.fileName !== fileName || fileId === item.id)
 
 		if (!result && inputEl) {
 			inputEl.current.style.outline = "1px solid red";
@@ -135,7 +140,8 @@ function Filesbar({
 			setError({ error: '', left: 0, top: 0, width: 0 });			
 		}
 
-		return result;
+		return result;		
+	
 	};
 
 	return (
@@ -175,20 +181,21 @@ function Filesbar({
 					/>
 					}
 
-					{Object.keys(fileList).map((fileId) => (
+					{fileList.map((item) => (
 						<FileItem
-							fileId={fileId}
-							fileName={fileList[fileId]}
-							selected={activeFile === fileId}
+							fileId={item.id}
+							fileName={item.fileName}
+							selected={activeFile === item.id}
 							focused={focused}
-							mode={renameFileName.fileId === fileId ? 'RENAME_FILE' : undefined}
+							mode={renameFileName.fileId === item.id ? 'RENAME_FILE' : undefined}
 							onClick={(fileId: string) => setActiveFile(fileId)}
 							onMenu={(e, fileId) => onContextMenu(e, fileId)}
 							onFileRenamed={onFileRenamed}
 							onChangeValidator={onChangeValidator}
-							key={fileId}
+							key={item.id}
 						/>
 					))}
+
 
 					{(renameFileName.fileId !== "" || showInputNewFile) && (
 						<div

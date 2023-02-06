@@ -9,19 +9,32 @@ import uuid from "react-uuid";
 import { files, ButtonId, sidebarButton } from "./types";
 import { sortFiles } from "./utils";
 
-const defaultFiles: files = {
-	[uuid()]: "index.html",
-	[uuid()]: "style.css",
-	[uuid()]: "logo.svg",
-};
+const defaultFiles: files[] = [
+	{
+		id: uuid(),
+		fileName: "index.html",
+		content: ""
+	},
+	{
+		id: uuid(),
+		fileName: "style.css",
+		content: ""
+	},
+	{
+		id: uuid(),
+		fileName: "logo.svg",
+		content: ""
+	},		
+
+]
 
 function App() {
 	const [activeSidebarButton, setActiveSidebarButton] =
 		useState<ButtonId>("FILES");
 
 	const [fileList, setFileList] = useState(defaultFiles);
-	const [activeFile, setActiveFile] = useState<string | undefined>(Object.keys(defaultFiles)[0]);
-	const [tabs, setTabs] = useState([Object.keys(defaultFiles)[0]]);
+	const [activeFile, setActiveFile] = useState<string | undefined>(defaultFiles[0].id);
+	const [tabs, setTabs] = useState([defaultFiles[0].id]);
 	
 	const [widthSidebar, setWidthSidebar] = useState(260)
 	const [dragSizeSidebar, setDragSizeSidebar] = useState({draggable: false, xMouseStart: 0, initPosX: 0})

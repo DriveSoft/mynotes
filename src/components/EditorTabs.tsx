@@ -3,7 +3,7 @@ import { files } from "../types";
 import "./EditorTabs.css";
 
 interface EditorTabsProps {
-	fileList: files;
+	fileList: files[];
 	activeFile: string | undefined;
 	setActiveFile: (value: string | undefined) => void;
 	tabs: string[];
@@ -52,11 +52,15 @@ function EditorTabs({
 		}
 	};	
 
+	const getFilename = (files: files[], id: string) => {
+		return files.find((item) => item.id === id)?.fileName || undefined;
+	}
+
 	return (
 		<div className="editorTabs">
 			{tabs.map(
 				(fileId: string, index: number) =>
-					fileList[fileId] && (
+					getFilename(fileList, fileId) && (
 						<div
 							key={fileId}
 							className={ activeFile === fileId ? "tab activeTab" : "tab" }
@@ -68,7 +72,7 @@ function EditorTabs({
 							draggable
 						>
 							<i className="tabIcon fa-regular fa-file-lines"></i>
-							<p className="tabFilename">{fileList[fileId]}</p>
+							<p className="tabFilename">{getFilename(fileList, fileId)}</p>
 							<p
 								className="tabCloseButton"
 								onClick={(e) => onCloseButton(e, fileId)}
