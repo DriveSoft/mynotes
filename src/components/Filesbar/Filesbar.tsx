@@ -6,6 +6,7 @@ import FileItem from "./FileItem";
 import "./Filesbar.css";
 
 import { files } from "../../types";
+import { URL_API } from "../../utils";
 
 interface FilesbarProps {
 	title?: string;
@@ -49,7 +50,7 @@ function Filesbar({
 	const errorFileExists = (fileName: string) =>
 		`A file or folder ${fileName} already exists at this location. Please choose a different name.`;
 
-	const onFileRenamed = (
+	const onFileRenamed = async(
 		fileId: string,
 		success: boolean,
 		newFilename: string,
@@ -57,30 +58,43 @@ function Filesbar({
 	) => {
 		setError({ error: '', left: 0, top: 0, width: 0 });	
 		inputEl.current.style.outline = "";
-
-		setRenameFileName({ fileId: "", newName: "" });
-		if (success) {			
-			setFileList( sortFiles(fileList.map(item => {
-				if (item.id === fileId) {
-					return {...item, fileName: newFilename}
-				} else {
-					return item
-				}
-			})) )
+		
+		if (success) {						
+			try {
+				if(await updateFilenameAPI(fileId, newFilename)) {
+					setRenameFileName({ fileId: "", newName: "" });
+					setFileList( sortFiles(fileList.map(item => {
+						if (item.id === fileId) {
+							return {...item, fileName: newFilename}
+						} else {
+							return item
+						}
+					})) )
+				}	
+			} catch(e) {
+				alert(e)
+				setRenameFileName({ fileId: "", newName: "" });
+				console.log('onFileRenamed error', e)
+			}
 		}
 	};
 
-	const onFileCreated = (success: boolean, filename: string, inputEl: any) => {
+	const onFileCreated = async(success: boolean, filename: string, inputEl: any) => {
 		setError({ error: '', left: 0, top: 0, width: 0 });	
 		inputEl.current.style.outline = "1px solid #252525";
 
 		if (success) {
-			const newId = uuid()
-			//setFileList( sortFiles({ ...fileList, [newId]: filename}) )
-			setFileList(sortFiles([...fileList, {id: newId, fileName: filename, content: ''}]))
-			setActiveFile(newId)
-		}
-		
+			const newId = uuid()	
+			try {
+			if(await createFilenameAPI(newId, filename)) {
+				setFileList(sortFiles([...fileList, {id: newId, fileName: filename, content: ''}]))
+				setActiveFile(newId)
+			}
+			} catch(e) {
+				alert(e)
+			}
+
+		}		
 		setShowInputNewFile(false)
 	}
 
@@ -98,7 +112,7 @@ function Filesbar({
 		});
 	};
 
-	const onClickItem = (fileId: string, itemId: string) => {
+	const onClickItem = async(fileId: string, itemId: string) => {
 		if (itemId === "NEW_FILE") {
 			setShowInputNewFile(true)
 		}
@@ -113,8 +127,14 @@ function Filesbar({
 		}
 
 		if (itemId === "DELETE_FILE") {
-			const newFileList = fileList.filter(item => item.id !== fileId)
-			setFileList(newFileList);
+			try {
+				if (await deleteFilenameAPI(fileId)) {
+					const newFileList = fileList.filter(item => item.id !== fileId)
+					setFileList(newFileList);
+				} 
+			} catch(e) {
+				alert(e)
+			}
 		}
 	};
 
@@ -143,6 +163,63 @@ function Filesbar({
 		return result;		
 	
 	};
+
+	async function createFilenameAPI(id: string, newFilename: string){
+		const response = await fetch(`${URL_API}`, {
+			method: 'POST', // *GET, POST, PUT, DELETE, etc.
+			mode: 'cors', // no-cors, *cors, same-origin
+			cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+			credentials: 'same-origin', // include, *same-origin, omit
+			headers: {
+			  'Content-Type': 'application/json'
+			},
+			redirect: 'follow', // manual, *follow, error
+			referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+			body: JSON.stringify({id: id, fileName: newFilename, content: ''}) // body data type must match "Content-Type" header
+		})
+
+		if(!response.ok) throw new Error(response.status.toString())
+	
+		const data = await response.json()
+		return data?.fileName === newFilename
+	}
+
+	async function updateFilenameAPI(id: string, newFilename: string){
+		const response = await fetch(`${URL_API}/${id}`, {
+			method: 'PUT', // *GET, POST, PUT, DELETE, etc.
+			mode: 'cors', // no-cors, *cors, same-origin
+			cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+			credentials: 'same-origin', // include, *same-origin, omit
+			headers: {
+			  'Content-Type': 'application/json'
+			},
+			redirect: 'follow', // manual, *follow, error
+			referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+			body: JSON.stringify({fileName: newFilename, content: ''}) // body data type must match "Content-Type" header
+		})
+
+		if(!response.ok) throw new Error(response.status.toString())
+	
+		const data = await response.json()
+		return data?.fileName === newFilename
+	}
+
+	async function deleteFilenameAPI(id: string){
+		const response = await fetch(`${URL_API}/${id}`, {
+			method: 'DELETE', 
+			mode: 'cors', // no-cors, *cors, same-origin
+			cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+			credentials: 'same-origin', // include, *same-origin, omit
+			headers: {
+			  'Content-Type': 'application/json'
+			},
+			redirect: 'follow', // manual, *follow, error
+			referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url			
+		})
+
+		if(!response.ok) throw new Error(response.status.toString())
+		return response.ok
+	}	
 
 	return (
 		<div

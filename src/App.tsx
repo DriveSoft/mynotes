@@ -7,38 +7,46 @@ import EditorTabs from "./components/EditorTabs";
 import TextEditor from "./components/TextEditor";
 import uuid from "react-uuid";
 import { files, ButtonId, sidebarButton } from "./types";
-import { sortFiles } from "./utils";
+import { sortFiles, URL_API } from "./utils";
 
-const defaultFiles: files[] = [
-	{
-		id: uuid(),
-		fileName: "index.html",
-		content: ""
-	},
-	{
-		id: uuid(),
-		fileName: "style.css",
-		content: ""
-	},
-	{
-		id: uuid(),
-		fileName: "logo.svg",
-		content: ""
-	},		
-
-]
+// const defaultFiles: files[] = [
+// 	{
+// 		id: uuid(),
+// 		fileName: "index.html",
+// 		content: ""
+// 	},
+// 	{
+// 		id: uuid(),
+// 		fileName: "style.css",
+// 		content: ""
+// 	},
+// 	{
+// 		id: uuid(),
+// 		fileName: "logo.svg",
+// 		content: ""
+// 	},		
+// ]
 
 function App() {
-	const [activeSidebarButton, setActiveSidebarButton] =
-		useState<ButtonId>("FILES");
+	const [activeSidebarButton, setActiveSidebarButton] = useState<ButtonId>("FILES");
 
-	const [fileList, setFileList] = useState(defaultFiles);
-	const [activeFile, setActiveFile] = useState<string | undefined>(defaultFiles[0].id);
-	const [tabs, setTabs] = useState([defaultFiles[0].id]);
+	const [fileList, setFileList] = useState<files[]>([]);
+	const [activeFile, setActiveFile] = useState<string | undefined>(undefined);
+	const [tabs, setTabs] = useState<string[]>([]);
 	
 	const [widthSidebar, setWidthSidebar] = useState(260)
 	const [dragSizeSidebar, setDragSizeSidebar] = useState({draggable: false, xMouseStart: 0, initPosX: 0})
 
+
+	useEffect(() => {
+		const fetchData = async() => {
+			const response = await fetch(URL_API)
+			const data = await response.json()
+			setFileList(sortFiles(data))
+		}
+
+		fetchData()
+	}, [])
 
 
 	useEffect(() => {
@@ -60,11 +68,6 @@ function App() {
 		}
         
 	}, [dragSizeSidebar])
-
-
-	useEffect(() => {
-		setFileList(sortFiles(fileList));
-	}, []);
 
 	useEffect(() => {
 		if (!activeFile) return;
