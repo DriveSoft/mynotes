@@ -13,7 +13,7 @@ interface FilesbarProps {
 	setFileList: (value: files) => void;
 	activeFile?: string;
 	setActiveFile: (value: string) => void;
-	//onMenu: (e: React.MouseEvent<HTMLDivElement>, fileId: string) => void;
+	width: number;
 }
 
 function Filesbar({
@@ -22,6 +22,7 @@ function Filesbar({
 	setFileList,
 	activeFile,
 	setActiveFile,
+	width
 }: FilesbarProps) {
 	const [focused, setFocused] = useState(false);
 	const [showInputNewFile, setShowInputNewFile] = useState(false);
@@ -29,8 +30,7 @@ function Filesbar({
 		fileId: "",
 		newName: "",
 	});
-	//const [newFileName, setNewFileName] = useState("");
-	//const [newFileError, setNewFileError] = useState("");
+
 	const [error, setError] = useState({
 		error: "",
 		left: 0,
@@ -148,6 +148,7 @@ function Filesbar({
 				setFocused(false);
 			}}
 			onContextMenu={(e) => onContextMenu(e, "")}
+			style={{width: width}}
 		>
 			<span>EXPLORER</span>
 			<div className="files">

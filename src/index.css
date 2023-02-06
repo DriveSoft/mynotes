@@ -12,15 +12,26 @@ body {
   font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-
 .wrapper {
   display: flex;   
   height: 100vh; 
 }
 
-
 .editorWrapper {
   display: flex;
   flex-direction: column;
-  width: 100%;
+  flex: 1;
+}
+
+.dragBar {
+  width: 4px;
+  cursor: col-resize;
+  background-color: #252525;  
+  transition: background-color 0.3s;
+  transition-delay: 0.1s;
+}
+
+.dragBar:hover {
+  background-color: hsl(204, 100%, 42%);
+  width: 4px;
 }
