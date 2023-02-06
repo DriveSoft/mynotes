@@ -68,15 +68,14 @@ function App() {
 				setActiveSidebarButton={setActiveSidebarButton}
 			/>
 
-			<div className="sidebar2">
+			<div className="sidebar2" style={{width: widthSidebar}}>
 				{activeSidebarButton === "FILES" && (
 					<Filesbar
 						title="Dmitriy's notes"
 						fileList={fileList}
 						setFileList={setFileList}
 						activeFile={activeFile}
-						setActiveFile={setActiveFile}
-						width={widthSidebar}
+						setActiveFile={setActiveFile}						
 					/>
 				)}
 

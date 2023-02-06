@@ -13,7 +13,6 @@ interface FilesbarProps {
 	setFileList: (value: files) => void;
 	activeFile?: string;
 	setActiveFile: (value: string) => void;
-	width: number;
 }
 
 function Filesbar({
@@ -22,7 +21,7 @@ function Filesbar({
 	setFileList,
 	activeFile,
 	setActiveFile,
-	width
+	
 }: FilesbarProps) {
 	const [focused, setFocused] = useState(false);
 	const [showInputNewFile, setShowInputNewFile] = useState(false);
@@ -148,7 +147,6 @@ function Filesbar({
 				setFocused(false);
 			}}
 			onContextMenu={(e) => onContextMenu(e, "")}
-			style={{width: width}}
 		>
 			<span>EXPLORER</span>
 			<div className="files">
