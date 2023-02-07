@@ -27,7 +27,7 @@ export async function createFilenameAPI(id: string, newFilename: string){
     return data?.fileName === newFilename
 }
 
-export async function updateFilenameAPI(id: string, newFilename: string){
+export async function updateFilenameAPI(id: string, fileName: string, content: string){
     const response = await fetch(`${URL_API}/${id}`, {
         method: 'PUT', // *GET, POST, PUT, DELETE, etc.
         mode: 'cors', // no-cors, *cors, same-origin
@@ -38,13 +38,15 @@ export async function updateFilenameAPI(id: string, newFilename: string){
         },
         redirect: 'follow', // manual, *follow, error
         referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
-        body: JSON.stringify({fileName: newFilename, content: ''}) // body data type must match "Content-Type" header
+        body: JSON.stringify({fileName: fileName, content: content}) // body data type must match "Content-Type" header
     })
+
+    console.log(content)
 
     if(!response.ok) throw new Error(response.status.toString())
 
     const data = await response.json()
-    return data?.fileName === newFilename
+    return data?.fileName === fileName
 }
 
 export async function deleteFilenameAPI(id: string){

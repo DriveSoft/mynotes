@@ -60,15 +60,19 @@ function Filesbar({
 		
 		if (success) {						
 			try {
-				if(await updateFilenameAPI(fileId, newFilename)) {
+				let content = ''
+				const newFileList = sortFiles(fileList.map(item => {
+					if (item.id === fileId) {
+						content = item.content
+						return {...item, fileName: newFilename}
+					} else {
+						return item
+					}
+				}))
+
+				if(await updateFilenameAPI(fileId, newFilename, content)) {
 					setRenameFileName({ fileId: "", newName: "" });
-					setFileList( sortFiles(fileList.map(item => {
-						if (item.id === fileId) {
-							return {...item, fileName: newFilename}
-						} else {
-							return item
-						}
-					})) )
+					setFileList(newFileList)
 				}	
 			} catch(e) {
 				alert(e)

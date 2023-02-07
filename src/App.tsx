@@ -6,7 +6,7 @@ import Profilebar from "./components/Profilebar";
 import EditorTabs from "./components/EditorTabs";
 import TextEditor from "./components/TextEditor";
 import { files, tabs, ButtonId } from "./types";
-import { sortFiles, URL_API } from "./utils";
+import { sortFiles, updateFilenameAPI, URL_API } from "./utils";
 
 // const defaultFiles: files[] = [
 // 	{
@@ -47,6 +47,18 @@ function App() {
 		fetchData()
 	}, [])
 
+	useEffect(() => {
+		const onKeyDown = (e: KeyboardEvent) => {			 
+			if(e.ctrlKey && e.code === 'KeyS') {				
+				e.preventDefault()
+				activeFile && saveFile(activeFile)
+			}
+		}
+
+		window.addEventListener('keydown', onKeyDown)
+		return () => window.removeEventListener('keydown', onKeyDown)
+	}, [activeFile, fileList])	
+
 
 	useEffect(() => {
 		const onMouseMove = (e: MouseEvent) => {
@@ -70,14 +82,24 @@ function App() {
 
 	useEffect(() => {
 		if (!activeFile) return;
-		// if (!tabs.includes(activeFile)) {
-		// 	setTabs([...tabs, activeFile]);
-		// }
 		if (!tabs.find(tabItem => tabItem.id === activeFile)) {
 			setTabs([...tabs, {id: activeFile, saved: true}]);
 		}		
 	}, [activeFile]);
 
+	const fileIdToObject = (fileId: string) => {
+		return fileList.find(file => file.id === fileId)
+	}
+
+	const saveFile = async (idFile: string) => {
+		const fileObj = fileIdToObject(idFile)
+		if(fileObj) {
+			if(await updateFilenameAPI(fileObj.id, fileObj.fileName, fileObj.content)) {
+				const newTabs = tabs.map(tab => tab.id === idFile ? {...tab, saved: true} : tab)
+				setTabs(newTabs)
+			}
+		}
+	}
 
 	return (
 		<div className="wrapper">

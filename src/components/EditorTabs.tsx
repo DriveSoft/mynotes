@@ -59,28 +59,6 @@ function EditorTabs({
 	return (
 		<div className="editorTabs">
 			{tabs.map(
-				// (fileId: string, index: number) =>
-				// 	getFilename(fileList, fileId) && (
-				// 		<div
-				// 			key={fileId}
-				// 			className={ activeFile === fileId ? "tab activeTab" : "tab" }
-				// 			onClick={() => setActiveFile(fileId)}
-				// 			onDragStart={(e) => onDragStart(e, index)}
-				// 			onDragEnter={(e) => onDragEnter(e, index)}
-				// 			onDragOver={(e) => e.preventDefault()}
-				// 			onDragEnd={drop}
-				// 			draggable
-				// 		>
-				// 			<i className="tabIcon fa-regular fa-file-lines"></i>
-				// 			<p className="tabFilename">{getFilename(fileList, fileId)}</p>
-				// 			<p
-				// 				className="tabCloseButton"
-				// 				onClick={(e) => onCloseButton(e, fileId)}
-				// 			>
-				// 				⨉
-				// 			</p>
-				// 		</div>
-				// 	)
 				(fileTab: tabs, index: number) =>
 					getFilename(fileList, fileTab.id) && (
 						<div
