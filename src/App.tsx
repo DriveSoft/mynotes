@@ -5,8 +5,7 @@ import Searchbar from "./components/Searchbar";
 import Profilebar from "./components/Profilebar";
 import EditorTabs from "./components/EditorTabs";
 import TextEditor from "./components/TextEditor";
-import uuid from "react-uuid";
-import { files, ButtonId, sidebarButton } from "./types";
+import { files, tabs, ButtonId } from "./types";
 import { sortFiles, URL_API } from "./utils";
 
 // const defaultFiles: files[] = [
@@ -32,7 +31,7 @@ function App() {
 
 	const [fileList, setFileList] = useState<files[]>([]);
 	const [activeFile, setActiveFile] = useState<string | undefined>(undefined);
-	const [tabs, setTabs] = useState<string[]>([]);
+	const [tabs, setTabs] = useState<tabs[]>([]);
 	
 	const [widthSidebar, setWidthSidebar] = useState(260)
 	const [dragSizeSidebar, setDragSizeSidebar] = useState({draggable: false, xMouseStart: 0, initPosX: 0})
@@ -71,9 +70,12 @@ function App() {
 
 	useEffect(() => {
 		if (!activeFile) return;
-		if (!tabs.includes(activeFile)) {
-			setTabs([...tabs, activeFile]);
-		}
+		// if (!tabs.includes(activeFile)) {
+		// 	setTabs([...tabs, activeFile]);
+		// }
+		if (!tabs.find(tabItem => tabItem.id === activeFile)) {
+			setTabs([...tabs, {id: activeFile, saved: true}]);
+		}		
 	}, [activeFile]);
 
 
@@ -115,7 +117,7 @@ function App() {
 					tabs={tabs}
 					setTabs={setTabs}
 				/>
-				<TextEditor tabs={tabs} activeFile={activeFile} />
+				<TextEditor tabs={tabs} setTabs={setTabs} filesList={fileList} setFileList={setFileList} activeFile={activeFile} />
 			</div>
 		</div>
 	);

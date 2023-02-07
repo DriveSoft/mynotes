@@ -1,13 +1,13 @@
 import React, { useRef } from "react";
-import { files } from "../types";
+import { files, tabs } from "../types";
 import "./EditorTabs.css";
 
 interface EditorTabsProps {
 	fileList: files[];
 	activeFile: string | undefined;
 	setActiveFile: (value: string | undefined) => void;
-	tabs: string[];
-	setTabs: (value: string[]) => void;
+	tabs: tabs[];
+	setTabs: (value: tabs[]) => void;
 }
 
 function EditorTabs({
@@ -26,7 +26,7 @@ function EditorTabs({
 		fileToClose: string
 	) => {
 		e.stopPropagation();
-		setTabs(tabs.filter((fileForClose) => fileForClose !== fileToClose));
+		setTabs(tabs.filter((fileForClose) => fileForClose.id !== fileToClose));
 		if (activeFile === fileToClose) setActiveFile(undefined);
 	};
 
@@ -59,12 +59,34 @@ function EditorTabs({
 	return (
 		<div className="editorTabs">
 			{tabs.map(
-				(fileId: string, index: number) =>
-					getFilename(fileList, fileId) && (
+				// (fileId: string, index: number) =>
+				// 	getFilename(fileList, fileId) && (
+				// 		<div
+				// 			key={fileId}
+				// 			className={ activeFile === fileId ? "tab activeTab" : "tab" }
+				// 			onClick={() => setActiveFile(fileId)}
+				// 			onDragStart={(e) => onDragStart(e, index)}
+				// 			onDragEnter={(e) => onDragEnter(e, index)}
+				// 			onDragOver={(e) => e.preventDefault()}
+				// 			onDragEnd={drop}
+				// 			draggable
+				// 		>
+				// 			<i className="tabIcon fa-regular fa-file-lines"></i>
+				// 			<p className="tabFilename">{getFilename(fileList, fileId)}</p>
+				// 			<p
+				// 				className="tabCloseButton"
+				// 				onClick={(e) => onCloseButton(e, fileId)}
+				// 			>
+				// 				⨉
+				// 			</p>
+				// 		</div>
+				// 	)
+				(fileTab: tabs, index: number) =>
+					getFilename(fileList, fileTab.id) && (
 						<div
-							key={fileId}
-							className={ activeFile === fileId ? "tab activeTab" : "tab" }
-							onClick={() => setActiveFile(fileId)}
+							key={fileTab.id}
+							className={ activeFile === fileTab.id ? "tab activeTab" : "tab" }
+							onClick={() => setActiveFile(fileTab.id)}
 							onDragStart={(e) => onDragStart(e, index)}
 							onDragEnter={(e) => onDragEnter(e, index)}
 							onDragOver={(e) => e.preventDefault()}
@@ -72,15 +94,15 @@ function EditorTabs({
 							draggable
 						>
 							<i className="tabIcon fa-regular fa-file-lines"></i>
-							<p className="tabFilename">{getFilename(fileList, fileId)}</p>
+							<p className="tabFilename">{getFilename(fileList, fileTab.id)}</p>
 							<p
 								className="tabCloseButton"
-								onClick={(e) => onCloseButton(e, fileId)}
+								onClick={(e) => onCloseButton(e, fileTab.id)}
 							>
-								⨉
+								<span>{fileTab.saved ? '⨉' : '⬤'}</span>	
 							</p>
 						</div>
-					)
+					)				
 			)}
 		</div>
 	);

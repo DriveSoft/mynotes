@@ -1,12 +1,11 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import ContexMenu from "../ContexMenu";
 import uuid from "react-uuid";
-import { sortFiles } from "../../utils"
+import { sortFiles, createFilenameAPI, updateFilenameAPI, deleteFilenameAPI } from "../../utils"
 import FileItem from "./FileItem";
 import "./Filesbar.css";
-
 import { files } from "../../types";
-import { URL_API } from "../../utils";
+
 
 interface FilesbarProps {
 	title?: string;
@@ -112,17 +111,18 @@ function Filesbar({
 		});
 	};
 
+
 	const onClickItem = async(fileId: string, itemId: string) => {
 		if (itemId === "NEW_FILE") {
 			setShowInputNewFile(true)
 		}
 				
 		if (itemId === "EDIT_FILE") {
-			const fileName = fileList.find((item) => item.id === fileId)?.content || '';
+			const fileName = fileList.find((item) => item.id === fileId)?.content || ''
 			setRenameFileName({fileId: fileId, newName: fileName })
 			setTimeout(() => {
 				//@ts-ignore
-				if (inputRenameRef) inputRenameRef?.current?.select();
+				if (inputRenameRef) inputRenameRef?.current?.select()
 			}, 0);
 		}
 
@@ -130,7 +130,7 @@ function Filesbar({
 			try {
 				if (await deleteFilenameAPI(fileId)) {
 					const newFileList = fileList.filter(item => item.id !== fileId)
-					setFileList(newFileList);
+					setFileList(newFileList)
 				} 
 			} catch(e) {
 				alert(e)
@@ -164,62 +164,7 @@ function Filesbar({
 	
 	};
 
-	async function createFilenameAPI(id: string, newFilename: string){
-		const response = await fetch(`${URL_API}`, {
-			method: 'POST', // *GET, POST, PUT, DELETE, etc.
-			mode: 'cors', // no-cors, *cors, same-origin
-			cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-			credentials: 'same-origin', // include, *same-origin, omit
-			headers: {
-			  'Content-Type': 'application/json'
-			},
-			redirect: 'follow', // manual, *follow, error
-			referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
-			body: JSON.stringify({id: id, fileName: newFilename, content: ''}) // body data type must match "Content-Type" header
-		})
-
-		if(!response.ok) throw new Error(response.status.toString())
 	
-		const data = await response.json()
-		return data?.fileName === newFilename
-	}
-
-	async function updateFilenameAPI(id: string, newFilename: string){
-		const response = await fetch(`${URL_API}/${id}`, {
-			method: 'PUT', // *GET, POST, PUT, DELETE, etc.
-			mode: 'cors', // no-cors, *cors, same-origin
-			cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-			credentials: 'same-origin', // include, *same-origin, omit
-			headers: {
-			  'Content-Type': 'application/json'
-			},
-			redirect: 'follow', // manual, *follow, error
-			referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
-			body: JSON.stringify({fileName: newFilename, content: ''}) // body data type must match "Content-Type" header
-		})
-
-		if(!response.ok) throw new Error(response.status.toString())
-	
-		const data = await response.json()
-		return data?.fileName === newFilename
-	}
-
-	async function deleteFilenameAPI(id: string){
-		const response = await fetch(`${URL_API}/${id}`, {
-			method: 'DELETE', 
-			mode: 'cors', // no-cors, *cors, same-origin
-			cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-			credentials: 'same-origin', // include, *same-origin, omit
-			headers: {
-			  'Content-Type': 'application/json'
-			},
-			redirect: 'follow', // manual, *follow, error
-			referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url			
-		})
-
-		if(!response.ok) throw new Error(response.status.toString())
-		return response.ok
-	}	
 
 	return (
 		<div

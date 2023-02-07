@@ -22,5 +22,10 @@ export interface sidebarButton {
 export interface files {
 	id: string;	
 	fileName: string;
-	content: string;
+	content: string;	
+}
+
+export interface tabs {
+	id: string;
+	saved: boolean;
 }

@@ -37,6 +37,15 @@
     border-radius: 5px;
     margin-right: 4px;
   }
+
   .tab .tabCloseButton:hover {
-    background-color: hsl(0, 0%, 24%); 
+    background-color: hsl(0, 0%, 24%);
+  }
+
+  .tab .tabCloseButton:hover span {
+    display: none;
+  }
+
+  .tab .tabCloseButton:hover::after {
+    content: '⨉';
   }

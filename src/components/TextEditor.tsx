@@ -1,19 +1,55 @@
-import React from "react"
-import './TextEditor.css'
+import React from "react";
+import { files, tabs } from "../types";
+import "./TextEditor.css";
 
 interface TextEditorProps {
-	tabs: string[];
+	tabs: tabs[];
+	setTabs: (value: tabs[]) => void;
+	filesList: files[];
+	setFileList: (value: files[]) => void;
 	activeFile: string | undefined;
 }
 
-function TextEditor( {tabs, activeFile}: TextEditorProps  ) {
+function TextEditor({ filesList, setFileList, tabs, setTabs, activeFile }: TextEditorProps) {
+	const getFileObject = (fileId: string) => {
+		return filesList.find(fileItem => fileItem.id === fileId)
+	}
+
+	const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>, fileId: string) => {		
+		const newFileList = filesList.map((file: files) => {
+			if(file.id === fileId) {
+				return {...file, content: e.target.value} 
+			} else {
+				return file
+			}
+		})
+
+		const newTabList = tabs.map((fileTab: tabs) => {
+			if(fileTab.id === fileId) {
+				return {...fileTab, saved: false} 
+			} else {
+				return fileTab
+			}
+		})		
+
+		setTabs(newTabList)
+		setFileList(newFileList)
+	}
+
 	return (
-		<div className="mainEditor">			
-			{
-				tabs.map((tabFile) => (
-					<textarea key={tabFile} name="note" style={{display: (tabFile === activeFile ? "block" : "none" ) }}></textarea>
-				))
-			}			
+		<div className="mainEditor">
+			{tabs.map((tabFile) => (
+				<textarea
+					key={tabFile.id}
+					name="note"
+					style={{
+						display: tabFile.id === activeFile ? "block" : "none",
+					}}
+					value={getFileObject(tabFile.id)?.content}
+					onChange={e => onChange(e, tabFile.id)}
+
+				></textarea>
+			))}
 		</div>
 	);
 }
