@@ -15,10 +15,6 @@ export interface sidebarButton {
 	icon: string;
 }
 
-// export interface files {
-// 	[key: string]: string;	
-// }
-
 export interface files {
 	id: string;	
 	fileName: string;

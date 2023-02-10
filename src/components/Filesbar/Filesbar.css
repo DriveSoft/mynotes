@@ -7,9 +7,13 @@
     height: 100%;
   }
   
-  .filesbar span {
+  .filesbar>span {
     color: hsl(0, 0%, 86%);
     padding: 14px 14px;
+  }
+
+  .filesbar .error {
+    color: hsl(0, 0%, 86%);    
   }
   
   .filesTitle {

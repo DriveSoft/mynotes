@@ -1,34 +1,68 @@
-import React, { useRef } from "react";
+import React, { useRef, useState, useContext } from "react";
+import { AppContext, AppContextType } from "../Context";
+import ModalDialog from "./ModalDialog";
 import { files, tabs } from "../types";
 import "./EditorTabs.css";
 
-interface EditorTabsProps {
-	fileList: files[];
-	activeFile: string | undefined;
-	setActiveFile: (value: string | undefined) => void;
-	tabs: tabs[];
-	setTabs: (value: tabs[]) => void;
-}
 
-function EditorTabs({
-	fileList,
-	activeFile,
-	setActiveFile,
-	tabs,
-	setTabs,
-}: EditorTabsProps) {
+function EditorTabs(){
+
+	const { 
+		fileList, 
+		
+		tabs,
+		setTabs,
+
+		activeFile,
+		setActiveFile,
+		
+		updateFile, 
+	} = useContext(AppContext) as AppContextType;
+
+
+	const [showDlgSaveFile, setShowDlgSaveFile] = useState(false)
+	const [showDlgSaveFileParams, setShowDlgSaveFileParams] = useState({fileId: '', fileName: ''})
 
 	const dragTab = useRef<number | null>(null);
 	const dragOverTab = useRef<number | null>(null);
 
-	const onCloseButton = (
-		e: React.MouseEvent<HTMLElement>,
-		fileToClose: string
-	) => {
+	const closeTab = (fileId: string) => {
+		setTabs(tabs.filter((fileForClose) => fileForClose.id !== fileId));
+		if (activeFile === fileId) setActiveFile(undefined);		
+	}
+
+	const onCloseButton = async (e: React.MouseEvent<HTMLElement>, fileToClose: string) => {
 		e.stopPropagation();
-		setTabs(tabs.filter((fileForClose) => fileForClose.id !== fileToClose));
-		if (activeFile === fileToClose) setActiveFile(undefined);
+
+		const objTab = tabs.find((tab) => tab.id === fileToClose)
+
+		if(objTab) {
+			if(!objTab.saved) {
+				setShowDlgSaveFileParams({fileId: fileToClose, fileName: getFilename(fileToClose) || ''})
+				setShowDlgSaveFile(true)
+			} else {
+				closeTab(fileToClose)
+			}
+		}
 	};
+
+	const onButtonClickModalDlgSaveFile = async (idButton: string) => {
+		if(idButton === 'SAVE') {
+			const objFile = fileList.find(file => file.id === showDlgSaveFileParams.fileId)
+			try{					
+				if(objFile) {
+					await updateFile(objFile)
+					closeTab(showDlgSaveFileParams.fileId)
+				}	
+			} catch(e) {
+				alert(e)
+			}
+		}
+
+		if(idButton === 'DONTSAVE') {
+			closeTab(showDlgSaveFileParams.fileId)
+		}
+	}	
 
 	const onDragStart = (e: React.DragEvent<HTMLDivElement>, position: number) => {
 		dragTab.current = position
@@ -52,15 +86,15 @@ function EditorTabs({
 		}
 	};	
 
-	const getFilename = (files: files[], id: string) => {
-		return files.find((item) => item.id === id)?.fileName || undefined;
+	function getFilename(id: string) {
+		return fileList.find((item) => item.id === id)?.fileName || undefined;
 	}
 
 	return (
 		<div className="editorTabs">
 			{tabs.map(
 				(fileTab: tabs, index: number) =>
-					getFilename(fileList, fileTab.id) && (
+					getFilename(fileTab.id) && (
 						<div
 							key={fileTab.id}
 							className={ activeFile === fileTab.id ? "tab activeTab" : "tab" }
@@ -72,7 +106,7 @@ function EditorTabs({
 							draggable
 						>
 							<i className="tabIcon fa-regular fa-file-lines"></i>
-							<p className="tabFilename">{getFilename(fileList, fileTab.id)}</p>
+							<p className="tabFilename">{getFilename(fileTab.id)}</p>
 							<p
 								className="tabCloseButton"
 								onClick={(e) => onCloseButton(e, fileTab.id)}
@@ -82,6 +116,22 @@ function EditorTabs({
 						</div>
 					)				
 			)}
+
+
+			<ModalDialog
+				title="Confirm"
+				message={`Do you want to save the changes you made to '${showDlgSaveFileParams.fileName}'?`}
+				faIcon="fa-regular fa-circle-question"
+				buttons={[
+					{ idButton: "SAVE", caption: "Save" },
+					{ idButton: "DONTSAVE", caption: "Don't save" },
+					{ idButton: "CANCEL", caption: "Cancel" },
+				]}
+				onButtonClick={onButtonClickModalDlgSaveFile}
+				show={showDlgSaveFile}
+				setShow={setShowDlgSaveFile}					
+			/>
+
 		</div>
 	);
 }

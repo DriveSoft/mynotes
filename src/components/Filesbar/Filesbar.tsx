@@ -1,30 +1,31 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useContext } from "react";
+import { AppContext, AppContextType } from "../../Context";
 import ContexMenu from "../ContexMenu";
-import uuid from "react-uuid";
-import { sortFiles, createFilenameAPI, updateFilenameAPI, deleteFilenameAPI } from "../../utils"
+import ModalDialog from "../ModalDialog";
 import FileItem from "./FileItem";
 import "./Filesbar.css";
-import { files } from "../../types";
 
 
 interface FilesbarProps {
 	title?: string;
-	fileList: files[];
-	setFileList: (value: files[]) => void;
-	activeFile?: string;
-	setActiveFile: (value: string) => void;
 }
 
-function Filesbar({
-	title,
-	fileList,
-	setFileList,
-	activeFile,
-	setActiveFile,
-	
-}: FilesbarProps) {
-	const [focused, setFocused] = useState(false);
-	const [showInputNewFile, setShowInputNewFile] = useState(false);
+function Filesbar({title}: FilesbarProps) {
+
+	const { 
+		fileList, 
+		setFileList, 
+
+		activeFile,
+		setActiveFile,
+		
+		createFile, 
+		updateFile, 
+		deleteFile 
+	} = useContext(AppContext) as AppContextType;
+
+	const [focused, setFocused] = useState(false)
+	const [showInputNewFile, setShowInputNewFile] = useState(false)
 	const [renameFileName, setRenameFileName] = useState({
 		fileId: "",
 		newName: "",
@@ -35,14 +36,17 @@ function Filesbar({
 		left: 0,
 		top: 0,
 		width: 0,
-	});
+	})
 
 	const [showMenu, setShowMenu] = useState({
 		show: false,
 		x: 0,
 		y: 0,
 		fileId: "",
-	});
+	})
+
+	const [showDialogConfirmDelete, setShowDialogConfirmDelete] = useState(false)
+	const [showDialogConfirmDeleteParams, setShowDialogConfirmDeleteParams] = useState({fileName: '', fileId: ''})
 
 	const inputRenameRef = useRef(null);
 
@@ -58,27 +62,19 @@ function Filesbar({
 		setError({ error: '', left: 0, top: 0, width: 0 });	
 		inputEl.current.style.outline = "";
 		
-		if (success) {						
-			try {
-				let content = ''
-				const newFileList = sortFiles(fileList.map(item => {
-					if (item.id === fileId) {
-						content = item.content
-						return {...item, fileName: newFilename}
-					} else {
-						return item
-					}
-				}))
-
-				if(await updateFilenameAPI(fileId, newFilename, content)) {
+		if (success) {		
+			const objFile = fileList.find(file => file.id === fileId)
+			if(objFile) {
+				try {
+					await updateFile({...objFile, fileName: newFilename})								
 					setRenameFileName({ fileId: "", newName: "" });
-					setFileList(newFileList)
-				}	
-			} catch(e) {
-				alert(e)
-				setRenameFileName({ fileId: "", newName: "" });
-				console.log('onFileRenamed error', e)
+				} catch(e) {					
+					alert(e)
+				}
+				
 			}
+		} else {
+			setRenameFileName({ fileId: "", newName: "" });
 		}
 	};
 
@@ -87,18 +83,15 @@ function Filesbar({
 		inputEl.current.style.outline = "1px solid #252525";
 
 		if (success) {
-			const newId = uuid()	
 			try {
-			if(await createFilenameAPI(newId, filename)) {
-				setFileList(sortFiles([...fileList, {id: newId, fileName: filename, content: ''}]))
-				setActiveFile(newId)
-			}
+				await createFile(filename)
+				setShowInputNewFile(false)
 			} catch(e) {
 				alert(e)
 			}
-
-		}		
-		setShowInputNewFile(false)
+		} else {
+			setShowInputNewFile(false)
+		}				
 	}
 
 	const onContextMenu = (
@@ -130,17 +123,27 @@ function Filesbar({
 			}, 0);
 		}
 
-		if (itemId === "DELETE_FILE") {
+		if (itemId === "DELETE_FILE") {			
+			const fileObj = fileList.find(item => item.id === fileId)
+			setShowDialogConfirmDeleteParams({fileId: fileId, fileName: fileObj?.fileName || ''})
+			setShowDialogConfirmDelete(true)
+		}
+	};
+
+
+	const onButtonClickModalDlgConfirmDelete = async(idButton: string) => {
+		if(idButton === 'DELETE') {
 			try {
-				if (await deleteFilenameAPI(fileId)) {
-					const newFileList = fileList.filter(item => item.id !== fileId)
+				if (await deleteFile(showDialogConfirmDeleteParams.fileId)) {
+					const newFileList = fileList.filter(item => item.id !== showDialogConfirmDeleteParams.fileId)
 					setFileList(newFileList)
 				} 
 			} catch(e) {
 				alert(e)
-			}
+		   }			
 		}
-	};
+	}
+
 
 	const onChangeValidator = (
 		fileId: string,
@@ -249,6 +252,7 @@ function Filesbar({
 
 			{error.error && (
 				<div
+					className='error'
 					style={{
 						position: "fixed",
 						left: error.left,
@@ -263,6 +267,24 @@ function Filesbar({
 					<span>{error.error}</span>
 				</div>
 			)}
+
+		
+			<ModalDialog
+				title="Confirm"
+				message={`Are you sure you want to delete '${showDialogConfirmDeleteParams.fileName}'?`}
+				faIcon="fa-regular fa-circle-question"
+				buttons={[
+					{ idButton: "DELETE", caption: "Delete" },					
+					{ idButton: "CANCEL", caption: "Cancel" },
+				]}
+				onButtonClick={onButtonClickModalDlgConfirmDelete}
+				show={showDialogConfirmDelete}
+				setShow={setShowDialogConfirmDelete}					
+			/>
+		
+
+
+
 		</div>
 	);
 }
