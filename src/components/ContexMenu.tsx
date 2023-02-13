@@ -2,8 +2,8 @@ import React, { useEffect } from "react";
 import "./ContexMenu.css";
 
 interface ContexMenuProps {
-	showMenu: { show: boolean; x: number; y: number; fileId: string };
-	onClickItem: (fileId: string, itemId: string) => void;
+	showMenu: { show: boolean; x: number; y: number; fileId: number };
+	onClickItem: (fileId: number, itemId: string) => void;
 	setShowMenu: any;
 }
 
@@ -50,8 +50,8 @@ const ContexMenu = ({
 				{menuData.map((item) => (
 					<li
 						key={item.id}
-                        className={item.fileReq && showMenu.fileId === '' ? "menuItem menuItemDisabled" : "menuItem" }  						
-						onClick={() => !(item.fileReq && showMenu.fileId === '') && onClickItem(showMenu.fileId, item.id)}
+                        className={item.fileReq && showMenu.fileId === 0 ? "menuItem menuItemDisabled" : "menuItem" }  						
+						onClick={() => !(item.fileReq && showMenu.fileId === 0) && onClickItem(showMenu.fileId, item.id)}
 					>
 						{item.title}                        
 					</li>

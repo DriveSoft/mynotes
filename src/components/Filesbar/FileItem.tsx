@@ -1,18 +1,19 @@
+//https://codesandbox.io/s/upbeat-gould-st8dib?file=/src/App.tsx
 import React, { useState, useEffect, useRef } from "react";
 
 interface FileItemProps {
-	fileId: string;
+	fileId: number;
 	fileName: string;
 	//editable?: boolean;
 	selected: boolean;
 	focused?: boolean;
     //isNewFile?: boolean;
     mode?: 'NEW_FILE' | 'RENAME_FILE';
-	onClick?: (fileId: string) => void;
-	onMenu: (e: React.MouseEvent<HTMLDivElement>, fileId: string) => void;
+	onClick?: (fileId: number) => void;
+	onMenu: (e: React.MouseEvent<HTMLDivElement>, fileId: number) => void;
     onFileCreated?: (success: boolean, filename: string, inputEl: any) => void;
-    onFileRenamed?: (fileId: string, success: boolean, newFilename: string, inputEl: any) => void;
-	onChangeValidator: (fileId: string, fileName: string, inputEl: any) => boolean;
+    onFileRenamed?: (fileId: number, success: boolean, newFilename: string, inputEl: any) => void;
+	onChangeValidator: (fileId: number, fileName: string, inputEl: any) => boolean;
 }
 
 function FileItem({

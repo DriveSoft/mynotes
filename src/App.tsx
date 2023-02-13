@@ -1,15 +1,14 @@
-import React, { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext } from "react";
 import Sidebar from "./components/Sidebar";
 import Filesbar from "./components/Filesbar/Filesbar";
 import Searchbar from "./components/Searchbar";
 import Profilebar from "./components/Profilebar";
 import EditorTabs from "./components/EditorTabs";
 import TextEditor from "./components/TextEditor";
-import ModalDialog from "./components/ModalDialog";
-import { files, tabs, ButtonId } from "./types";
+import { ButtonId } from "./types";
 import { sortFiles, updateFilenameAPI, URL_API } from "./utils";
-
 import { AppContext, AppContextType } from './Context';
+import { files } from "./types";
 
 
 // const defaultFiles: files[] = [
@@ -35,16 +34,13 @@ function App() {
 	const { 
 		fileList, 
 		setFileList, 
-
 		activeFile, 
-		setActiveFile,
-
 		tabs,
 		setTabs
-
 	} = useContext(AppContext) as AppContextType;
 
 	const [activeSidebarButton, setActiveSidebarButton] = useState<ButtonId>("FILES");
+
 	const [widthSidebar, setWidthSidebar] = useState(260);
 	const [dragSizeSidebar, setDragSizeSidebar] = useState({
 		draggable: false,
@@ -52,16 +48,28 @@ function App() {
 		initPosX: 0,
 	});
 
-	const [showDlgSaveFile, setShowDlgSaveFile] = useState(true)
-
 	useEffect(() => {
+		const createDataTree = (data: files[]): any => {
+			const hashTable = Object.create(null);
+			data.forEach(file => hashTable[file.id] = {...file, childNodes: []});
+			const dataTree: any = [];
+
+			data.forEach(file => {
+			  if(file.parentId > 0 && hashTable[file.parentId]) hashTable[file.parentId].childNodes.push(hashTable[file.id])
+			  else dataTree.push(hashTable[file.id])
+			});
+			return dataTree;
+		  };
+
 		const fetchData = async () => {
 			const response = await fetch(URL_API);
 			const data = await response.json();
 			setFileList(sortFiles(data));
+			console.log(createDataTree(data))
 		};
 
 		fetchData();
+		console.log('fetch')
 	}, []);
 
 	useEffect(() => {
@@ -111,34 +119,31 @@ function App() {
 		}
 	}, [activeFile]);
 
-	const fileIdToObject = (fileId: string) => {
+	const fileIdToObject = (fileId: number) => {
 		return fileList.find((file) => file.id === fileId);
 	};
 
-	const savedStatusOfFile = (idFile: string, saved: boolean) => {
+	const savedStatusOfFile = (idFile: number, saved: boolean) => {
 		const newTabs = tabs.map((tab) =>
 			tab.id === idFile ? { ...tab, saved: true } : tab
 		);
 		setTabs(newTabs);
 	}
 
-	const saveFile = async (idFile: string) => {
+	const saveFile = async (idFile: number) => {
 		const fileObj = fileIdToObject(idFile);
 		if (fileObj) {
 			if (await updateFilenameAPI(
 					fileObj.id,
 					fileObj.fileName,
-					fileObj.content
+					fileObj.content,
+					fileObj.parentId
 				)
 			) {
 				savedStatusOfFile(idFile, true)
 			}
 		}
 	};
-
-	const onButtonClickModalDlgSaveFile = (idButton: string) => {
-		console.log(idButton)
-	}
 
 	return (
 		<>
@@ -150,13 +155,7 @@ function App() {
 
 				<div className="sidebar2" style={{ width: widthSidebar }}>
 					{activeSidebarButton === "FILES" && (
-						<Filesbar
-							title="Dmitriy's notes"
-							//fileList={fileList}
-							//setFileList={setFileList}
-							//activeFile={activeFile}
-							//setActiveFile={setActiveFile}
-						/>
+						<Filesbar title="Dmitriy's notes"/>
 					)}
 
 					{activeSidebarButton === "SEARCH" && <Searchbar />}
@@ -186,20 +185,6 @@ function App() {
 						activeFile={activeFile}
 					/>
 				</div>
-
-				{/* <ModalDialog
-					title="Confirm"
-					message="Do you want to save the changes you made?"
-					faIcon="fa-regular fa-circle-question"
-					buttons={[
-						{ idButton: "SAVE", caption: "Save" },
-						{ idButton: "DONTSAVE", caption: "Don't save" },
-						{ idButton: "CANCEL", caption: "Cancel" },
-					]}
-					onButtonClick={onButtonClickModalDlgSaveFile}
-					show={showDlgSaveFile}
-					setShow={setShowDlgSaveFile}					
-				/> */}
 			</div>
 		</>
 	);

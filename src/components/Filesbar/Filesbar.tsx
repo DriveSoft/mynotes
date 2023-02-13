@@ -27,7 +27,7 @@ function Filesbar({title}: FilesbarProps) {
 	const [focused, setFocused] = useState(false)
 	const [showInputNewFile, setShowInputNewFile] = useState(false)
 	const [renameFileName, setRenameFileName] = useState({
-		fileId: "",
+		fileId: 0,
 		newName: "",
 	});
 
@@ -42,11 +42,11 @@ function Filesbar({title}: FilesbarProps) {
 		show: false,
 		x: 0,
 		y: 0,
-		fileId: "",
+		fileId: 0,
 	})
 
 	const [showDialogConfirmDelete, setShowDialogConfirmDelete] = useState(false)
-	const [showDialogConfirmDeleteParams, setShowDialogConfirmDeleteParams] = useState({fileName: '', fileId: ''})
+	const [showDialogConfirmDeleteParams, setShowDialogConfirmDeleteParams] = useState({fileName: '', fileId: 0})
 
 	const inputRenameRef = useRef(null);
 
@@ -54,7 +54,7 @@ function Filesbar({title}: FilesbarProps) {
 		`A file or folder ${fileName} already exists at this location. Please choose a different name.`;
 
 	const onFileRenamed = async(
-		fileId: string,
+		fileId: number,
 		success: boolean,
 		newFilename: string,
 		inputEl: any
@@ -66,15 +66,15 @@ function Filesbar({title}: FilesbarProps) {
 			const objFile = fileList.find(file => file.id === fileId)
 			if(objFile) {
 				try {
-					await updateFile({...objFile, fileName: newFilename})								
-					setRenameFileName({ fileId: "", newName: "" });
+					await updateFile({...objFile, fileName: newFilename, parentId: 0})								
+					setRenameFileName({ fileId: 0, newName: "" });
 				} catch(e) {					
 					alert(e)
 				}
 				
 			}
 		} else {
-			setRenameFileName({ fileId: "", newName: "" });
+			setRenameFileName({ fileId: 0, newName: "" });
 		}
 	};
 
@@ -96,11 +96,10 @@ function Filesbar({title}: FilesbarProps) {
 
 	const onContextMenu = (
 		e: React.MouseEvent<HTMLDivElement>,
-		fileId: string
+		fileId: number
 	) => {
 		e.preventDefault();
 		setShowMenu({
-			...showMenu,
 			show: true,
 			x: e.pageX,
 			y: e.pageY,
@@ -109,7 +108,7 @@ function Filesbar({title}: FilesbarProps) {
 	};
 
 
-	const onClickItem = async(fileId: string, itemId: string) => {
+	const onClickItem = async(fileId: number, itemId: string) => {
 		if (itemId === "NEW_FILE") {
 			setShowInputNewFile(true)
 		}
@@ -146,7 +145,7 @@ function Filesbar({title}: FilesbarProps) {
 
 
 	const onChangeValidator = (
-		fileId: string,
+		fileId: number,
 		fileName: string,
 		inputEl: any
 	): boolean => {
@@ -160,7 +159,8 @@ function Filesbar({title}: FilesbarProps) {
 				error: errorFileExists(fileName),
 				left: elRect.left-1,
 				top: elRect.bottom - 1,
-				width: elRect.right - elRect.left + 2,
+				//width: elRect.right - elRect.left + 2,
+				width: inputEl?.current?.offsetWidth+2 ?? 0
 			});
 		} else {
 			inputEl.current.style.outline = "";
@@ -181,7 +181,7 @@ function Filesbar({title}: FilesbarProps) {
 			onBlur={() => {
 				setFocused(false);
 			}}
-			onContextMenu={(e) => onContextMenu(e, "")}
+			onContextMenu={(e) => onContextMenu(e, 0)}
 		>
 			<span>EXPLORER</span>
 			<div className="files">
@@ -197,7 +197,7 @@ function Filesbar({title}: FilesbarProps) {
 
 					{ showInputNewFile && 
 						<FileItem
-							fileId={''}
+							fileId={0}
 							fileName={''}
 							selected={false}
 							focused={focused}		
@@ -217,7 +217,7 @@ function Filesbar({title}: FilesbarProps) {
 							selected={activeFile === item.id}
 							focused={focused}
 							mode={renameFileName.fileId === item.id ? 'RENAME_FILE' : undefined}
-							onClick={(fileId: string) => setActiveFile(fileId)}
+							onClick={(fileId: number) => setActiveFile(fileId)}
 							onMenu={(e, fileId) => onContextMenu(e, fileId)}
 							onFileRenamed={onFileRenamed}
 							onChangeValidator={onChangeValidator}
@@ -226,7 +226,7 @@ function Filesbar({title}: FilesbarProps) {
 					))}
 
 
-					{(renameFileName.fileId !== "" || showInputNewFile) && (
+					{(renameFileName.fileId !== 0 || showInputNewFile) && (
 						<div
 							style={{
 								position: "absolute",

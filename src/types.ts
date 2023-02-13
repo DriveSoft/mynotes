@@ -16,12 +16,13 @@ export interface sidebarButton {
 }
 
 export interface files {
-	id: string;	
+	id: number;	
 	fileName: string;
 	content: string;	
+	parentId: number;
 }
 
 export interface tabs {
-	id: string;
+	id: number;
 	saved: boolean;
 }

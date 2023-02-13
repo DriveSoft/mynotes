@@ -21,17 +21,17 @@ function EditorTabs(){
 
 
 	const [showDlgSaveFile, setShowDlgSaveFile] = useState(false)
-	const [showDlgSaveFileParams, setShowDlgSaveFileParams] = useState({fileId: '', fileName: ''})
+	const [showDlgSaveFileParams, setShowDlgSaveFileParams] = useState({fileId: 0, fileName: ''})
 
 	const dragTab = useRef<number | null>(null);
 	const dragOverTab = useRef<number | null>(null);
 
-	const closeTab = (fileId: string) => {
+	const closeTab = (fileId: number) => {
 		setTabs(tabs.filter((fileForClose) => fileForClose.id !== fileId));
 		if (activeFile === fileId) setActiveFile(undefined);		
 	}
 
-	const onCloseButton = async (e: React.MouseEvent<HTMLElement>, fileToClose: string) => {
+	const onCloseButton = async (e: React.MouseEvent<HTMLElement>, fileToClose: number) => {
 		e.stopPropagation();
 
 		const objTab = tabs.find((tab) => tab.id === fileToClose)
@@ -86,7 +86,7 @@ function EditorTabs(){
 		}
 	};	
 
-	function getFilename(id: string) {
+	function getFilename(id: number) {
 		return fileList.find((item) => item.id === id)?.fileName || undefined;
 	}
 

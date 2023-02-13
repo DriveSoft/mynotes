@@ -7,15 +7,15 @@ interface TextEditorProps {
 	setTabs: (value: tabs[]) => void;
 	filesList: files[];
 	setFileList: (value: files[]) => void;
-	activeFile: string | undefined;
+	activeFile: number | undefined;
 }
 
 function TextEditor({ filesList, setFileList, tabs, setTabs, activeFile }: TextEditorProps) {
-	const getFileObject = (fileId: string) => {
+	const getFileObject = (fileId: number) => {
 		return filesList.find(fileItem => fileItem.id === fileId)
 	}
 
-	const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>, fileId: string) => {		
+	const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>, fileId: number) => {		
 		const newFileList = filesList.map((file: files) => {
 			if(file.id === fileId) {
 				return {...file, content: e.target.value} 

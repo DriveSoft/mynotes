@@ -14,15 +14,15 @@ export type AppContextType = {
 	fileList: files[];
 	setFileList: (value: files[]) => void;
 
-	activeFile: string | undefined;
-	setActiveFile: (value: string | undefined) => void;
+	activeFile: number | undefined;
+	setActiveFile: (value: number | undefined) => void;
 
 	tabs: tabs[];
 	setTabs: (value: tabs[]) => void;
 
 	createFile: (fileName: string) => Promise<boolean>;
 	updateFile: (file: files) => Promise<boolean>;
-	deleteFile: (fileId: string) => Promise<boolean>;
+	deleteFile: (fileId: number) => Promise<boolean>;
 };
 
 interface AppProviderProps {
@@ -32,7 +32,7 @@ interface AppProviderProps {
 const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 
 	const [fileList, setFileList] = useState<files[]>([]);
-	const [activeFile, setActiveFile] = useState<string | undefined>(undefined);
+	const [activeFile, setActiveFile] = useState<number | undefined>(undefined);
 	const [tabs, setTabs] = useState<tabs[]>([]);
 
 	const value = { 
@@ -52,12 +52,12 @@ const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 
 	function createFile (fileName: string): Promise<boolean> {
 		return new Promise( async(resolve, reject) => {
-			const newId = uuid()
-			if (await createFilenameAPI(newId, fileName)) {
+			const newId = getNewId(fileList)//uuid()
+			if (await createFilenameAPI(newId, fileName, 0)) {
 				setFileList(
 					sortFiles([
 						...fileList,
-						{ id: newId, fileName: fileName, content: "" },
+						{ id: newId, fileName: fileName, content: "", parentId: 0 },
 					])
 				);
 				setActiveFile(newId);				
@@ -79,7 +79,7 @@ const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 				})
 			);
 
-			const result = await updateFilenameAPI(updatedfile.id, updatedfile.fileName, updatedfile.content)
+			const result = await updateFilenameAPI(updatedfile.id, updatedfile.fileName, updatedfile.content, updatedfile.parentId)
 			if (result) {				
 				setFileList(newFileList);	
 				resolve(true)			
@@ -89,7 +89,7 @@ const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 		})
 	};
 
-	async function deleteFile (fileId: string): Promise<boolean> {//: Promise<boolean>
+	async function deleteFile (fileId: number): Promise<boolean> {//: Promise<boolean>
 
 		if (await deleteFilenameAPI(fileId)) {
 			const newFileList = fileList.filter(item => item.id !== fileId)
@@ -99,6 +99,10 @@ const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 		
 		return false
 	};	
+
+	function getNewId(files: files[]): number {
+		return files.reduce((acc, item) => item.id > acc ? item.id : acc, 0 )
+	}
 
 	return (
 		<AppContext.Provider value={value}>			
