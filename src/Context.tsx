@@ -1,5 +1,4 @@
 import React, { useState, createContext } from "react";
-import uuid from "react-uuid";
 import {
 	sortFiles,
 	createFilenameAPI,
@@ -22,10 +21,9 @@ export type AppContextType = {
 	tabs: tabs[];
 	setTabs: (value: tabs[]) => void;
 
-	createFile: (fileName: string) => Promise<boolean>;
-	//updateFile: (file: files) => Promise<boolean>;
+	//createFile: (fileName: string) => Promise<boolean>;
+	createFile: (fileName: string) => void
 	deleteFile: (fileId: number) => Promise<boolean>;
-
 	saveFileContent: (idFile: number, content: string) => Promise<any>
 	renameFilename: (idFile: number, newFilename: string) => Promise<any>
 };
@@ -51,57 +49,42 @@ const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 		setTabs,
 
 		createFile, 
-		//updateFile,
 		deleteFile,
-
 		saveFileContent,
 		renameFilename
 	}
 
-	function createFile (fileName: string): Promise<boolean> {
-		return new Promise( async(resolve, reject) => {
-			const newId = getNewId(fileList)//uuid()
-			if (await createFilenameAPI(newId, fileName, 0)) {
+	// function createFile (fileName: string): Promise<boolean> {
+	// 	return new Promise( async(resolve, reject) => {
+	// 		const newId = getNewId(fileList)
+
+	// 		if (await createFilenameAPI({id: newId, fileName: fileName, content: '', parentId: 0})) {
+	// 			setFileList(
+	// 				sortFiles([
+	// 					...fileList,
+	// 					{ id: newId, fileName: fileName, content: "", parentId: 0, childNodes:[], isOpened: false },
+	// 				])
+	// 			);
+	// 			setActiveFile(newId);				
+	// 			resolve(true)				
+	// 		}	
+	// 		reject('Error createFile')		
+	// 	})
+	// };
+
+	async function createFile (fileName: string) {
+			const newId = getNewId(fileList)
+
+			if (await createFilenameAPI({id: newId, fileName: fileName, content: '', parentId: 0})) {
 				setFileList(
 					sortFiles([
 						...fileList,
 						{ id: newId, fileName: fileName, content: "", parentId: 0, childNodes:[], isOpened: false },
 					])
 				);
-				setActiveFile(newId);				
-				resolve(true)				
+				setActiveFile(newId)							
 			}	
-			reject('Error createFile')		
-		})
 	};
-
-	// function updateFile(updatedfile: files): Promise<boolean> {
-	// 	return new Promise(async(resolve, reject) => {
-	// 		const newFileList = sortFiles(
-	// 			fileList.map((item) => {
-	// 				if (item.id === updatedfile.id) {
-	// 					return updatedfile;
-	// 				} else {
-	// 					return item;
-	// 				}
-	// 			})
-	// 		);
-
-	// 		const result = await updateFilenameAPI(
-	// 			updatedfile.id,
-	// 			updatedfile.fileName,
-	// 			updatedfile.content,
-	// 			updatedfile.parentId,
-	// 			updatedfile?.childNodes ? "FOLDER" : "FILE"
-	// 		);
-	// 		if (result) {				
-	// 			setFileList(newFileList);	
-	// 			resolve(true)			
-	// 		}
-			
-	// 		reject('updateFile error')
-	// 	})
-	// };
 
 	async function deleteFile (fileId: number): Promise<boolean> {//: Promise<boolean>
 
