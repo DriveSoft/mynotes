@@ -3,6 +3,7 @@ import { AppContext, AppContextType } from "../../Context";
 import ContexMenu from "../ContexMenu";
 import ModalDialog from "../ModalDialog";
 import FileItem from "./FileItem";
+import { files, fileType } from "../../types";
 import "./Filesbar.css";
 
 
@@ -20,8 +21,9 @@ function Filesbar({title}: FilesbarProps) {
 		setActiveFile,
 		
 		createFile, 
-		updateFile, 
-		deleteFile 
+		renameFilename,
+		deleteFile
+			
 	} = useContext(AppContext) as AppContextType;
 
 	const [focused, setFocused] = useState(false)
@@ -58,21 +60,19 @@ function Filesbar({title}: FilesbarProps) {
 		success: boolean,
 		newFilename: string,
 		inputEl: any
-	) => {
+	) => {		
 		setError({ error: '', left: 0, top: 0, width: 0 });	
 		inputEl.current.style.outline = "";
 		
-		if (success) {		
-			const objFile = fileList.find(file => file.id === fileId)
-			if(objFile) {
-				try {
-					await updateFile({...objFile, fileName: newFilename, parentId: 0})								
-					setRenameFileName({ fileId: 0, newName: "" });
-				} catch(e) {					
-					alert(e)
-				}
-				
+		if (success) {					
+			try {
+				//await updateFile({...objFile, fileName: newFilename, parentId: 0})								
+				await renameFilename(fileId, newFilename)
+				setRenameFileName({ fileId: 0, newName: "" })
+			} catch(e) {					
+				alert(e)
 			}
+					
 		} else {
 			setRenameFileName({ fileId: 0, newName: "" });
 		}
@@ -167,10 +167,60 @@ function Filesbar({title}: FilesbarProps) {
 			setError({ error: '', left: 0, top: 0, width: 0 });			
 		}
 
-		return result;		
-	
+		return result;			
 	};
 
+
+	const onClickFileItem = (fileId: number) => {
+		setActiveFile(fileId)	
+		console.log(fileId)
+	}
+
+	const renderFiles = (file: files, level: number) => {
+
+		if(file?.childNodes) {
+			return (
+				<FileItem
+					fileObj={file}
+					fileId={file.id}
+					fileName={file.fileName}
+					fileType={'FOLDER'}
+					selected={activeFile === file.id}
+					focused={focused}
+					mode={renameFileName.fileId === file.id ? 'RENAME_FILE' : undefined}
+					onClick={onClickFileItem}
+					onMenu={(e, fileId) => onContextMenu(e, fileId)}
+					onFileRenamed={onFileRenamed}
+					onChangeValidator={onChangeValidator}
+					key={file.id}
+					level={level}					
+				>	
+					{						
+						file.childNodes.map((file: any) => renderFiles(file, level+1))
+					}
+				</FileItem>	
+			)
+		}
+
+
+		return (
+			<FileItem
+				fileObj={file}
+				fileId={file.id}
+				fileName={file.fileName}
+				fileType={'FILE'}
+				selected={activeFile === file.id}
+				focused={focused}
+				mode={renameFileName.fileId === file.id ? 'RENAME_FILE' : undefined}
+				onClick={onClickFileItem}
+				onMenu={(e, fileId) => onContextMenu(e, fileId)}
+				onFileRenamed={onFileRenamed}
+				onChangeValidator={onChangeValidator}
+				key={file.id}
+				level={level}
+			/>			
+		)
+	}
 	
 
 	return (
@@ -197,8 +247,10 @@ function Filesbar({title}: FilesbarProps) {
 
 					{ showInputNewFile && 
 						<FileItem
+							fileObj={{id: 0, fileName: '', content: '', parentId: 0}}	
 							fileId={0}
 							fileName={''}
+							fileType='FILE'
 							selected={false}
 							focused={focused}		
 							//isNewFile={true}	
@@ -207,23 +259,12 @@ function Filesbar({title}: FilesbarProps) {
 							onFileCreated={onFileCreated}
 							onChangeValidator={onChangeValidator}
 							key={'newFile'}
+							level={0}
 					/>
 					}
 
-					{fileList.map((item) => (
-						<FileItem
-							fileId={item.id}
-							fileName={item.fileName}
-							selected={activeFile === item.id}
-							focused={focused}
-							mode={renameFileName.fileId === item.id ? 'RENAME_FILE' : undefined}
-							onClick={(fileId: number) => setActiveFile(fileId)}
-							onMenu={(e, fileId) => onContextMenu(e, fileId)}
-							onFileRenamed={onFileRenamed}
-							onChangeValidator={onChangeValidator}
-							key={item.id}
-						/>
-					))}
+
+					{fileList.map((file: any) => renderFiles(file, 0))}
 
 
 					{(renameFileName.fileId !== 0 || showInputNewFile) && (

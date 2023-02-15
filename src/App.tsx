@@ -6,9 +6,9 @@ import Profilebar from "./components/Profilebar";
 import EditorTabs from "./components/EditorTabs";
 import TextEditor from "./components/TextEditor";
 import { ButtonId } from "./types";
-import { sortFiles, updateFilenameAPI, URL_API } from "./utils";
+import { sortFiles, getFileById, updateFilenameAPI, getUpdatedFileList, saveFileContentToApiAndGetUpdatedState, URL_API } from "./utils";
 import { AppContext, AppContextType } from './Context';
-import { files } from "./types";
+import { files, fileAPI, fileType } from "./types";
 
 
 // const defaultFiles: files[] = [
@@ -36,7 +36,8 @@ function App() {
 		setFileList, 
 		activeFile, 
 		tabs,
-		setTabs
+		setTabs,
+		saveFileContent
 	} = useContext(AppContext) as AppContextType;
 
 	const [activeSidebarButton, setActiveSidebarButton] = useState<ButtonId>("FILES");
@@ -49,23 +50,30 @@ function App() {
 	});
 
 	useEffect(() => {
-		const createDataTree = (data: files[]): any => {
+		const createDataTree = (data: fileAPI[]): files[] => {
 			const hashTable = Object.create(null);
-			data.forEach(file => hashTable[file.id] = {...file, childNodes: []});
-			const dataTree: any = [];
+			data.forEach(file => hashTable[file.id] = file.type === 'FOLDER' ? {...file, childNodes: [], isOpened: false} : {...file});
+			const dataTree: files[] = [];
 
 			data.forEach(file => {
-			  if(file.parentId > 0 && hashTable[file.parentId]) hashTable[file.parentId].childNodes.push(hashTable[file.id])
-			  else dataTree.push(hashTable[file.id])
-			});
-			return dataTree;
+				console.log(file.id)
+				if(file.parentId > 0 && hashTable[file.parentId]) {     
+					if(hashTable[file.parentId]?.childNodes) hashTable[file.parentId].childNodes.push(hashTable[file.id])
+					else dataTree.push(hashTable[file.id]) // in case, if file referencing to not Folder
+			  	} else {
+					dataTree.push(hashTable[file.id])
+			  	}
+			})
+
+			console.log(dataTree)
+			return dataTree
 		  };
 
 		const fetchData = async () => {
 			const response = await fetch(URL_API);
 			const data = await response.json();
-			setFileList(sortFiles(data));
-			console.log(createDataTree(data))
+			//setFileList(sortFiles(data))
+			setFileList(createDataTree(data));
 		};
 
 		fetchData();
@@ -76,13 +84,14 @@ function App() {
 		const onKeyDown = (e: KeyboardEvent) => {
 			if (e.ctrlKey && e.code === "KeyS") {
 				e.preventDefault();
-				activeFile && saveFile(activeFile);
+				let content = tabs.find(item => item.id === activeFile)?.content
+				activeFile && content && saveFileContent(activeFile, content);
 			}
 		};
 
 		window.addEventListener("keydown", onKeyDown);
 		return () => window.removeEventListener("keydown", onKeyDown);
-	}, [activeFile, fileList]);
+	}, [activeFile, tabs]);
 
 	useEffect(() => {
 		const onMouseMove = (e: MouseEvent) => {
@@ -115,12 +124,14 @@ function App() {
 	useEffect(() => {
 		if (!activeFile) return;
 		if (!tabs.find((tabItem) => tabItem.id === activeFile)) {
-			setTabs([...tabs, { id: activeFile, saved: true }]);
+			const content = getFileById(fileList, activeFile)?.content
+			setTabs([...tabs, { id: activeFile, saved: true, content: content}]);
 		}
+		console.log(tabs)
 	}, [activeFile]);
 
-	const fileIdToObject = (fileId: number) => {
-		return fileList.find((file) => file.id === fileId);
+	 const fileIdToObject = (fileId: number) => {
+	 	return fileList.find((file) => file.id === fileId);
 	};
 
 	const savedStatusOfFile = (idFile: number, saved: boolean) => {
@@ -130,20 +141,32 @@ function App() {
 		setTabs(newTabs);
 	}
 
-	const saveFile = async (idFile: number) => {
-		const fileObj = fileIdToObject(idFile);
-		if (fileObj) {
-			if (await updateFilenameAPI(
-					fileObj.id,
-					fileObj.fileName,
-					fileObj.content,
-					fileObj.parentId
-				)
-			) {
-				savedStatusOfFile(idFile, true)
-			}
-		}
-	};
+	// const saveFileContent = async (idFile: number, content: string) => {
+	// 	const newFileList = await saveFileContentToApiAndGetUpdatedState(fileList, idFile, content)
+	// 	if (newFileList) {
+	// 		newFileList && setFileList(newFileList)
+	// 		savedStatusOfFile(idFile, true)			
+	// 	}
+	// 	// //const fileObj = fileIdToObject(idFile);
+	// 	// const fileObj = getFileById(fileList, idFile);
+	// 	// if(!fileObj) return
+	// 	// fileObj.content = content
+
+	// 	// if (fileObj) {			
+	// 	// 	if (await updateFilenameAPI(
+	// 	// 			fileObj.id,
+	// 	// 			fileObj.fileName,
+	// 	// 			fileObj.content,
+	// 	// 			fileObj.parentId,
+	// 	// 			fileObj?.childNodes ? 'FOLDER' : 'FILE'					
+	// 	// 		)
+	// 	// 	) {
+	// 	// 		const newFileList = getUpdatedFileList(fileList, fileObj)
+	// 	// 		newFileList && setFileList(newFileList)
+	// 	// 		savedStatusOfFile(idFile, true)
+	// 	// 	}
+	// 	// }
+	// };
 
 	return (
 		<>

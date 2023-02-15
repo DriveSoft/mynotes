@@ -16,7 +16,7 @@ function EditorTabs(){
 		activeFile,
 		setActiveFile,
 		
-		updateFile, 
+		saveFileContent
 	} = useContext(AppContext) as AppContextType;
 
 
@@ -48,15 +48,9 @@ function EditorTabs(){
 
 	const onButtonClickModalDlgSaveFile = async (idButton: string) => {
 		if(idButton === 'SAVE') {
-			const objFile = fileList.find(file => file.id === showDlgSaveFileParams.fileId)
-			try{					
-				if(objFile) {
-					await updateFile(objFile)
-					closeTab(showDlgSaveFileParams.fileId)
-				}	
-			} catch(e) {
-				alert(e)
-			}
+			let content = tabs.find(item => item.id === activeFile)?.content
+			content && await saveFileContent(showDlgSaveFileParams.fileId, content)
+			closeTab(showDlgSaveFileParams.fileId)
 		}
 
 		if(idButton === 'DONTSAVE') {
@@ -86,8 +80,21 @@ function EditorTabs(){
 		}
 	};	
 
-	function getFilename(id: number) {
-		return fileList.find((item) => item.id === id)?.fileName || undefined;
+	function getFilename(id: number): string | undefined {
+		//return fileList.find((item) => item.id === id)?.fileName || undefined;
+		let result: any = undefined
+
+		const findFilename = (ar: files[]) => {
+			let res = ar.find(file => {
+				if(file?.childNodes?.length && file.childNodes.length > 0) findFilename(file.childNodes)
+				return file.id === id
+			})
+
+			if (res) result = res
+			return result
+		}
+
+		return findFilename(fileList)?.fileName || undefined;
 	}
 
 	return (
