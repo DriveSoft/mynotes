@@ -6,7 +6,7 @@ import Profilebar from "./components/Profilebar";
 import EditorTabs from "./components/EditorTabs";
 import TextEditor from "./components/TextEditor";
 import { ButtonId } from "./types";
-import { getFileById, URL_API } from "./utils";
+import { sortFiles, getFileById, URL_API } from "./utils";
 import { AppContext, AppContextType } from './Context';
 import { files, fileAPI, fileType } from "./types";
 
@@ -73,7 +73,7 @@ function App() {
 			const response = await fetch(URL_API);
 			const data = await response.json();
 			//setFileList(sortFiles(data))
-			setFileList(createDataTree(data));
+			setFileList(sortFiles(createDataTree(data)));
 		};
 
 		fetchData();

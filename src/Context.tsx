@@ -2,7 +2,6 @@ import React, { useState, createContext } from "react";
 import {
 	sortFiles,
 	createFilenameAPI,
-	updateFilenameAPI,
 	deleteFilenameAPI,
 	saveFileContentToApiAndGetUpdatedState,
 	renameFilenameToApiAndGetUpdatedState
@@ -79,7 +78,7 @@ const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 				setFileList(
 					sortFiles([
 						...fileList,
-						{ id: newId, fileName: fileName, content: "", parentId: 0, childNodes:[], isOpened: false },
+						{ id: newId, fileName: fileName, content: "", parentId: 0 }, //, childNodes:[], isOpened: false
 					])
 				);
 				setActiveFile(newId)							
