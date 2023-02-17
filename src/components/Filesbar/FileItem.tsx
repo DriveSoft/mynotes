@@ -4,15 +4,10 @@ import { files, fileType } from "../../types"
 
 interface FileItemProps {
 	fileObj: files
-	fileId: number
-	fileName: string
-	fileType: fileType
-	//editable?: boolean;
 	selected: boolean
 	focused?: boolean
-    //isNewFile?: boolean;
     mode?: 'NEW_FILE' | 'RENAME_FILE'
-	onClick?: (fileId: number) => void
+	onClick?: (file: files) => void
 	onMenu: (e: React.MouseEvent<HTMLDivElement>, fileId: number) => void
     onFileCreated?: (success: boolean, filename: string, inputEl: any) => void
     onFileRenamed?: (fileId: number, success: boolean, newFilename: string, inputEl: any) => void
@@ -23,13 +18,8 @@ interface FileItemProps {
 
 function FileItem({
 	fileObj,
-	fileId,
-	fileName,
-	fileType,
-	//editable,
 	selected,
 	focused,
-    //isNewFile,
     mode,
 	onClick,
 	onMenu,
@@ -39,53 +29,94 @@ function FileItem({
 	children,
 	level
 }: FileItemProps) {
-	const [renameFilename, setRenameFilename] = useState(fileName)
-    const [isValid, setIsValid] = useState(true)
+	const [renameFilename, setRenameFilename] = useState(fileObj.fileName);
+	const [isValid, setIsValid] = useState(true);
+	const fileType: fileType = fileObj?.childNodes ? "FOLDER" : "FILE";
 
-    const inputEl = useRef(null)
+	const inputEl = useRef(null);
 
 	const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
 		if (e.key === "Enter" && isValid) {
 			if (renameFilename !== "") {
-                mode === 'RENAME_FILE' && onFileRenamed && onFileRenamed(fileId, true, renameFilename, inputEl)
-                mode === 'NEW_FILE' && onFileCreated && onFileCreated(true, renameFilename, inputEl)
+				mode === "RENAME_FILE" &&
+					onFileRenamed &&
+					onFileRenamed(fileObj.id, true, renameFilename, inputEl);
+				mode === "NEW_FILE" &&
+					onFileCreated &&
+					onFileCreated(true, renameFilename, inputEl);
 			}
 		}
 
 		if (e.key === "Escape") {
-			setRenameFilename(fileName);
-            mode === 'RENAME_FILE' && onFileRenamed && onFileRenamed(fileId, false, '', inputEl)
-            mode === 'NEW_FILE' && onFileCreated && onFileCreated(false, '', inputEl)
+			setRenameFilename(fileObj.fileName);
+			mode === "RENAME_FILE" &&
+				onFileRenamed &&
+				onFileRenamed(fileObj.id, false, "", inputEl);
+			mode === "NEW_FILE" &&
+				onFileCreated &&
+				onFileCreated(false, "", inputEl);
 		}
 	};
 
-    const onBlur = () => {
-        setRenameFilename(fileName);
-        mode === 'RENAME_FILE' && onFileRenamed && onFileRenamed(fileId, false, '', inputEl)
-        mode === 'NEW_FILE' && onFileCreated && onFileCreated(false, '', inputEl)
-    }
+	const onBlur = () => {
+		setRenameFilename(fileObj.fileName);
+		mode === "RENAME_FILE" &&
+			onFileRenamed &&
+			onFileRenamed(fileObj.id, false, "", inputEl);
+		mode === "NEW_FILE" &&
+			onFileCreated &&
+			onFileCreated(false, "", inputEl);
+	};
 
-    const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value
-        setRenameFilename(value)
-        setIsValid(onChangeValidator(fileId, value, inputEl))     
-    }
+	const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const value = e.target.value;
+		setRenameFilename(value);
+		setIsValid(onChangeValidator(fileObj.id, value, inputEl));
+	};
 
+	useEffect(() => {
+		//@ts-ignore
+		//if ((editable || isNewFile) && inputEl) inputEl?.current?.select();
+		if (mode && inputEl) inputEl?.current?.select();
+	}, [mode]);
 
-    useEffect(()=>{
-        //@ts-ignore
-        //if ((editable || isNewFile) && inputEl) inputEl?.current?.select();
-        if (mode && inputEl) inputEl?.current?.select();
-    }, [mode])
+	const paddingLeftTree = `${25 + level * 10}px`;
 
-	const paddingLeftTree = `${48+level*10}px`
+	interface FileIconProps {
+		type: fileType;
+		isOpened: boolean;
+	}
+	function FileIcon({ type, isOpened }: FileIconProps) {		
+		return (
+			<>
+				{type === "FOLDER" ? (
+					<>
+						{isOpened ? (
+							<>
+								<i className="fa-solid fa-chevron-down" style={{width: "13px"}}></i>
+								<i className="fa-regular fa-folder"></i>
+							</>
+						) : (
+							<>
+								<i className="fa-solid fa-chevron-right" style={{width: "13px"}}></i>
+								<i className="fa-regular fa-folder"></i>
+							</>
+						)}
+					</>
+				) : (
+					<i className="fa-regular fa-file-lines" style={{paddingLeft: "16px"}}></i>
+				)}
+			</>
+		);
+	}
 
 	return (
 		<div>
 			<div
+				onClick={() => mode !== "RENAME_FILE" && onClick && onClick(fileObj)}
 				onContextMenu={(e) => {
 					e.stopPropagation();
-					onMenu(e, fileId);
+					onMenu(e, fileObj.id);
 				}}
 				className={
 					selected && focused
@@ -94,14 +125,18 @@ function FileItem({
 						? "fileItem selectedFile"
 						: "fileItem"
 				}
-				style={{paddingLeft: paddingLeftTree}}				
+				style={{ paddingLeft: paddingLeftTree }}
 			>
-				{fileType === 'FOLDER' ? <i className="fa-regular fa-folder"></i> : <i className="fa-regular fa-file-lines"></i>}
+				{/* {fileType === 'FOLDER' ? <><i className="fa-solid fa-chevron-right"></i><i className="fa-regular fa-folder"></i></> : <i className="fa-regular fa-file-lines"></i>} */}
+				<FileIcon
+					type={fileType}
+					isOpened={fileObj?.isOpened || false}
+				/>
 
-				{mode === 'RENAME_FILE' ? (
+				{mode === "RENAME_FILE" ? (
 					<input
 						type="text"
-						onClick={() => onClick && onClick(fileId)}
+						//onClick={() => onClick && onClick(fileObj)}
 						value={renameFilename}
 						onChange={onChange}
 						onKeyDown={onKeyDown}
@@ -109,7 +144,7 @@ function FileItem({
 						style={{ cursor: "auto", zIndex: "2" }}
 						ref={inputEl}
 					/>
-				) : mode === 'NEW_FILE' ? (
+				) : mode === "NEW_FILE" ? (
 					<input
 						type="text"
 						value={renameFilename}
@@ -123,13 +158,11 @@ function FileItem({
 					<input
 						readOnly
 						type="text"
-						onClick={() => onClick && onClick(fileId)}
-						value={fileName}
+						//onClick={() => onClick && onClick(fileObj)}
+						value={fileObj.fileName}
 						style={{ userSelect: "none" }}
 					/>
 				)}
-
-				
 			</div>
 			{children}
 		</div>

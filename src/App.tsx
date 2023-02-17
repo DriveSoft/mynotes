@@ -6,7 +6,7 @@ import Profilebar from "./components/Profilebar";
 import EditorTabs from "./components/EditorTabs";
 import TextEditor from "./components/TextEditor";
 import { ButtonId } from "./types";
-import { sortFiles, getFileById, updateFilenameAPI, getUpdatedFileList, saveFileContentToApiAndGetUpdatedState, URL_API } from "./utils";
+import { getFileById, URL_API } from "./utils";
 import { AppContext, AppContextType } from './Context';
 import { files, fileAPI, fileType } from "./types";
 
@@ -127,7 +127,6 @@ function App() {
 			const content = getFileById(fileList, activeFile)?.content
 			setTabs([...tabs, { id: activeFile, saved: true, content: content}]);
 		}
-		console.log(tabs)
 	}, [activeFile]);
 
 	 const fileIdToObject = (fileId: number) => {

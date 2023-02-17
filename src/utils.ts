@@ -73,41 +73,102 @@ export function getFileById(fileList: files[], id: number): files | undefined {
     return findObj(fileList);
 }
 
-export function getUpdatedFileList(fileList: files[], objFile: files): files[] | undefined {
-    //const files = [...fileList]
-    const files = structuredClone(fileList);
-    let result: files | undefined = undefined
+// export function getUpdatedFileList(fileList: files[], objFile: files): files[] | undefined {
+//     //const files = [...fileList]
+//     const files = structuredClone(fileList);
+//     let result: files | undefined = undefined
 
-    const findObj = (files: files[]) => {
-        let res = files.find(file => {
-            if(file?.childNodes?.length && file.childNodes.length > 0) findObj(file.childNodes)
-            return file.id === objFile.id
+//     const findObj = (files: files[]) => {
+//         let res = files.find(file => {
+//             if(file?.childNodes?.length && file.childNodes.length > 0) findObj(file.childNodes)
+//             return file.id === objFile.id
+//         })
+
+//         if (res) result = res
+//         return result
+//     }
+
+//     let obj = findObj(files)
+//     if (obj) {
+//         obj = objFile
+//         return files
+//     }
+
+//     return undefined
+// }
+
+export function changeContentAndUpdateFileList(fileList: files[], idFile: number, content: string): files[] | undefined {
+
+    const mapItems = (files: files[]): files[] => {
+        return files.map((file: files) => {
+            if (file?.childNodes && file.childNodes.length > 0) {
+                return {...file, childNodes: mapItems(file.childNodes)}
+            } else {
+                if(file.id === idFile) {
+                    return {...file, content: content}
+                }
+                return file
+            }
         })
-
-        if (res) result = res
-        return result
     }
 
-    let obj = findObj(files)
-    if (obj) {
-        obj = objFile
-        return files
+    return mapItems(fileList)
+}
+
+export function changeFilenameAndUpdateFileList(fileList: files[], idFile: number, newFilename: string): files[] | undefined {
+
+    const mapItems = (files: files[]): files[] => {
+        return files.map((file: files) => {
+            if (file?.childNodes && file.childNodes.length > 0) {
+                return {...file, childNodes: mapItems(file.childNodes)}
+            } else {
+                if(file.id === idFile) {
+                    return {...file, fileName: newFilename}
+                }
+                return file
+            }
+        })
     }
 
-    return undefined
+    return mapItems(fileList)
 }
 
 
+
+
+// export async function saveFileContentToApiAndGetUpdatedState(fileList: files[], idFile: number, content: string) {
+//     // const fileObj = getFileById(fileList, idFile);
+//     // if(!fileObj) return undefined
+//     // fileObj.content = content
+ 			
+//     // if (await updateFilenameAPI(fileObj)) {
+//     //     return getUpdatedFileList(fileList, fileObj)            
+//     // }
+
+//     // return undefined 
+
+//     const fileObj = getFileById(fileList, idFile);
+//     if(!fileObj) return undefined
+//     fileObj.content = content
+ 			
+//     if (await updateFilenameAPI(fileObj)) {
+//         return changeContentAndUpdateFileList(fileList, idFile, content)           
+//     }
+
+//     return undefined     
+// };
+
 export async function saveFileContentToApiAndGetUpdatedState(fileList: files[], idFile: number, content: string) {
+
     const fileObj = getFileById(fileList, idFile);
     if(!fileObj) return undefined
     fileObj.content = content
  			
     if (await updateFilenameAPI(fileObj)) {
-        return getUpdatedFileList(fileList, fileObj)            
+        return changeContentAndUpdateFileList(fileList, idFile, content)           
     }
 
-    return undefined 
+    return undefined     
 };
 
 export async function renameFilenameToApiAndGetUpdatedState(fileList: files[], idFile: number, newFilename: string) {
@@ -116,7 +177,8 @@ export async function renameFilenameToApiAndGetUpdatedState(fileList: files[], i
     fileObj.fileName = newFilename
  			
     if (await updateFilenameAPI(fileObj)) {
-        return getUpdatedFileList(fileList, fileObj)            
+        //return getUpdatedFileList(fileList, fileObj)     
+        return changeFilenameAndUpdateFileList(fileList, idFile, newFilename)       
     }
 
     return undefined 

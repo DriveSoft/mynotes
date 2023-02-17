@@ -23,7 +23,7 @@ function Filesbar({title}: FilesbarProps) {
 		createFile, 
 		renameFilename,
 		deleteFile
-			
+
 	} = useContext(AppContext) as AppContextType;
 
 	const [focused, setFocused] = useState(false)
@@ -171,9 +171,33 @@ function Filesbar({title}: FilesbarProps) {
 	};
 
 
-	const onClickFileItem = (fileId: number) => {
-		setActiveFile(fileId)	
-		console.log(fileId)
+	const onClickFileItem = (file: files) => {
+		setActiveFile(file.id)	
+		
+		if(file?.childNodes) {
+			const newFileList = changeIsOpenedAndUpdateFileList(fileList, file.id)		
+			newFileList && setFileList(newFileList)
+		}
+
+		//!!! I can change folder's status if only I clicked on the filename also I shouldn't change status of folder if a file has been clicked
+	}
+
+	function changeIsOpenedAndUpdateFileList(fileList: files[], idFile: number): files[] | undefined {
+
+		const mapItems = (files: files[]): files[] => {
+			return files.map((file: files) => {
+				if (file?.childNodes) {
+					if(file.id === idFile) {
+						return {...file, childNodes: mapItems(file.childNodes), isOpened: !file.isOpened}
+					}
+					return {...file, childNodes: mapItems(file.childNodes)}
+				} else {
+					return file
+				}
+			})
+		}
+	
+		return mapItems(fileList)
 	}
 
 	const renderFiles = (file: files, level: number) => {
@@ -182,9 +206,6 @@ function Filesbar({title}: FilesbarProps) {
 			return (
 				<FileItem
 					fileObj={file}
-					fileId={file.id}
-					fileName={file.fileName}
-					fileType={'FOLDER'}
 					selected={activeFile === file.id}
 					focused={focused}
 					mode={renameFileName.fileId === file.id ? 'RENAME_FILE' : undefined}
@@ -196,7 +217,7 @@ function Filesbar({title}: FilesbarProps) {
 					level={level}					
 				>	
 					{						
-						file.childNodes.map((file: any) => renderFiles(file, level+1))
+						file.isOpened && file.childNodes.map((file: any) => renderFiles(file, level+1))
 					}
 				</FileItem>	
 			)
@@ -206,9 +227,6 @@ function Filesbar({title}: FilesbarProps) {
 		return (
 			<FileItem
 				fileObj={file}
-				fileId={file.id}
-				fileName={file.fileName}
-				fileType={'FILE'}
 				selected={activeFile === file.id}
 				focused={focused}
 				mode={renameFileName.fileId === file.id ? 'RENAME_FILE' : undefined}
@@ -248,12 +266,8 @@ function Filesbar({title}: FilesbarProps) {
 					{ showInputNewFile && 
 						<FileItem
 							fileObj={{id: 0, fileName: '', content: '', parentId: 0}}	
-							fileId={0}
-							fileName={''}
-							fileType='FILE'
 							selected={false}
 							focused={focused}		
-							//isNewFile={true}	
 							mode='NEW_FILE'			
 							onMenu={(e, fileId) => onContextMenu(e, fileId)}
 							onFileCreated={onFileCreated}
