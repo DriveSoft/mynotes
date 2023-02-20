@@ -8,7 +8,7 @@ interface FileItemProps {
 	focused?: boolean
     mode?: 'NEW_FILE' | 'RENAME_FILE'
 	onClick?: (file: files) => void
-	onMenu: (e: React.MouseEvent<HTMLDivElement>, fileId: number) => void
+	onMenu?: (e: React.MouseEvent<HTMLDivElement>, fileId: number) => void
     onFileCreated?: (success: boolean, filename: string, inputEl: any) => void
     onFileRenamed?: (fileId: number, success: boolean, newFilename: string, inputEl: any) => void
 	onChangeValidator: (fileId: number, fileName: string, inputEl: any) => boolean
@@ -94,7 +94,7 @@ function FileItem({
 						{isOpened ? (
 							<>
 								<i className="fa-solid fa-chevron-down" style={{width: "14px"}}></i>
-								<i className="fa-regular fa-folder"></i>
+								<i className="fa-regular fa-folder-open"></i>
 							</>
 						) : (
 							<>
@@ -104,19 +104,19 @@ function FileItem({
 						)}
 					</>
 				) : (
-					<i className="fa-regular fa-file-lines" style={{paddingLeft: "18px"}}></i>
+					<i className="fa-regular fa-file" style={{paddingLeft: "18px"}}></i>
 				)}
 			</>
 		);
 	}
-
+//<i class="fa-regular fa-folder-open"></i>
 	return (
 		<div>
 			<div
 				onClick={() => mode !== "RENAME_FILE" && onClick && onClick(fileObj)}
 				onContextMenu={(e) => {
 					e.stopPropagation();
-					onMenu(e, fileObj.id);
+					onMenu && onMenu(e, fileObj.id);
 				}}
 				className={
 					selected && focused

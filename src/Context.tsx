@@ -4,7 +4,8 @@ import {
 	createFilenameAPI,
 	deleteFilenameAPI,
 	saveFileContentToApiAndGetUpdatedState,
-	renameFilenameToApiAndGetUpdatedState
+	renameFilenameToApiAndGetUpdatedState,
+	createFileAndUpdateFileList
 } from "./utils";
 import { files, tabs } from "./types";
 
@@ -20,8 +21,7 @@ export type AppContextType = {
 	tabs: tabs[];
 	setTabs: (value: tabs[]) => void;
 
-	//createFile: (fileName: string) => Promise<boolean>;
-	createFile: (fileName: string) => void
+	createNewFile: (fileName: string, parentId: number) => Promise<boolean>
 	deleteFile: (fileId: number) => Promise<boolean>;
 	saveFileContent: (idFile: number, content: string) => Promise<any>
 	renameFilename: (idFile: number, newFilename: string) => Promise<any>
@@ -47,43 +47,24 @@ const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 		tabs,
 		setTabs,
 
-		createFile, 
+		createNewFile, 
 		deleteFile,
 		saveFileContent,
 		renameFilename
 	}
 
-	// function createFile (fileName: string): Promise<boolean> {
-	// 	return new Promise( async(resolve, reject) => {
-	// 		const newId = getNewId(fileList)
 
-	// 		if (await createFilenameAPI({id: newId, fileName: fileName, content: '', parentId: 0})) {
-	// 			setFileList(
-	// 				sortFiles([
-	// 					...fileList,
-	// 					{ id: newId, fileName: fileName, content: "", parentId: 0, childNodes:[], isOpened: false },
-	// 				])
-	// 			);
-	// 			setActiveFile(newId);				
-	// 			resolve(true)				
-	// 		}	
-	// 		reject('Error createFile')		
-	// 	})
-	// };
-
-	async function createFile (fileName: string) {
-			const newId = getNewId(fileList)
-
-			if (await createFilenameAPI({id: newId, fileName: fileName, content: '', parentId: 0})) {
-				setFileList(
-					sortFiles([
-						...fileList,
-						{ id: newId, fileName: fileName, content: "", parentId: 0 }, //, childNodes:[], isOpened: false
-					])
-				);
-				setActiveFile(newId)							
-			}	
-	};
+	async function createNewFile(fileName: string, parentId: number): Promise<any> {		
+		const newId = await createFilenameAPI({id: 0, fileName: fileName, content: '', parentId: parentId})
+		
+		if (newId) {
+			const newFileList = createFileAndUpdateFileList(fileList, newId, parentId, fileName)
+			if (newFileList) {
+				newFileList && setFileList(newFileList)		
+			}
+			setActiveFile(newId)
+		}
+	}	
 
 	async function deleteFile (fileId: number): Promise<boolean> {//: Promise<boolean>
 
@@ -103,14 +84,14 @@ const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 			newFileList && setFileList(newFileList)
 			savedStatusOfFile(idFile, true)			
 		}
-	};
+	}
 
 	async function renameFilename(idFile: number, newFilename: string) {
 		const newFileList = await renameFilenameToApiAndGetUpdatedState(fileList, idFile, newFilename)
 		if (newFileList) {
 			newFileList && setFileList(newFileList)				
 		}
-	};
+	}
 
 
 	function savedStatusOfFile(idFile: number, saved: boolean) {

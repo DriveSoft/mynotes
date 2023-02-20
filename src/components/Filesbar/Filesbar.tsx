@@ -4,6 +4,7 @@ import ContexMenu from "../ContexMenu";
 import ModalDialog from "../ModalDialog";
 import FileItem from "./FileItem";
 import { files, fileType } from "../../types";
+import { getFileById } from "../../utils"
 import "./Filesbar.css";
 
 
@@ -20,14 +21,14 @@ function Filesbar({title}: FilesbarProps) {
 		activeFile,
 		setActiveFile,
 		
-		createFile, 
+		createNewFile, 
 		renameFilename,
 		deleteFile
 
 	} = useContext(AppContext) as AppContextType;
 
 	const [focused, setFocused] = useState(false)
-	const [showInputNewFile, setShowInputNewFile] = useState(false)
+	const [showInputNewFileAtParent, setShowInputNewFileAtParent] = useState(-1)
 	const [renameFileName, setRenameFileName] = useState({
 		fileId: 0,
 		newName: "",
@@ -84,13 +85,13 @@ function Filesbar({title}: FilesbarProps) {
 
 		if (success) {
 			try {
-				await createFile(filename)
-				setShowInputNewFile(false)
+				await createNewFile(filename, showInputNewFileAtParent)
+				setShowInputNewFileAtParent(-1)
 			} catch(e) {
 				alert(e)
 			}
 		} else {
-			setShowInputNewFile(false)
+			setShowInputNewFileAtParent(-1)
 		}				
 	}
 
@@ -110,7 +111,7 @@ function Filesbar({title}: FilesbarProps) {
 
 	const onClickItem = async(fileId: number, itemId: string) => {
 		if (itemId === "NEW_FILE") {
-			setShowInputNewFile(true)
+			setShowInputNewFileAtParent(0)
 		}
 				
 		if (itemId === "EDIT_FILE") {
@@ -178,8 +179,6 @@ function Filesbar({title}: FilesbarProps) {
 			const newFileList = changeIsOpenedAndUpdateFileList(fileList, file.id)		
 			newFileList && setFileList(newFileList)
 		}
-
-		//!!! I can change folder's status if only I clicked on the filename also I shouldn't change status of folder if a file has been clicked
 	}
 
 	function changeIsOpenedAndUpdateFileList(fileList: files[], idFile: number): files[] | undefined {
@@ -200,10 +199,21 @@ function Filesbar({title}: FilesbarProps) {
 		return mapItems(fileList)
 	}
 
-	const renderFiles = (file: files, level: number) => {
+	const onClickButtonNewFile = () => {
+		if(activeFile !== undefined){
+			const objFile = getFileById(fileList, activeFile)
+			objFile && setShowInputNewFileAtParent(objFile.parentId)
+			return
+		}		
 
-		if(file?.childNodes) {
-			return (
+		setShowInputNewFileAtParent(0)
+	}
+
+
+	const renderFiles = (files: files[], newFileAtParent: number) => {
+
+		const render = (file: files, level: number) => {
+			const fileItemEl = (
 				<FileItem
 					fileObj={file}
 					selected={activeFile === file.id}
@@ -217,28 +227,81 @@ function Filesbar({title}: FilesbarProps) {
 					level={level}					
 				>	
 					{						
-						file.isOpened && file.childNodes.map((file: any) => renderFiles(file, level+1))
+						file?.childNodes && file.isOpened && file.childNodes.map((file: any) => render(file, level+1))
 					}
-				</FileItem>	
+				</FileItem>					
 			)
+
+			
+			if (file.parentId == newFileAtParent) {
+				newFileAtParent = -1
+				console.log('file.parentId === newFileAtParent')
+				return (
+					<React.Fragment key={file.id}>
+						<FileItem
+							fileObj={{id: 0, fileName: '', content: '', parentId: 0}}	
+							selected={false}
+							focused={focused}		
+							mode='NEW_FILE'			
+							onFileCreated={onFileCreated}
+							onChangeValidator={onChangeValidator}
+							key={'newFile'}
+							level={level}
+						/>
+
+						{fileItemEl}
+					</React.Fragment>				
+				)
+			}
+
+			return (fileItemEl)			
 		}
 
+		return files.map((file: any) => render(file, 0))
 
-		return (
-			<FileItem
-				fileObj={file}
-				selected={activeFile === file.id}
-				focused={focused}
-				mode={renameFileName.fileId === file.id ? 'RENAME_FILE' : undefined}
-				onClick={onClickFileItem}
-				onMenu={(e, fileId) => onContextMenu(e, fileId)}
-				onFileRenamed={onFileRenamed}
-				onChangeValidator={onChangeValidator}
-				key={file.id}
-				level={level}
-			/>			
-		)
 	}
+
+
+	// const renderFiles = (file: files, level: number, showNewFile: boolean) => {
+
+	// 	if (showNewFile) {
+	// 		showNewFile = false
+	// 		return (			
+	// 			<FileItem
+	// 				fileObj={{id: 0, fileName: '', content: '', parentId: 0}}	
+	// 				selected={false}
+	// 				focused={focused}		
+	// 				mode='NEW_FILE'			
+	// 				onFileCreated={onFileCreated}
+	// 				onChangeValidator={onChangeValidator}
+	// 				key={'newFile'}
+	// 				level={0}
+	// 			/>			
+	// 		)
+
+	// 	}
+
+
+	// 	return (
+	// 		<FileItem
+	// 			fileObj={file}
+	// 			selected={activeFile === file.id}
+	// 			focused={focused}
+	// 			mode={renameFileName.fileId === file.id ? 'RENAME_FILE' : undefined}
+	// 			onClick={onClickFileItem}
+	// 			onMenu={(e, fileId) => onContextMenu(e, fileId)}
+	// 			onFileRenamed={onFileRenamed}
+	// 			onChangeValidator={onChangeValidator}
+	// 			key={file.id}
+	// 			level={level}					
+	// 		>	
+	// 			{						
+	// 				file?.childNodes && file.isOpened && file.childNodes.map((file: any) => renderFiles(file, level+1, false))
+	// 			}
+	// 		</FileItem>	
+			
+	// 	)
+	// }
 	
 
 	return (
@@ -257,31 +320,31 @@ function Filesbar({title}: FilesbarProps) {
 					{title && <span>{title}</span>}
 					<i
 						className="fa-regular fa-file"
-						onClick={() => setShowInputNewFile(true)}
+						onClick={onClickButtonNewFile}
 					></i>
 				</div>
 
 				<div style={{ position: "relative" }}>
 
-					{ showInputNewFile && 
+					{/* { showInputNewFile && 
 						<FileItem
 							fileObj={{id: 0, fileName: '', content: '', parentId: 0}}	
 							selected={false}
 							focused={focused}		
 							mode='NEW_FILE'			
-							onMenu={(e, fileId) => onContextMenu(e, fileId)}
 							onFileCreated={onFileCreated}
 							onChangeValidator={onChangeValidator}
 							key={'newFile'}
 							level={0}
 					/>
-					}
+					} */}
 
 
-					{fileList.map((file: any) => renderFiles(file, 0))}
+					{/* {fileList.map((file: any) => renderFiles(file, 0, true))} */}
+					{renderFiles(fileList, showInputNewFileAtParent)}
 
 
-					{(renameFileName.fileId !== 0 || showInputNewFile) && (
+					{(renameFileName.fileId !== 0 || showInputNewFileAtParent > -1) && (
 						<div
 							style={{
 								position: "absolute",

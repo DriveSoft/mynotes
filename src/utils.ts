@@ -16,21 +16,28 @@ export const sortFiles = (files: files[]) => {
     return copyArr.sort((a, b) => a.fileName > b.fileName ? 1 : -1)
 }
 
-export async function createFilenameAPI(file: files){
+export async function createFilenameAPI(file: files): Promise<number | undefined>{
 
-    const fileObjApi: fileAPI = {
-        id: file.id,
+    const fileObjApi: fileAPI = {        
+        id: 0,
         fileName: file.fileName,
         content: file.content,
         parentId: file.parentId,
         type: file?.childNodes ? 'FOLDER' : 'FILE'
     };
+    //@ts-ignore We have to remove id from obj to get new id by server
+    delete fileObjApi.id;
 
+    console.log(fileObjApi)
     const response = await fetch(`${URL_API}`, {...fetchOptions, method: 'POST', body: JSON.stringify(fileObjApi)})
     
     const data = await response.json()    
     if(!response.ok) throw new Error(response.status.toString())
-    return data?.fileName === fileObjApi.fileName
+    //return data?.fileName === fileObjApi.fileName
+    
+    const result = parseInt(data.id)
+    if(result === undefined) return undefined
+    return result
 }
 
 export async function updateFilenameAPI(file: files){
@@ -132,6 +139,29 @@ export function changeFilenameAndUpdateFileList(fileList: files[], idFile: numbe
 
     return mapItems(fileList)
 }
+
+export function createFileAndUpdateFileList(fileList: files[], newIdFile: number, idParentFile: number, fileName: string): files[] | undefined {
+    
+    const mapItems = (files: files[]): files[] => {
+        return files.map((file: files) => {
+            if (file?.childNodes && file.childNodes.length > 0) {
+                if(file.id == idParentFile) file.childNodes.push({id: newIdFile, parentId: idParentFile, fileName: fileName, content: ''})
+                return {...file, childNodes: mapItems(file.childNodes)}
+            } else {
+                return file
+            }
+        })
+    }
+
+    const result = mapItems(fileList)
+    
+    if(idParentFile === 0) {  // new file in root      
+        result.push({id: newIdFile, parentId: 0, fileName: fileName, content: ''})
+    }
+
+    return result
+}
+
 
 
 
