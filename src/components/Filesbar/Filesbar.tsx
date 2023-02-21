@@ -1,15 +1,15 @@
-import React, { useState, useRef, useContext } from "react";
-import { AppContext, AppContextType } from "../../Context";
-import ContexMenu from "../ContexMenu";
-import ModalDialog from "../ModalDialog";
-import FileItem from "./FileItem";
-import { files, fileType } from "../../types";
-import { getFileById } from "../../utils"
-import "./Filesbar.css";
+import React, { useState, useRef, useContext } from "react"
+import { AppContext, AppContextType } from "../../Context"
+import ContexMenu from "../ContexMenu"
+import ModalDialog from "../ModalDialog"
+import FileItem from "./FileItem"
+import { files, fileType } from "../../types"
+import { getFileById, changeIsOpenedAndUpdateFileList } from "../../utils"
+import "./Filesbar.css"
 
 
 interface FilesbarProps {
-	title?: string;
+	title?: string
 }
 
 function Filesbar({title}: FilesbarProps) {
@@ -25,14 +25,11 @@ function Filesbar({title}: FilesbarProps) {
 		renameFilename,
 		deleteFile
 
-	} = useContext(AppContext) as AppContextType;
+	} = useContext(AppContext) as AppContextType
 
-	const [focused, setFocused] = useState(false)
+	const [focusedCmp, setFocusedCmp] = useState(false) 
 	const [showInputNewFileAtParent, setShowInputNewFileAtParent] = useState(-1)
-	const [renameFileName, setRenameFileName] = useState({
-		fileId: 0,
-		newName: "",
-	});
+	const [renameFileNameId, setRenameFileNameId] = useState(0)
 
 	const [error, setError] = useState({
 		error: "",
@@ -54,34 +51,12 @@ function Filesbar({title}: FilesbarProps) {
 	const inputRenameRef = useRef(null);
 
 	const errorFileExists = (fileName: string) =>
-		`A file or folder ${fileName} already exists at this location. Please choose a different name.`;
+		`A file or folder ${fileName} already exists at this location. Please choose a different name.`
 
-	const onFileRenamed = async(
-		fileId: number,
-		success: boolean,
-		newFilename: string,
-		inputEl: any
-	) => {		
-		setError({ error: '', left: 0, top: 0, width: 0 });	
-		inputEl.current.style.outline = "";
-		
-		if (success) {					
-			try {
-				//await updateFile({...objFile, fileName: newFilename, parentId: 0})								
-				await renameFilename(fileId, newFilename)
-				setRenameFileName({ fileId: 0, newName: "" })
-			} catch(e) {					
-				alert(e)
-			}
-					
-		} else {
-			setRenameFileName({ fileId: 0, newName: "" });
-		}
-	};
 
-	const onFileCreated = async(success: boolean, filename: string, inputEl: any) => {
-		setError({ error: '', left: 0, top: 0, width: 0 });	
-		inputEl.current.style.outline = "1px solid #252525";
+	const onFileCreate = async(success: boolean, filename: string, inputEl: any) => {
+		setError({ error: '', left: 0, top: 0, width: 0 })
+		inputEl.current.style.outline = ""
 
 		if (success) {
 			try {
@@ -95,19 +70,39 @@ function Filesbar({title}: FilesbarProps) {
 		}				
 	}
 
+	const onFileRename = async(
+		fileId: number,
+		success: boolean,
+		newFilename: string,
+		inputEl: any
+	) => {		
+		setError({ error: '', left: 0, top: 0, width: 0 })
+		inputEl.current.style.outline = ""
+		
+		if (success) {					
+			try {								
+				await renameFilename(fileId, newFilename)
+				setRenameFileNameId(0)
+			} catch(e) {					
+				alert(e)
+			}					
+		} else {
+			setRenameFileNameId(0)
+		}
+	}
+
 	const onContextMenu = (
 		e: React.MouseEvent<HTMLDivElement>,
 		fileId: number
 	) => {
-		e.preventDefault();
+		e.preventDefault()
 		setShowMenu({
 			show: true,
 			x: e.pageX,
 			y: e.pageY,
 			fileId: fileId,
-		});
-	};
-
+		})
+	}
 
 	const onClickItem = async(fileId: number, itemId: string) => {
 		if (itemId === "NEW_FILE") {
@@ -115,29 +110,24 @@ function Filesbar({title}: FilesbarProps) {
 		}
 				
 		if (itemId === "EDIT_FILE") {
-			const fileName = fileList.find((item) => item.id === fileId)?.content || ''
-			setRenameFileName({fileId: fileId, newName: fileName })
+			setRenameFileNameId(fileId)
 			setTimeout(() => {
 				//@ts-ignore
 				if (inputRenameRef) inputRenameRef?.current?.select()
-			}, 0);
+			}, 0)
 		}
 
 		if (itemId === "DELETE_FILE") {			
-			const fileObj = fileList.find(item => item.id === fileId)
+			const fileObj = getFileById(fileList, fileId)
 			setShowDialogConfirmDeleteParams({fileId: fileId, fileName: fileObj?.fileName || ''})
 			setShowDialogConfirmDelete(true)
 		}
-	};
-
+	}
 
 	const onButtonClickModalDlgConfirmDelete = async(idButton: string) => {
 		if(idButton === 'DELETE') {
 			try {
-				if (await deleteFile(showDialogConfirmDeleteParams.fileId)) {
-					const newFileList = fileList.filter(item => item.id !== showDialogConfirmDeleteParams.fileId)
-					setFileList(newFileList)
-				} 
+				await deleteFile(showDialogConfirmDeleteParams.fileId)		
 			} catch(e) {
 				alert(e)
 		   }			
@@ -154,21 +144,20 @@ function Filesbar({title}: FilesbarProps) {
 		const result = fileList.every(item => item.fileName !== fileName || fileId === item.id)
 
 		if (!result && inputEl) {
-			inputEl.current.style.outline = "1px solid red";
-			const elRect = inputEl.current.getBoundingClientRect();
+			inputEl.current.style.outline = "1px solid red"
+			const elRect = inputEl.current.getBoundingClientRect()
 			setError({
 				error: errorFileExists(fileName),
-				left: elRect.left-1,
+				left: elRect.left - 1,
 				top: elRect.bottom - 1,
-				//width: elRect.right - elRect.left + 2,
 				width: inputEl?.current?.offsetWidth+2 ?? 0
 			});
 		} else {
-			inputEl.current.style.outline = "";
-			setError({ error: '', left: 0, top: 0, width: 0 });			
+			inputEl.current.style.outline = ""
+			setError({ error: '', left: 0, top: 0, width: 0 })		
 		}
 
-		return result;			
+		return result	
 	};
 
 
@@ -177,38 +166,25 @@ function Filesbar({title}: FilesbarProps) {
 		
 		if(file?.childNodes) {
 			const newFileList = changeIsOpenedAndUpdateFileList(fileList, file.id)		
-			newFileList && setFileList(newFileList)
+			setFileList(newFileList)
 		}
-	}
-
-	function changeIsOpenedAndUpdateFileList(fileList: files[], idFile: number): files[] | undefined {
-
-		const mapItems = (files: files[]): files[] => {
-			return files.map((file: files) => {
-				if (file?.childNodes) {
-					if(file.id === idFile) {
-						return {...file, childNodes: mapItems(file.childNodes), isOpened: !file.isOpened}
-					}
-					return {...file, childNodes: mapItems(file.childNodes)}
-				} else {
-					return file
-				}
-			})
-		}
-	
-		return mapItems(fileList)
 	}
 
 	const onClickButtonNewFile = () => {
 		if(activeFile !== undefined){
 			const objFile = getFileById(fileList, activeFile)
-			objFile && setShowInputNewFileAtParent(objFile.parentId)
+			//objFile && setShowInputNewFileAtParent(objFile.parentId)
+			if(objFile) {
+				if(objFile?.childNodes) {
+					setShowInputNewFileAtParent(objFile.id)	
+				} else {
+					setShowInputNewFileAtParent(objFile.parentId)	
+				}
+			}
 			return
 		}		
-
 		setShowInputNewFileAtParent(0)
 	}
-
 
 	const renderFiles = (files: files[], newFileAtParent: number) => {
 
@@ -217,11 +193,11 @@ function Filesbar({title}: FilesbarProps) {
 				<FileItem
 					fileObj={file}
 					selected={activeFile === file.id}
-					focused={focused}
-					mode={renameFileName.fileId === file.id ? 'RENAME_FILE' : undefined}
+					focused={focusedCmp}
+					mode={renameFileNameId === file.id ? 'RENAME_FILE' : undefined}
 					onClick={onClickFileItem}
 					onMenu={(e, fileId) => onContextMenu(e, fileId)}
-					onFileRenamed={onFileRenamed}
+					onFileRenamed={onFileRename}
 					onChangeValidator={onChangeValidator}
 					key={file.id}
 					level={level}					
@@ -241,9 +217,9 @@ function Filesbar({title}: FilesbarProps) {
 						<FileItem
 							fileObj={{id: 0, fileName: '', content: '', parentId: 0}}	
 							selected={false}
-							focused={focused}		
+							focused={focusedCmp}		
 							mode='NEW_FILE'			
-							onFileCreated={onFileCreated}
+							onFileCreated={onFileCreate}
 							onChangeValidator={onChangeValidator}
 							key={'newFile'}
 							level={level}
@@ -259,58 +235,15 @@ function Filesbar({title}: FilesbarProps) {
 
 		return files.map((file: any) => render(file, 0))
 
-	}
-
-
-	// const renderFiles = (file: files, level: number, showNewFile: boolean) => {
-
-	// 	if (showNewFile) {
-	// 		showNewFile = false
-	// 		return (			
-	// 			<FileItem
-	// 				fileObj={{id: 0, fileName: '', content: '', parentId: 0}}	
-	// 				selected={false}
-	// 				focused={focused}		
-	// 				mode='NEW_FILE'			
-	// 				onFileCreated={onFileCreated}
-	// 				onChangeValidator={onChangeValidator}
-	// 				key={'newFile'}
-	// 				level={0}
-	// 			/>			
-	// 		)
-
-	// 	}
-
-
-	// 	return (
-	// 		<FileItem
-	// 			fileObj={file}
-	// 			selected={activeFile === file.id}
-	// 			focused={focused}
-	// 			mode={renameFileName.fileId === file.id ? 'RENAME_FILE' : undefined}
-	// 			onClick={onClickFileItem}
-	// 			onMenu={(e, fileId) => onContextMenu(e, fileId)}
-	// 			onFileRenamed={onFileRenamed}
-	// 			onChangeValidator={onChangeValidator}
-	// 			key={file.id}
-	// 			level={level}					
-	// 		>	
-	// 			{						
-	// 				file?.childNodes && file.isOpened && file.childNodes.map((file: any) => renderFiles(file, level+1, false))
-	// 			}
-	// 		</FileItem>	
-			
-	// 	)
-	// }
-	
+	}	
 
 	return (
 		<div
 			className="filesbar"
 			tabIndex={0}
-			onFocus={() => setFocused(true)}
+			onFocus={() => setFocusedCmp(true)}
 			onBlur={() => {
-				setFocused(false);
+				setFocusedCmp(false);
 			}}
 			onContextMenu={(e) => onContextMenu(e, 0)}
 		>
@@ -326,25 +259,10 @@ function Filesbar({title}: FilesbarProps) {
 
 				<div style={{ position: "relative" }}>
 
-					{/* { showInputNewFile && 
-						<FileItem
-							fileObj={{id: 0, fileName: '', content: '', parentId: 0}}	
-							selected={false}
-							focused={focused}		
-							mode='NEW_FILE'			
-							onFileCreated={onFileCreated}
-							onChangeValidator={onChangeValidator}
-							key={'newFile'}
-							level={0}
-					/>
-					} */}
-
-
-					{/* {fileList.map((file: any) => renderFiles(file, 0, true))} */}
 					{renderFiles(fileList, showInputNewFileAtParent)}
 
-
-					{(renameFileName.fileId !== 0 || showInputNewFileAtParent > -1) && (
+					{/* dark transparent layer */}
+					{(renameFileNameId !== 0 || showInputNewFileAtParent > -1) && (
 						<div
 							style={{
 								position: "absolute",
@@ -399,9 +317,6 @@ function Filesbar({title}: FilesbarProps) {
 				show={showDialogConfirmDelete}
 				setShow={setShowDialogConfirmDelete}					
 			/>
-		
-
-
 
 		</div>
 	);

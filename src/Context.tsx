@@ -5,7 +5,8 @@ import {
 	deleteFilenameAPI,
 	saveFileContentToApiAndGetUpdatedState,
 	renameFilenameToApiAndGetUpdatedState,
-	createFileAndUpdateFileList
+	createFileAndUpdateFileList,
+	deleteFileAndUpdateFileList
 } from "./utils";
 import { files, tabs } from "./types";
 
@@ -21,7 +22,7 @@ export type AppContextType = {
 	tabs: tabs[];
 	setTabs: (value: tabs[]) => void;
 
-	createNewFile: (fileName: string, parentId: number) => Promise<boolean>
+	createNewFile: (fileName: string, parentId: number) => Promise<any>
 	deleteFile: (fileId: number) => Promise<boolean>;
 	saveFileContent: (idFile: number, content: string) => Promise<any>
 	renameFilename: (idFile: number, newFilename: string) => Promise<any>
@@ -59,22 +60,15 @@ const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 		
 		if (newId) {
 			const newFileList = createFileAndUpdateFileList(fileList, newId, parentId, fileName)
-			if (newFileList) {
-				newFileList && setFileList(newFileList)		
-			}
+			setFileList(newFileList)		
 			setActiveFile(newId)
 		}
 	}	
 
-	async function deleteFile (fileId: number): Promise<boolean> {//: Promise<boolean>
-
-		if (await deleteFilenameAPI(fileId)) {
-			const newFileList = fileList.filter(item => item.id !== fileId)
-			setFileList(newFileList)
-			return true
-		} 
-		
-		return false
+	async function deleteFile (fileId: number): Promise<any> {
+		await deleteFilenameAPI(fileId)
+		const newFileList = deleteFileAndUpdateFileList(fileList, fileId)
+		setFileList(newFileList)	
 	};	
 
 

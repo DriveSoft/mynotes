@@ -28,15 +28,13 @@ export async function createFilenameAPI(file: files): Promise<number | undefined
     //@ts-ignore We have to remove id from obj to get new id by server
     delete fileObjApi.id;
 
-    console.log(fileObjApi)
-    const response = await fetch(`${URL_API}`, {...fetchOptions, method: 'POST', body: JSON.stringify(fileObjApi)})
-    
+    const response = await fetch(`${URL_API}`, {...fetchOptions, method: 'POST', body: JSON.stringify(fileObjApi)})    
+    if(!response.ok) throw new Error(response.status.toString()) 
+
     const data = await response.json()    
-    if(!response.ok) throw new Error(response.status.toString())
-    //return data?.fileName === fileObjApi.fileName
-    
     const result = parseInt(data.id)
-    if(result === undefined) return undefined
+              
+    if(isNaN(result)) throw new Error('Wrong id for a new record')
     return result
 }
 
@@ -61,7 +59,6 @@ export async function updateFilenameAPI(file: files){
 export async function deleteFilenameAPI(id: number){
     const response = await fetch(`${URL_API}/${id}`, {...fetchOptions, method: 'DELETE'})
     if(!response.ok) throw new Error(response.status.toString())
-    return response.ok
 }
 
 export function getFileById(fileList: files[], id: number): files | undefined {
@@ -140,7 +137,7 @@ export function changeFilenameAndUpdateFileList(fileList: files[], idFile: numbe
     return mapItems(fileList)
 }
 
-export function createFileAndUpdateFileList(fileList: files[], newIdFile: number, idParentFile: number, fileName: string): files[] | undefined {
+export function createFileAndUpdateFileList(fileList: files[], newIdFile: number, idParentFile: number, fileName: string): files[] {
     
     const mapItems = (files: files[]): files[] => {
         return files.map((file: files) => {
@@ -163,6 +160,16 @@ export function createFileAndUpdateFileList(fileList: files[], newIdFile: number
 }
 
 
+export function deleteFileAndUpdateFileList(fileList: files[], idFile: number): files[] {
+    const mapItems = (files: files[]): files[] => {
+        return files.filter((file: files) => {            
+            if (file?.childNodes && file.childNodes.length > 0) file.childNodes = mapItems(file.childNodes)                                       
+            return file.id !== idFile
+        })
+    }
+
+    return mapItems(fileList)
+}
 
 
 
@@ -212,4 +219,23 @@ export async function renameFilenameToApiAndGetUpdatedState(fileList: files[], i
     }
 
     return undefined 
-};
+}
+
+
+export function changeIsOpenedAndUpdateFileList(fileList: files[], idFile: number): files[] {
+
+    const mapItems = (files: files[]): files[] => {
+        return files.map((file: files) => {
+            if (file?.childNodes) {
+                if(file.id === idFile) {
+                    return {...file, childNodes: mapItems(file.childNodes), isOpened: !file.isOpened}
+                }
+                return {...file, childNodes: mapItems(file.childNodes)}
+            } else {
+                return file
+            }
+        })
+    }
+
+    return mapItems(fileList)
+}

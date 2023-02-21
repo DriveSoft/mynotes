@@ -76,8 +76,7 @@ function App() {
 			setFileList(sortFiles(createDataTree(data)));
 		};
 
-		fetchData();
-		console.log('fetch')
+		fetchData().catch((reason) => console.log('fetchData failed', reason));
 	}, []);
 
 	useEffect(() => {
