@@ -1,4 +1,4 @@
-import { fileAPI, files } from "./types"
+import { fileAPI, files, typeFile } from "./types"
 
 export const URL_API = 'https://retoolapi.dev/41py8X/data'
 
@@ -77,30 +77,6 @@ export function getFileById(fileList: files[], id: number): files | undefined {
     return findObj(fileList);
 }
 
-// export function getUpdatedFileList(fileList: files[], objFile: files): files[] | undefined {
-//     //const files = [...fileList]
-//     const files = structuredClone(fileList);
-//     let result: files | undefined = undefined
-
-//     const findObj = (files: files[]) => {
-//         let res = files.find(file => {
-//             if(file?.childNodes?.length && file.childNodes.length > 0) findObj(file.childNodes)
-//             return file.id === objFile.id
-//         })
-
-//         if (res) result = res
-//         return result
-//     }
-
-//     let obj = findObj(files)
-//     if (obj) {
-//         obj = objFile
-//         return files
-//     }
-
-//     return undefined
-// }
-
 export function changeContentAndUpdateFileList(fileList: files[], idFile: number, content: string): files[] | undefined {
 
     const mapItems = (files: files[]): files[] => {
@@ -137,12 +113,16 @@ export function changeFilenameAndUpdateFileList(fileList: files[], idFile: numbe
     return mapItems(fileList)
 }
 
-export function createFileAndUpdateFileList(fileList: files[], newIdFile: number, idParentFile: number, fileName: string): files[] {
-    
+export function createFileAndUpdateFileList(fileList: files[], newIdFile: number, idParentFile: number, fileName: string, typeFile: typeFile): files[] {
+    let objNewFile: files = {id: newIdFile, parentId: idParentFile, fileName: fileName, content: ''}                    
+    if(typeFile === 'folder') objNewFile = {...objNewFile, childNodes: [], isOpened: false}    
+
     const mapItems = (files: files[]): files[] => {
         return files.map((file: files) => {
             if (file?.childNodes && file.childNodes.length > 0) {
-                if(file.id == idParentFile) file.childNodes.push({id: newIdFile, parentId: idParentFile, fileName: fileName, content: ''})
+                if(file.id == idParentFile) {
+                    file.childNodes.push(objNewFile)
+                }
                 return {...file, childNodes: mapItems(file.childNodes)}
             } else {
                 return file
@@ -152,8 +132,8 @@ export function createFileAndUpdateFileList(fileList: files[], newIdFile: number
 
     const result = mapItems(fileList)
     
-    if(idParentFile === 0) {  // new file in root      
-        result.push({id: newIdFile, parentId: 0, fileName: fileName, content: ''})
+    if(idParentFile === 0) {  // new file in root              
+        result.push(objNewFile)
     }
 
     return result

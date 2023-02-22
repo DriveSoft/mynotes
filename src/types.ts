@@ -39,3 +39,5 @@ export interface tabs {
 	saved: boolean
 	content: string | undefined
 }
+
+export type typeFile = 'file' | 'folder'

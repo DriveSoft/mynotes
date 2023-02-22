@@ -8,7 +8,7 @@ import {
 	createFileAndUpdateFileList,
 	deleteFileAndUpdateFileList
 } from "./utils";
-import { files, tabs } from "./types";
+import { files, tabs, typeFile } from "./types";
 
 export const AppContext = createContext<AppContextType | null>(null);
 
@@ -22,7 +22,7 @@ export type AppContextType = {
 	tabs: tabs[];
 	setTabs: (value: tabs[]) => void;
 
-	createNewFile: (fileName: string, parentId: number) => Promise<any>
+	createNewFile: (fileName: string, parentId: number, typeFile: typeFile) => Promise<any>
 	deleteFile: (fileId: number) => Promise<boolean>;
 	saveFileContent: (idFile: number, content: string) => Promise<any>
 	renameFilename: (idFile: number, newFilename: string) => Promise<any>
@@ -55,11 +55,13 @@ const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 	}
 
 
-	async function createNewFile(fileName: string, parentId: number): Promise<any> {		
-		const newId = await createFilenameAPI({id: 0, fileName: fileName, content: '', parentId: parentId})
+	async function createNewFile(fileName: string, parentId: number, typeFile: typeFile): Promise<any> {		
+		let objFile: files = {id: 0, fileName: fileName, content: '', parentId: parentId}
+		if(typeFile === 'folder') objFile = {...objFile, childNodes: []}
+		const newId = await createFilenameAPI(objFile)
 		
 		if (newId) {
-			const newFileList = createFileAndUpdateFileList(fileList, newId, parentId, fileName)
+			const newFileList = createFileAndUpdateFileList(fileList, newId, parentId, fileName, typeFile)
 			setFileList(newFileList)		
 			setActiveFile(newId)
 		}

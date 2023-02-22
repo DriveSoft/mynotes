@@ -3,7 +3,7 @@ import { AppContext, AppContextType } from "../../Context"
 import ContexMenu from "../ContexMenu"
 import ModalDialog from "../ModalDialog"
 import FileItem from "./FileItem"
-import { files, fileType } from "../../types"
+import { files, typeFile } from "../../types"
 import { getFileById, changeIsOpenedAndUpdateFileList } from "../../utils"
 import "./Filesbar.css"
 
@@ -27,8 +27,10 @@ function Filesbar({title}: FilesbarProps) {
 
 	} = useContext(AppContext) as AppContextType
 
+	type typeNewFileAtParent = {parentId: number, type: typeFile}
+
 	const [focusedCmp, setFocusedCmp] = useState(false) 
-	const [showInputNewFileAtParent, setShowInputNewFileAtParent] = useState(-1)
+	const [showInputNewFileAtParent, setShowInputNewFileAtParent] = useState<typeNewFileAtParent>({parentId: -2, type: 'file'})
 	const [renameFileNameId, setRenameFileNameId] = useState(0)
 
 	const [error, setError] = useState({
@@ -60,13 +62,13 @@ function Filesbar({title}: FilesbarProps) {
 
 		if (success) {
 			try {
-				await createNewFile(filename, showInputNewFileAtParent)
-				setShowInputNewFileAtParent(-1)
+				await createNewFile(filename, showInputNewFileAtParent.parentId, showInputNewFileAtParent.type)
+				setShowInputNewFileAtParent({parentId: -1, type: 'file'})
 			} catch(e) {
 				alert(e)
 			}
 		} else {
-			setShowInputNewFileAtParent(-1)
+			setShowInputNewFileAtParent({parentId: -1, type: 'file'})
 		}				
 	}
 
@@ -106,7 +108,7 @@ function Filesbar({title}: FilesbarProps) {
 
 	const onClickItem = async(fileId: number, itemId: string) => {
 		if (itemId === "NEW_FILE") {
-			setShowInputNewFileAtParent(0)
+			setShowInputNewFileAtParent({parentId: 0, type: 'file'})
 		}
 				
 		if (itemId === "EDIT_FILE") {
@@ -170,23 +172,26 @@ function Filesbar({title}: FilesbarProps) {
 		}
 	}
 
-	const onClickButtonNewFile = () => {
+	const onClickButtonNewFile = (type: typeFile) => {
 		if(activeFile !== undefined){
 			const objFile = getFileById(fileList, activeFile)
 			//objFile && setShowInputNewFileAtParent(objFile.parentId)
 			if(objFile) {
 				if(objFile?.childNodes) {
-					setShowInputNewFileAtParent(objFile.id)	
+					setShowInputNewFileAtParent({parentId: objFile.id, type: type})	
 				} else {
-					setShowInputNewFileAtParent(objFile.parentId)	
+					setShowInputNewFileAtParent({parentId: objFile.parentId, type: type})	
 				}
 			}
 			return
 		}		
-		setShowInputNewFileAtParent(0)
+		setShowInputNewFileAtParent({parentId: 0, type: type})
+
 	}
 
-	const renderFiles = (files: files[], newFileAtParent: number) => {
+	const renderFiles = (files: files[], newFileAtParent: typeNewFileAtParent) => {
+		let _newFileAtParent = newFileAtParent.parentId 
+		console.log(newFileAtParent)
 
 		const render = (file: files, level: number) => {
 			const fileItemEl = (
@@ -208,10 +213,8 @@ function Filesbar({title}: FilesbarProps) {
 				</FileItem>					
 			)
 
-			
-			if (file.parentId == newFileAtParent) {
-				newFileAtParent = -1
-				console.log('file.parentId === newFileAtParent')
+			if (file.parentId == _newFileAtParent) {
+				_newFileAtParent = -1
 				return (
 					<React.Fragment key={file.id}>
 						<FileItem
@@ -251,10 +254,16 @@ function Filesbar({title}: FilesbarProps) {
 			<div className="files">
 				<div className="filesTitle">
 					{title && <span>{title}</span>}
+
+					<i
+						className="fa-regular fa-folder"
+						onClick={() => onClickButtonNewFile('folder')}
+					></i>					
 					<i
 						className="fa-regular fa-file"
-						onClick={onClickButtonNewFile}
+						onClick={() => onClickButtonNewFile('file')}
 					></i>
+										
 				</div>
 
 				<div style={{ position: "relative" }}>
@@ -262,7 +271,7 @@ function Filesbar({title}: FilesbarProps) {
 					{renderFiles(fileList, showInputNewFileAtParent)}
 
 					{/* dark transparent layer */}
-					{(renameFileNameId !== 0 || showInputNewFileAtParent > -1) && (
+					{(renameFileNameId !== 0 || showInputNewFileAtParent.parentId > -1) && (
 						<div
 							style={{
 								position: "absolute",

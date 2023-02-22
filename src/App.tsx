@@ -128,44 +128,6 @@ function App() {
 		}
 	}, [activeFile]);
 
-	 const fileIdToObject = (fileId: number) => {
-	 	return fileList.find((file) => file.id === fileId);
-	};
-
-	const savedStatusOfFile = (idFile: number, saved: boolean) => {
-		const newTabs = tabs.map((tab) =>
-			tab.id === idFile ? { ...tab, saved: true } : tab
-		);
-		setTabs(newTabs);
-	}
-
-	// const saveFileContent = async (idFile: number, content: string) => {
-	// 	const newFileList = await saveFileContentToApiAndGetUpdatedState(fileList, idFile, content)
-	// 	if (newFileList) {
-	// 		newFileList && setFileList(newFileList)
-	// 		savedStatusOfFile(idFile, true)			
-	// 	}
-	// 	// //const fileObj = fileIdToObject(idFile);
-	// 	// const fileObj = getFileById(fileList, idFile);
-	// 	// if(!fileObj) return
-	// 	// fileObj.content = content
-
-	// 	// if (fileObj) {			
-	// 	// 	if (await updateFilenameAPI(
-	// 	// 			fileObj.id,
-	// 	// 			fileObj.fileName,
-	// 	// 			fileObj.content,
-	// 	// 			fileObj.parentId,
-	// 	// 			fileObj?.childNodes ? 'FOLDER' : 'FILE'					
-	// 	// 		)
-	// 	// 	) {
-	// 	// 		const newFileList = getUpdatedFileList(fileList, fileObj)
-	// 	// 		newFileList && setFileList(newFileList)
-	// 	// 		savedStatusOfFile(idFile, true)
-	// 	// 	}
-	// 	// }
-	// };
-
 	return (
 		<>
 			<div className="wrapper">
