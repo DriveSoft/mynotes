@@ -207,8 +207,28 @@ function Filesbar({title}: FilesbarProps) {
 					key={file.id}
 					level={level}					
 				>	
-					{						
-						file?.childNodes && file.isOpened && file.childNodes.map((file: any) => render(file, level+1))
+
+					{/* In case when we are creating file inside empty folder */}
+					{
+						file?.childNodes && file?.childNodes.length===0 && file.id == _newFileAtParent && 					
+						<FileItem
+							fileObj={{id: 0, fileName: '', content: '', parentId: 0}}	
+							selected={false}
+							focused={focusedCmp}		
+							mode='NEW_FILE'			
+							onFileCreated={onFileCreate}
+							onChangeValidator={onChangeValidator}
+							key={'newFile'}
+							level={level+1}
+						/>	
+						
+					}
+
+					{/* we have to open folder if we are creating file inside it */}
+					{file?.childNodes && file.id == _newFileAtParent ? file.isOpened = true : file.isOpened = file.isOpened}					
+					
+					{												
+						file?.childNodes && file.isOpened && file.childNodes.map((file: any) => render(file, level+1))						
 					}
 				</FileItem>					
 			)

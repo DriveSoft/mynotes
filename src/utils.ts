@@ -119,7 +119,7 @@ export function createFileAndUpdateFileList(fileList: files[], newIdFile: number
 
     const mapItems = (files: files[]): files[] => {
         return files.map((file: files) => {
-            if (file?.childNodes && file.childNodes.length > 0) {
+            if (file?.childNodes) {
                 if(file.id == idParentFile) {
                     file.childNodes.push(objNewFile)
                 }

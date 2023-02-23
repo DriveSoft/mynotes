@@ -56,7 +56,7 @@ const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 
 
 	async function createNewFile(fileName: string, parentId: number, typeFile: typeFile): Promise<any> {		
-		let objFile: files = {id: 0, fileName: fileName, content: '', parentId: parentId}
+		let objFile: files = {id: 0, fileName: fileName, content: '', parentId: parentId}		
 		if(typeFile === 'folder') objFile = {...objFile, childNodes: []}
 		const newId = await createFilenameAPI(objFile)
 		
@@ -64,6 +64,7 @@ const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 			const newFileList = createFileAndUpdateFileList(fileList, newId, parentId, fileName, typeFile)
 			setFileList(newFileList)		
 			setActiveFile(newId)
+			console.log(newFileList)
 		}
 	}	
 
