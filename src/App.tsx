@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext } from "react";
 import Sidebar from "./components/Sidebar";
 import Filesbar from "./components/Filesbar/Filesbar";
+import FilesContainer from "./components/FilesContainer";
 import Searchbar from "./components/Searchbar";
 import Profilebar from "./components/Profilebar";
 import EditorTabs from "./components/EditorTabs";
@@ -138,7 +139,8 @@ function App() {
 
 				<div className="sidebar2" style={{ width: widthSidebar }}>
 					{activeSidebarButton === "FILES" && (
-						<Filesbar title="Dmitriy's notes"/>
+						// <Filesbar title="Dmitriy's notes"/>
+						<FilesContainer />
 					)}
 
 					{activeSidebarButton === "SEARCH" && <Searchbar />}

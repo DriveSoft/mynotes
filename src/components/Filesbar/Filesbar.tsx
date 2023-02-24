@@ -10,22 +10,30 @@ import "./Filesbar.css"
 
 interface FilesbarProps {
 	title?: string
+	fileList: files[]
+
+	setFileList: (value: files[]) => void
+	activeFile: number | undefined
+	setActiveFile: (value: number | undefined) => void
+	createNewFile: (fileName: string, parentId: number, typeFile: typeFile) => Promise<any>
+	renameFilename: (idFile: number, newFilename: string) => Promise<any>
+	deleteFile: (fileId: number) => Promise<boolean>
+
+	onFileCreate?: (fileName: string, type: typeFile, parentId: number) => Promise<boolean>
 }
 
-function Filesbar({title}: FilesbarProps) {
-
-	const { 
+function Filesbar({
+		title, 
 		fileList, 
-		setFileList, 
-
+		setFileList,
 		activeFile,
 		setActiveFile,
-		
-		createNewFile, 
+		createNewFile,
 		renameFilename,
-		deleteFile
+		deleteFile,
 
-	} = useContext(AppContext) as AppContextType
+		onFileCreate
+	}: FilesbarProps) {
 
 	type typeNewFileAtParent = {parentId: number, type: typeFile}
 
@@ -56,17 +64,17 @@ function Filesbar({title}: FilesbarProps) {
 		`A file or folder ${fileName} already exists at this location. Please choose a different name.`
 
 
-	const onFileCreate = async(success: boolean, filename: string, inputEl: any) => {
+	const _onFileCreate = async(success: boolean, filename: string, inputEl: any) => {
 		setError({ error: '', left: 0, top: 0, width: 0 })
 		inputEl.current.style.outline = ""
 
-		if (success) {
-			try {
-				await createNewFile(filename, showInputNewFileAtParent.parentId, showInputNewFileAtParent.type)
-				setShowInputNewFileAtParent({parentId: -1, type: 'file'})
-			} catch(e) {
-				alert(e)
-			}
+		if (success) {		
+			if(onFileCreate){
+				const result = await onFileCreate(filename, showInputNewFileAtParent.type, showInputNewFileAtParent.parentId)
+				result && setShowInputNewFileAtParent({parentId: -1, type: 'file'})
+			} else {
+				setShowInputNewFileAtParent({parentId: -1, type: 'file'})	
+			} 			
 		} else {
 			setShowInputNewFileAtParent({parentId: -1, type: 'file'})
 		}				
@@ -216,7 +224,7 @@ function Filesbar({title}: FilesbarProps) {
 							selected={false}
 							focused={focusedCmp}		
 							mode='NEW_FILE'			
-							onFileCreated={onFileCreate}
+							onFileCreated={_onFileCreate}
 							onChangeValidator={onChangeValidator}
 							key={'newFile'}
 							level={level+1}
@@ -242,7 +250,7 @@ function Filesbar({title}: FilesbarProps) {
 							selected={false}
 							focused={focusedCmp}		
 							mode='NEW_FILE'			
-							onFileCreated={onFileCreate}
+							onFileCreated={_onFileCreate}
 							onChangeValidator={onChangeValidator}
 							key={'newFile'}
 							level={level}
@@ -270,7 +278,7 @@ function Filesbar({title}: FilesbarProps) {
 			}}
 			onContextMenu={(e) => onContextMenu(e, 0)}
 		>
-			<span>EXPLORER</span>
+			{/* <span>EXPLORER</span> */}
 			<div className="files">
 				<div className="filesTitle">
 					{title && <span>{title}</span>}

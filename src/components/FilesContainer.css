@@ -1,0 +1,12 @@
+.filesContainer {
+    display: flex;
+    flex-direction: column;    
+    background-color: #252525; 
+    height: 100%;
+}
+
+.filesContainer>span {
+    font-size: 11px;
+    color: hsl(0, 0%, 86%);
+    padding: 14px 14px;
+  }
