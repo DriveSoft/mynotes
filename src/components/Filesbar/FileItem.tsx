@@ -93,18 +93,18 @@ function FileItem({
 					<>
 						{isOpened ? (
 							<>
-								<i className="fa-solid fa-chevron-down" style={{width: "14px"}}></i>
-								<i className="fa-regular fa-folder-open"></i>
+								<i className="fa-solid fa-chevron-down" data-testid={'arrow'} style={{width: "14px"}}></i>
+								<i className="fa-regular fa-folder-open" data-testid={'icon'}></i>
 							</>
 						) : (
 							<>
-								<i className="fa-solid fa-chevron-right" style={{width: "14px"}}></i>
-								<i className="fa-regular fa-folder"></i>
+								<i className="fa-solid fa-chevron-right" data-testid={'arrow'} style={{width: "14px"}}></i>
+								<i className="fa-regular fa-folder" data-testid={'icon'}></i>
 							</>
 						)}
 					</>
 				) : (
-					<i className="fa-regular fa-file" style={{paddingLeft: "18px"}}></i>
+					<i className="fa-regular fa-file" data-testid={'icon'} style={{paddingLeft: "18px"}}></i>
 				)}
 			</>
 		);
