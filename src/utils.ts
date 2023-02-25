@@ -28,7 +28,7 @@ export async function createFilenameAPI(file: files): Promise<number | undefined
     //@ts-ignore We have to remove id from obj to get new id by server
     delete fileObjApi.id;
 
-    const response = await fetch(`${URL_API}f`, {...fetchOptions, method: 'POST', body: JSON.stringify(fileObjApi)})    
+    const response = await fetch(`${URL_API}`, {...fetchOptions, method: 'POST', body: JSON.stringify(fileObjApi)})    
     if(!response.ok) throw new Error(response.status.toString()) 
 
     const data = await response.json()    

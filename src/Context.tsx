@@ -23,7 +23,7 @@ export type AppContextType = {
 	setTabs: (value: tabs[]) => void;
 
 	createNewFile: (fileName: string, parentId: number, typeFile: typeFile) => Promise<any>
-	deleteFile: (fileId: number) => Promise<boolean>;
+	deleteFile: (fileId: number) => Promise<any>;
 	saveFileContent: (idFile: number, content: string) => Promise<any>
 	renameFilename: (idFile: number, newFilename: string) => Promise<any>
 };

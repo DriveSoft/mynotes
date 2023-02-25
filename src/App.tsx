@@ -1,6 +1,5 @@
 import { useState, useEffect, useContext } from "react";
 import Sidebar from "./components/Sidebar";
-import Filesbar from "./components/Filesbar/Filesbar";
 import FilesContainer from "./components/FilesContainer";
 import Searchbar from "./components/Searchbar";
 import Profilebar from "./components/Profilebar";
@@ -11,24 +10,6 @@ import { sortFiles, getFileById, URL_API } from "./utils";
 import { AppContext, AppContextType } from './Context';
 import { files, fileAPI, fileType } from "./types";
 
-
-// const defaultFiles: files[] = [
-// 	{
-// 		id: uuid(),
-// 		fileName: "index.html",
-// 		content: ""
-// 	},
-// 	{
-// 		id: uuid(),
-// 		fileName: "style.css",
-// 		content: ""
-// 	},
-// 	{
-// 		id: uuid(),
-// 		fileName: "logo.svg",
-// 		content: ""
-// 	},
-// ]
 
 function App() {
 
@@ -139,7 +120,6 @@ function App() {
 
 				<div className="sidebar2" style={{ width: widthSidebar }}>
 					{activeSidebarButton === "FILES" && (
-						// <Filesbar title="Dmitriy's notes"/>
 						<FilesContainer />
 					)}
 
@@ -165,8 +145,6 @@ function App() {
 					<TextEditor
 						tabs={tabs}
 						setTabs={setTabs}
-						filesList={fileList}
-						setFileList={setFileList}
 						activeFile={activeFile}
 					/>
 				</div>

@@ -28,6 +28,27 @@ const FilesContainer = () => {
 		return true				
 	}
 
+	const onFileRename = async (fileId: number, newFilename: string): Promise<boolean> => {
+		try {
+			await renameFilename(fileId, newFilename)						
+		} catch(e) {
+			alert(e)
+			return false			
+		}
+		return true	
+	}
+
+	const onFileDelete = async(fileId: number): Promise<boolean> => {
+		try {
+			await deleteFile(fileId)
+			setActiveFile(undefined)						
+		} catch(e) {
+			alert(e)
+			return false			
+		}
+		return true	
+	}
+
 	return (
 		<div className="filesContainer">
 			<span>EXPLORER</span>
@@ -42,6 +63,8 @@ const FilesContainer = () => {
 				deleteFile={deleteFile}
 
 				onFileCreate={onFileCreate}
+				onFileRename={onFileRename}
+				onFileDelete={onFileDelete}
 			/>
 		</div>
 	);

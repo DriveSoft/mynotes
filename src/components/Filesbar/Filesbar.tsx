@@ -20,6 +20,8 @@ interface FilesbarProps {
 	deleteFile: (fileId: number) => Promise<boolean>
 
 	onFileCreate?: (fileName: string, type: typeFile, parentId: number) => Promise<boolean>
+	onFileRename?: (fileId: number,newFilename: string) => Promise<boolean>
+	onFileDelete?: (fileId: number) => Promise<boolean>
 }
 
 function Filesbar({
@@ -32,7 +34,9 @@ function Filesbar({
 		renameFilename,
 		deleteFile,
 
-		onFileCreate
+		onFileCreate,
+		onFileRename,
+		onFileDelete
 	}: FilesbarProps) {
 
 	type typeNewFileAtParent = {parentId: number, type: typeFile}
@@ -80,7 +84,7 @@ function Filesbar({
 		}				
 	}
 
-	const onFileRename = async(
+	const _onFileRename = async(
 		fileId: number,
 		success: boolean,
 		newFilename: string,
@@ -90,12 +94,12 @@ function Filesbar({
 		inputEl.current.style.outline = ""
 		
 		if (success) {					
-			try {								
-				await renameFilename(fileId, newFilename)
+			if(onFileRename) {
+				const result = await onFileRename(fileId, newFilename)
+				result && setRenameFileNameId(0)
+			} else {
 				setRenameFileNameId(0)
-			} catch(e) {					
-				alert(e)
-			}					
+			}									
 		} else {
 			setRenameFileNameId(0)
 		}
@@ -136,11 +140,7 @@ function Filesbar({
 
 	const onButtonClickModalDlgConfirmDelete = async(idButton: string) => {
 		if(idButton === 'DELETE') {
-			try {
-				await deleteFile(showDialogConfirmDeleteParams.fileId)		
-			} catch(e) {
-				alert(e)
-		   }			
+			onFileDelete && onFileDelete(showDialogConfirmDeleteParams.fileId)			
 		}
 	}
 
@@ -181,20 +181,21 @@ function Filesbar({
 	}
 
 	const onClickButtonNewFile = (type: typeFile) => {
+		console.log(activeFile)
 		if(activeFile !== undefined){
 			const objFile = getFileById(fileList, activeFile)
-			//objFile && setShowInputNewFileAtParent(objFile.parentId)
 			if(objFile) {
 				if(objFile?.childNodes) {
 					setShowInputNewFileAtParent({parentId: objFile.id, type: type})	
 				} else {
 					setShowInputNewFileAtParent({parentId: objFile.parentId, type: type})	
 				}
+			} else {
+				setShowInputNewFileAtParent({parentId: 0, type: type})	
 			}
 			return
 		}		
 		setShowInputNewFileAtParent({parentId: 0, type: type})
-
 	}
 
 	const renderFiles = (files: files[], newFileAtParent: typeNewFileAtParent) => {
@@ -210,7 +211,7 @@ function Filesbar({
 					mode={renameFileNameId === file.id ? 'RENAME_FILE' : undefined}
 					onClick={onClickFileItem}
 					onMenu={(e, fileId) => onContextMenu(e, fileId)}
-					onFileRenamed={onFileRename}
+					onFileRenamed={_onFileRename}
 					onChangeValidator={onChangeValidator}
 					key={file.id}
 					level={level}					
