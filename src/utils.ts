@@ -16,7 +16,7 @@ export const sortFiles = (files: files[]) => {
     return copyArr.sort((a, b) => a.fileName > b.fileName ? 1 : -1)
 }
 
-export async function createFilenameAPI(file: files): Promise<number | undefined>{
+export async function createFilenameAPI(file: files): Promise<number>{
 
     const fileObjApi: fileAPI = {        
         id: 0,
@@ -153,27 +153,6 @@ export function deleteFileAndUpdateFileList(fileList: files[], idFile: number): 
 
 
 
-// export async function saveFileContentToApiAndGetUpdatedState(fileList: files[], idFile: number, content: string) {
-//     // const fileObj = getFileById(fileList, idFile);
-//     // if(!fileObj) return undefined
-//     // fileObj.content = content
- 			
-//     // if (await updateFilenameAPI(fileObj)) {
-//     //     return getUpdatedFileList(fileList, fileObj)            
-//     // }
-
-//     // return undefined 
-
-//     const fileObj = getFileById(fileList, idFile);
-//     if(!fileObj) return undefined
-//     fileObj.content = content
- 			
-//     if (await updateFilenameAPI(fileObj)) {
-//         return changeContentAndUpdateFileList(fileList, idFile, content)           
-//     }
-
-//     return undefined     
-// };
 
 export async function saveFileContentToApiAndGetUpdatedState(fileList: files[], idFile: number, content: string) {
 
@@ -202,20 +181,3 @@ export async function renameFilenameToApiAndGetUpdatedState(fileList: files[], i
 }
 
 
-export function changeIsOpenedAndUpdateFileList(fileList: files[], idFile: number): files[] {
-
-    const mapItems = (files: files[]): files[] => {
-        return files.map((file: files) => {
-            if (file?.childNodes) {
-                if(file.id === idFile) {
-                    return {...file, childNodes: mapItems(file.childNodes), isOpened: !file.isOpened}
-                }
-                return {...file, childNodes: mapItems(file.childNodes)}
-            } else {
-                return file
-            }
-        })
-    }
-
-    return mapItems(fileList)
-}

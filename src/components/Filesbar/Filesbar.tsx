@@ -1,47 +1,38 @@
-import React, { useState, useRef, useContext } from "react"
-import { AppContext, AppContextType } from "../../Context"
+import React, { useState, useRef, useContext, useEffect } from "react"
 import ContexMenu from "../ContexMenu"
 import ModalDialog from "../ModalDialog"
 import FileItem from "./FileItem"
-import { files, typeFile } from "../../types"
-import { getFileById, changeIsOpenedAndUpdateFileList } from "../../utils"
+import { files, typeFile } from "./types"
+import { getFileById, createFileAndUpdateFileList, changeIsOpenedAndUpdateFileList } from "./utils"
 import "./Filesbar.css"
 
 
 interface FilesbarProps {
 	title?: string
 	fileList: files[]
-
-	setFileList: (value: files[]) => void
-	activeFile: number | undefined
-	setActiveFile: (value: number | undefined) => void
-	createNewFile: (fileName: string, parentId: number, typeFile: typeFile) => Promise<any>
-	renameFilename: (idFile: number, newFilename: string) => Promise<any>
-	deleteFile: (fileId: number) => Promise<boolean>
-
-	onFileCreate?: (fileName: string, type: typeFile, parentId: number) => Promise<boolean>
-	onFileRename?: (fileId: number,newFilename: string) => Promise<boolean>
+	selectedFile: number | undefined
+	onFileCreate?: (fileName: string, type: typeFile, parentId: number) => Promise<number>
+	onFileRename?: (fileId: number, newFilename: string) => Promise<boolean>
 	onFileDelete?: (fileId: number) => Promise<boolean>
+	onSelect?: (fileId: number) => void
 }
 
 function Filesbar({
 		title, 
 		fileList, 
-		setFileList,
-		activeFile,
-		setActiveFile,
-		createNewFile,
-		renameFilename,
-		deleteFile,
-
+		selectedFile,
 		onFileCreate,
 		onFileRename,
-		onFileDelete
+		onFileDelete,
+		onSelect
 	}: FilesbarProps) {
 
 	type typeNewFileAtParent = {parentId: number, type: typeFile}
 
-	const [focusedCmp, setFocusedCmp] = useState(false) 
+	const [treeData, setTreeData] = useState<files[]>([])
+	
+	const [focusedCmp, setFocusedCmp] = useState(false)
+	const [selectedFileId, setSelectedFileId] = useState<number | undefined>(undefined)
 	const [showInputNewFileAtParent, setShowInputNewFileAtParent] = useState<typeNewFileAtParent>({parentId: -2, type: 'file'})
 	const [renameFileNameId, setRenameFileNameId] = useState(0)
 
@@ -59,6 +50,16 @@ function Filesbar({
 		fileId: 0,
 	})
 
+	
+
+	useEffect(() => {
+		setTreeData(fileList)
+	}, [fileList])
+
+	useEffect(() => {
+		setSelectedFileId(selectedFile)
+	}, [selectedFile])
+
 	const [showDialogConfirmDelete, setShowDialogConfirmDelete] = useState(false)
 	const [showDialogConfirmDeleteParams, setShowDialogConfirmDeleteParams] = useState({fileName: '', fileId: 0})
 
@@ -74,8 +75,12 @@ function Filesbar({
 
 		if (success) {		
 			if(onFileCreate){
-				const result = await onFileCreate(filename, showInputNewFileAtParent.type, showInputNewFileAtParent.parentId)
-				result && setShowInputNewFileAtParent({parentId: -1, type: 'file'})
+				const fileId = await onFileCreate(filename, showInputNewFileAtParent.type, showInputNewFileAtParent.parentId)
+				if(fileId) {
+					const updatedTreeData = createFileAndUpdateFileList(treeData, fileId, showInputNewFileAtParent.parentId, filename, showInputNewFileAtParent.type)
+					setTreeData(updatedTreeData)
+					setShowInputNewFileAtParent({parentId: -1, type: 'file'})
+				}
 			} else {
 				setShowInputNewFileAtParent({parentId: -1, type: 'file'})	
 			} 			
@@ -132,7 +137,7 @@ function Filesbar({
 		}
 
 		if (itemId === "DELETE_FILE") {			
-			const fileObj = getFileById(fileList, fileId)
+			const fileObj = getFileById(treeData, fileId)
 			setShowDialogConfirmDeleteParams({fileId: fileId, fileName: fileObj?.fileName || ''})
 			setShowDialogConfirmDelete(true)
 		}
@@ -151,7 +156,7 @@ function Filesbar({
 		inputEl: any
 	): boolean => {
 
-		const result = fileList.every(item => item.fileName !== fileName || fileId === item.id)
+		const result = treeData.every(item => item.fileName !== fileName || fileId === item.id)
 
 		if (!result && inputEl) {
 			inputEl.current.style.outline = "1px solid red"
@@ -172,18 +177,21 @@ function Filesbar({
 
 
 	const onClickFileItem = (file: files) => {
-		setActiveFile(file.id)	
+		//setActiveFile(file.id)	
+		setSelectedFileId(file.id)
+		onSelect && onSelect(file.id)
 		
 		if(file?.childNodes) {
-			const newFileList = changeIsOpenedAndUpdateFileList(fileList, file.id)		
-			setFileList(newFileList)
+			const newFileList = changeIsOpenedAndUpdateFileList(treeData, file.id)		
+			//setFileList(newFileList)
+			setTreeData(newFileList)
 		}
 	}
 
 	const onClickButtonNewFile = (type: typeFile) => {
-		console.log(activeFile)
-		if(activeFile !== undefined){
-			const objFile = getFileById(fileList, activeFile)
+		console.log(selectedFileId)
+		if(selectedFileId !== undefined){
+			const objFile = getFileById(treeData, selectedFileId)
 			if(objFile) {
 				if(objFile?.childNodes) {
 					setShowInputNewFileAtParent({parentId: objFile.id, type: type})	
@@ -206,7 +214,7 @@ function Filesbar({
 			const fileItemEl = (
 				<FileItem
 					fileObj={file}
-					selected={activeFile === file.id}
+					selected={selectedFileId === file.id}
 					focused={focusedCmp}
 					mode={renameFileNameId === file.id ? 'RENAME_FILE' : undefined}
 					onClick={onClickFileItem}
@@ -297,7 +305,7 @@ function Filesbar({
 
 				<div style={{ position: "relative" }}>
 
-					{renderFiles(fileList, showInputNewFileAtParent)}
+					{renderFiles(treeData, showInputNewFileAtParent)}
 
 					{/* dark transparent layer */}
 					{(renameFileNameId !== 0 || showInputNewFileAtParent.parentId > -1) && (

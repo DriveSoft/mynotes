@@ -2,6 +2,7 @@ import { useContext } from "react";
 import Filesbar from "./Filesbar/Filesbar";
 import { AppContext, AppContextType } from "../Context";
 import { files, typeFile } from "../types"
+import { createFilenameAPI } from "../utils"
 import "./FilesContainer.css";
 
 const FilesContainer = () => {
@@ -11,21 +12,22 @@ const FilesContainer = () => {
 
 		activeFile,
 		setActiveFile,
-
-		createNewFile,
 		renameFilename,
 		deleteFile,
 	} = useContext(AppContext) as AppContextType;
 
 
-	const onFileCreate = async(fileName: string, type: typeFile, parentId: number): Promise<boolean> => {		
+	const onFileCreate = async(fileName: string, type: typeFile, parentId: number): Promise<number> => {		
+		let objFile: files = {id: 0, fileName: fileName, content: '', parentId: parentId}		
+		if(type === 'folder') objFile = {...objFile, childNodes: []}
+		
 		try {
-			await createNewFile(fileName, parentId, type)						
+			const newFileId = await createFilenameAPI(objFile)	
+			return newFileId
 		} catch(e) {
 			alert(e)
-			return false			
-		}
-		return true				
+			throw new Error('API call for creating a file is failed')		
+		}					
 	}
 
 	const onFileRename = async (fileId: number, newFilename: string): Promise<boolean> => {
@@ -49,22 +51,22 @@ const FilesContainer = () => {
 		return true	
 	}
 
+	const onSelect = (fileId: number) => {
+		setActiveFile(fileId)						
+	}	
+
 	return (
 		<div className="filesContainer">
 			<span>EXPLORER</span>
 			<Filesbar
 				title="Dmitriy's notes"
 				fileList={fileList}
-				setFileList={setFileList}
-				activeFile={activeFile}
-				setActiveFile={setActiveFile}
-				createNewFile={createNewFile}
-				renameFilename={renameFilename}
-				deleteFile={deleteFile}
+				selectedFile={activeFile}
 
 				onFileCreate={onFileCreate}
 				onFileRename={onFileRename}
 				onFileDelete={onFileDelete}
+				onSelect={onSelect}
 			/>
 		</div>
 	);
