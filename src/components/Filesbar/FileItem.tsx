@@ -10,7 +10,8 @@ interface FileItemProps {
 	onClick?: (file: files) => void
 	onMenu?: (e: React.MouseEvent<HTMLDivElement>, fileId: number) => void
     onFileCreated?: (success: boolean, filename: string, inputEl: any) => void
-    onFileRenamed?: (fileId: number, success: boolean, newFilename: string, inputEl: any) => void
+    //onFileRenamed?: (fileId: number, success: boolean, newFilename: string, inputEl: any) => void
+	onFileRenamed?: (fileObj: files, success: boolean, inputEl: any) => void
 	onChangeValidator: (fileId: number, fileName: string, inputEl: any) => boolean
 	children?: React.ReactNode
 	level: number
@@ -40,7 +41,8 @@ function FileItem({
 			if (renameFilename !== "") {
 				mode === "RENAME_FILE" &&
 					onFileRenamed &&
-					onFileRenamed(fileObj.id, true, renameFilename, inputEl);
+					//onFileRenamed(fileObj.id, true, renameFilename, inputEl);
+					onFileRenamed({...fileObj, fileName: renameFilename}, true, inputEl)
 				mode === "NEW_FILE" &&
 					onFileCreated &&
 					onFileCreated(true, renameFilename, inputEl);
@@ -51,7 +53,7 @@ function FileItem({
 			setRenameFilename(fileObj.fileName);
 			mode === "RENAME_FILE" &&
 				onFileRenamed &&
-				onFileRenamed(fileObj.id, false, "", inputEl);
+				onFileRenamed(fileObj, false, inputEl)
 			mode === "NEW_FILE" &&
 				onFileCreated &&
 				onFileCreated(false, "", inputEl);
@@ -62,7 +64,7 @@ function FileItem({
 		setRenameFilename(fileObj.fileName);
 		mode === "RENAME_FILE" &&
 			onFileRenamed &&
-			onFileRenamed(fileObj.id, false, "", inputEl);
+			onFileRenamed(fileObj, false, inputEl)
 		mode === "NEW_FILE" &&
 			onFileCreated &&
 			onFileCreated(false, "", inputEl);

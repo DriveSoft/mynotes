@@ -26,7 +26,7 @@ export function createFileAndUpdateFileList(fileList: files[], newIdFile: number
     return result
 }
 
-export function changeFilenameAndUpdateFileList(fileList: files[], idFile: number, newFilename: string): files[] | undefined {
+export function changeFilenameAndUpdateFileList(fileList: files[], idFile: number, newFilename: string): files[] {
 
     const mapItems = (files: files[]): files[] => {
         return files.map((file: files) => {

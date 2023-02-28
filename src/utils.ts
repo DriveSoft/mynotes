@@ -17,7 +17,6 @@ export const sortFiles = (files: files[]) => {
 }
 
 export async function createFilenameAPI(file: files): Promise<number>{
-
     const fileObjApi: fileAPI = {        
         id: 0,
         fileName: file.fileName,
@@ -38,7 +37,7 @@ export async function createFilenameAPI(file: files): Promise<number>{
     return result
 }
 
-export async function updateFilenameAPI(file: files){
+export async function updateFilenameAPI(file: files): Promise<any>{
 
     const fileObjApi: fileAPI = {
         id: file.id,
@@ -53,7 +52,8 @@ export async function updateFilenameAPI(file: files){
     if(!response.ok) throw new Error(response.status.toString())
 
     const data = await response.json()
-    return data?.fileName === file.fileName
+    if(data?.fileName !== file.fileName) throw new Error('Something wrong with renaming of the file')
+    return
 }
 
 export async function deleteFilenameAPI(id: number){
@@ -95,65 +95,6 @@ export function changeContentAndUpdateFileList(fileList: files[], idFile: number
     return mapItems(fileList)
 }
 
-export function changeFilenameAndUpdateFileList(fileList: files[], idFile: number, newFilename: string): files[] | undefined {
-
-    const mapItems = (files: files[]): files[] => {
-        return files.map((file: files) => {
-            if (file?.childNodes && file.childNodes.length > 0) {
-                return {...file, childNodes: mapItems(file.childNodes)}
-            } else {
-                if(file.id === idFile) {
-                    return {...file, fileName: newFilename}
-                }
-                return file
-            }
-        })
-    }
-
-    return mapItems(fileList)
-}
-
-export function createFileAndUpdateFileList(fileList: files[], newIdFile: number, idParentFile: number, fileName: string, typeFile: typeFile): files[] {
-    let objNewFile: files = {id: newIdFile, parentId: idParentFile, fileName: fileName, content: ''}                    
-    if(typeFile === 'folder') objNewFile = {...objNewFile, childNodes: [], isOpened: false}    
-
-    const mapItems = (files: files[]): files[] => {
-        return files.map((file: files) => {
-            if (file?.childNodes) {
-                if(file.id == idParentFile) {
-                    file.childNodes.push(objNewFile)
-                }
-                return {...file, childNodes: mapItems(file.childNodes)}
-            } else {
-                return file
-            }
-        })
-    }
-
-    const result = mapItems(fileList)
-    
-    if(idParentFile === 0) {  // new file in root              
-        result.push(objNewFile)
-    }
-
-    return result
-}
-
-
-export function deleteFileAndUpdateFileList(fileList: files[], idFile: number): files[] {
-    const mapItems = (files: files[]): files[] => {
-        return files.filter((file: files) => {            
-            if (file?.childNodes && file.childNodes.length > 0) file.childNodes = mapItems(file.childNodes)                                       
-            return file.id !== idFile
-        })
-    }
-
-    return mapItems(fileList)
-}
-
-
-
-
 export async function saveFileContentToApiAndGetUpdatedState(fileList: files[], idFile: number, content: string) {
 
     const fileObj = getFileById(fileList, idFile);
@@ -165,19 +106,4 @@ export async function saveFileContentToApiAndGetUpdatedState(fileList: files[], 
     }
 
     return undefined     
-};
-
-export async function renameFilenameToApiAndGetUpdatedState(fileList: files[], idFile: number, newFilename: string) {
-    const fileObj = getFileById(fileList, idFile);
-    if(!fileObj) return undefined
-    fileObj.fileName = newFilename
- 			
-    if (await updateFilenameAPI(fileObj)) {
-        //return getUpdatedFileList(fileList, fileObj)     
-        return changeFilenameAndUpdateFileList(fileList, idFile, newFilename)       
-    }
-
-    return undefined 
 }
-
-

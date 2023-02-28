@@ -3,7 +3,13 @@ import ContexMenu from "../ContexMenu"
 import ModalDialog from "../ModalDialog"
 import FileItem from "./FileItem"
 import { files, typeFile } from "./types"
-import { getFileById, createFileAndUpdateFileList, changeIsOpenedAndUpdateFileList } from "./utils"
+import { 
+	getFileById, 
+	createFileAndUpdateFileList, 
+	changeIsOpenedAndUpdateFileList,
+	changeFilenameAndUpdateFileList,
+	deleteFileAndUpdateFileList
+} from "./utils"
 import "./Filesbar.css"
 
 
@@ -12,8 +18,8 @@ interface FilesbarProps {
 	fileList: files[]
 	selectedFile: number | undefined
 	onFileCreate?: (fileName: string, type: typeFile, parentId: number) => Promise<number>
-	onFileRename?: (fileId: number, newFilename: string) => Promise<boolean>
-	onFileDelete?: (fileId: number) => Promise<boolean>
+	onFileRename?: (fileObj: files) => Promise<any>
+	onFileDelete?: (fileId: number) => Promise<any>
 	onSelect?: (fileId: number) => void
 }
 
@@ -90,23 +96,34 @@ function Filesbar({
 	}
 
 	const _onFileRename = async(
-		fileId: number,
+		fileObj: files,
 		success: boolean,
-		newFilename: string,
 		inputEl: any
 	) => {		
 		setError({ error: '', left: 0, top: 0, width: 0 })
 		inputEl.current.style.outline = ""
 		
 		if (success) {					
-			if(onFileRename) {
-				const result = await onFileRename(fileId, newFilename)
-				result && setRenameFileNameId(0)
+			if(onFileRename) {				
+				await onFileRename(fileObj)								
+				const updatedTreeData = changeFilenameAndUpdateFileList(treeData, fileObj.id, fileObj.fileName)
+				setTreeData(updatedTreeData)
+				setRenameFileNameId(0)
 			} else {
 				setRenameFileNameId(0)
 			}									
 		} else {
 			setRenameFileNameId(0)
+		}
+	}
+
+	const onButtonClickModalDlgConfirmDelete = async(idButton: string) => {
+		if(idButton === 'DELETE') {			
+			if(onFileDelete) {
+				await onFileDelete(showDialogConfirmDeleteParams.fileId)
+				const updatedTreeData = deleteFileAndUpdateFileList(treeData, showDialogConfirmDeleteParams.fileId)
+				setTreeData(updatedTreeData)
+			}
 		}
 	}
 
@@ -143,13 +160,6 @@ function Filesbar({
 		}
 	}
 
-	const onButtonClickModalDlgConfirmDelete = async(idButton: string) => {
-		if(idButton === 'DELETE') {
-			onFileDelete && onFileDelete(showDialogConfirmDeleteParams.fileId)			
-		}
-	}
-
-
 	const onChangeValidator = (
 		fileId: number,
 		fileName: string,
@@ -183,7 +193,6 @@ function Filesbar({
 		
 		if(file?.childNodes) {
 			const newFileList = changeIsOpenedAndUpdateFileList(treeData, file.id)		
-			//setFileList(newFileList)
 			setTreeData(newFileList)
 		}
 	}

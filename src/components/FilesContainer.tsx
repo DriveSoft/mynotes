@@ -2,18 +2,14 @@ import { useContext } from "react";
 import Filesbar from "./Filesbar/Filesbar";
 import { AppContext, AppContextType } from "../Context";
 import { files, typeFile } from "../types"
-import { createFilenameAPI } from "../utils"
+import { createFilenameAPI, updateFilenameAPI, deleteFilenameAPI } from "../utils"
 import "./FilesContainer.css";
 
 const FilesContainer = () => {
 	const {
 		fileList,
-		setFileList,
-
 		activeFile,
 		setActiveFile,
-		renameFilename,
-		deleteFile,
 	} = useContext(AppContext) as AppContextType;
 
 
@@ -25,30 +21,28 @@ const FilesContainer = () => {
 			const newFileId = await createFilenameAPI(objFile)	
 			return newFileId
 		} catch(e) {
-			alert(e)
-			throw new Error('API call for creating a file is failed')		
+			alert('onFileCreate: '+e)
+			throw new Error('API call for creating a file has been failed')		
 		}					
 	}
 
-	const onFileRename = async (fileId: number, newFilename: string): Promise<boolean> => {
+	const onFileRename = async (fileObj: files): Promise<any> => {				
 		try {
-			await renameFilename(fileId, newFilename)						
+			await updateFilenameAPI(fileObj)
 		} catch(e) {
 			alert(e)
-			return false			
-		}
-		return true	
+			throw new Error('API call for renaming a file has been failed')
+		}			
 	}
 
-	const onFileDelete = async(fileId: number): Promise<boolean> => {
+	const onFileDelete = async(fileId: number): Promise<any> => {
 		try {
-			await deleteFile(fileId)
+			await deleteFilenameAPI(fileId)
 			setActiveFile(undefined)						
 		} catch(e) {
 			alert(e)
-			return false			
+			throw new Error('API call for deleting a file has been failed')		
 		}
-		return true	
 	}
 
 	const onSelect = (fileId: number) => {
