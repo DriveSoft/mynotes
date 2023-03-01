@@ -1,4 +1,4 @@
-import { fileAPI, files, typeFile } from "./types"
+import { files, typeFile } from "./types"
 
 export function createFileAndUpdateFileList(fileList: files[], newIdFile: number, idParentFile: number, fileName: string, typeFile: typeFile): files[] {
     let objNewFile: files = {id: newIdFile, parentId: idParentFile, fileName: fileName, content: ''}                    
@@ -87,4 +87,18 @@ export function getFileById(fileList: files[], id: number): files | undefined {
     }
 
     return findObj(fileList);
+}
+
+export function getNewId(fileList: files[]): number {
+    let result = 0
+
+    const findMaxId = (fileList: files[]) => {
+        fileList.forEach(file => {
+            if(file?.childNodes?.length && file.childNodes.length > 0) findMaxId(file.childNodes)
+            if(file.id > result) result = file.id
+        })
+    }
+
+    findMaxId(fileList);
+    return result+1
 }

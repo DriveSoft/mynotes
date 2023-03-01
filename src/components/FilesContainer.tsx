@@ -18,10 +18,10 @@ const FilesContainer = () => {
 		if(type === 'folder') objFile = {...objFile, childNodes: []}
 		
 		try {
-			const newFileId = await createFilenameAPI(objFile)	
+			const newFileId = await createFilenameAPI(objFile)
 			return newFileId
 		} catch(e) {
-			alert('onFileCreate: '+e)
+			alert('onFileCreate: ' + e)
 			throw new Error('API call for creating a file has been failed')		
 		}					
 	}
@@ -30,7 +30,7 @@ const FilesContainer = () => {
 		try {
 			await updateFilenameAPI(fileObj)
 		} catch(e) {
-			alert(e)
+			alert('onFileRename: ' + e)
 			throw new Error('API call for renaming a file has been failed')
 		}			
 	}
@@ -40,7 +40,7 @@ const FilesContainer = () => {
 			await deleteFilenameAPI(fileId)
 			setActiveFile(undefined)						
 		} catch(e) {
-			alert(e)
+			alert('onFileDelete: ' + e)
 			throw new Error('API call for deleting a file has been failed')		
 		}
 	}
@@ -54,7 +54,7 @@ const FilesContainer = () => {
 			<span>EXPLORER</span>
 			<Filesbar
 				title="Dmitriy's notes"
-				fileList={fileList}
+				treeData={fileList}
 				selectedFile={activeFile}
 
 				onFileCreate={onFileCreate}

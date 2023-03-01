@@ -33,9 +33,9 @@ function App() {
 
 	useEffect(() => {
 		const createDataTree = (data: fileAPI[]): files[] => {
-			const hashTable = Object.create(null);
-			data.forEach(file => hashTable[file.id] = file.type === 'FOLDER' ? {...file, childNodes: [], isOpened: false} : {...file});
-			const dataTree: files[] = [];
+			const hashTable = Object.create(null)
+			data.forEach(file => hashTable[file.id] = file.type === 'FOLDER' ? {...file, childNodes: [], isOpened: false} : {...file})
+			const dataTree: files[] = []
 
 			data.forEach(file => {
 				console.log(file.id)
@@ -47,7 +47,6 @@ function App() {
 			  	}
 			})
 
-			console.log(dataTree)
 			return dataTree
 		  };
 
@@ -55,24 +54,24 @@ function App() {
 			const response = await fetch(URL_API);
 			const data = await response.json();
 			//setFileList(sortFiles(data))
-			setFileList(sortFiles(createDataTree(data)));
+			setFileList(sortFiles(createDataTree(data)))
 		};
 
 		fetchData().catch((reason) => console.log('fetchData failed', reason));
-	}, []);
+	}, [])
 
 	useEffect(() => {
 		const onKeyDown = (e: KeyboardEvent) => {
 			if (e.ctrlKey && e.code === "KeyS") {
 				e.preventDefault();
 				let content = tabs.find(item => item.id === activeFile)?.content
-				activeFile && content && saveFileContent(activeFile, content);
+				activeFile && content && saveFileContent(activeFile, content)
 			}
-		};
+		}
 
-		window.addEventListener("keydown", onKeyDown);
-		return () => window.removeEventListener("keydown", onKeyDown);
-	}, [activeFile, tabs]);
+		window.addEventListener("keydown", onKeyDown)
+		return () => window.removeEventListener("keydown", onKeyDown)
+	}, [activeFile, tabs])
 
 	useEffect(() => {
 		const onMouseMove = (e: MouseEvent) => {
@@ -80,8 +79,8 @@ function App() {
 				dragSizeSidebar.initPosX +
 				e.pageX -
 				dragSizeSidebar.xMouseStart;
-			width > 150 && setWidthSidebar(width);
-		};
+			width > 150 && setWidthSidebar(width)
+		}
 
 		const onMouseUp = (e: MouseEvent) => {
 			setDragSizeSidebar({

@@ -10,7 +10,6 @@ interface FileItemProps {
 	onClick?: (file: files) => void
 	onMenu?: (e: React.MouseEvent<HTMLDivElement>, fileId: number) => void
     onFileCreated?: (success: boolean, filename: string, inputEl: any) => void
-    //onFileRenamed?: (fileId: number, success: boolean, newFilename: string, inputEl: any) => void
 	onFileRenamed?: (fileObj: files, success: boolean, inputEl: any) => void
 	onChangeValidator: (fileId: number, fileName: string, inputEl: any) => boolean
 	children?: React.ReactNode
@@ -73,12 +72,11 @@ function FileItem({
 	const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value;
 		setRenameFilename(value);
-		setIsValid(onChangeValidator(fileObj.id, value, inputEl));
+		setIsValid(onChangeValidator(fileObj.id, value, inputEl))
 	};
 
 	useEffect(() => {
 		//@ts-ignore
-		//if ((editable || isNewFile) && inputEl) inputEl?.current?.select();
 		if (mode && inputEl) inputEl?.current?.select();
 	}, [mode]);
 
@@ -113,7 +111,7 @@ function FileItem({
 	}
 //<i class="fa-regular fa-folder-open"></i>
 	return (
-		<div>
+		<div role="listitem">
 			<div
 				onClick={() => mode !== "RENAME_FILE" && onClick && onClick(fileObj)}
 				onContextMenu={(e) => {
@@ -155,6 +153,7 @@ function FileItem({
 						onBlur={onBlur}
 						style={{ cursor: "auto", zIndex: "2" }}
 						ref={inputEl}
+						aria-label="Enter a file name"
 					/>
 				) : (
 					<input
@@ -164,9 +163,11 @@ function FileItem({
 						value={fileObj.fileName}
 						style={{ userSelect: "none" }}
 					/>
-				)}
+				)}				
 			</div>
+
 			{children}
+			
 		</div>
 	);
 }

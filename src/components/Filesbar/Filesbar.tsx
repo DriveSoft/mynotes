@@ -8,14 +8,15 @@ import {
 	createFileAndUpdateFileList, 
 	changeIsOpenedAndUpdateFileList,
 	changeFilenameAndUpdateFileList,
-	deleteFileAndUpdateFileList
+	deleteFileAndUpdateFileList,
+	getNewId
 } from "./utils"
 import "./Filesbar.css"
 
 
 interface FilesbarProps {
 	title?: string
-	fileList: files[]
+	treeData: files[]
 	selectedFile: number | undefined
 	onFileCreate?: (fileName: string, type: typeFile, parentId: number) => Promise<number>
 	onFileRename?: (fileObj: files) => Promise<any>
@@ -25,7 +26,7 @@ interface FilesbarProps {
 
 function Filesbar({
 		title, 
-		fileList, 
+		treeData, 
 		selectedFile,
 		onFileCreate,
 		onFileRename,
@@ -35,7 +36,7 @@ function Filesbar({
 
 	type typeNewFileAtParent = {parentId: number, type: typeFile}
 
-	const [treeData, setTreeData] = useState<files[]>([])
+	const [data, setData] = useState<files[]>([])
 	
 	const [focusedCmp, setFocusedCmp] = useState(false)
 	const [selectedFileId, setSelectedFileId] = useState<number | undefined>(undefined)
@@ -56,11 +57,9 @@ function Filesbar({
 		fileId: 0,
 	})
 
-	
-
 	useEffect(() => {
-		setTreeData(fileList)
-	}, [fileList])
+		setData(treeData)
+	}, [treeData])
 
 	useEffect(() => {
 		setSelectedFileId(selectedFile)
@@ -83,11 +82,13 @@ function Filesbar({
 			if(onFileCreate){
 				const fileId = await onFileCreate(filename, showInputNewFileAtParent.type, showInputNewFileAtParent.parentId)
 				if(fileId) {
-					const updatedTreeData = createFileAndUpdateFileList(treeData, fileId, showInputNewFileAtParent.parentId, filename, showInputNewFileAtParent.type)
-					setTreeData(updatedTreeData)
+					const updatedTreeData = createFileAndUpdateFileList(data, fileId, showInputNewFileAtParent.parentId, filename, showInputNewFileAtParent.type)
+					setData(updatedTreeData)
 					setShowInputNewFileAtParent({parentId: -1, type: 'file'})
 				}
 			} else {
+				const updatedTreeData = createFileAndUpdateFileList(data, getNewId(data), showInputNewFileAtParent.parentId, filename, showInputNewFileAtParent.type)
+				setData(updatedTreeData)								
 				setShowInputNewFileAtParent({parentId: -1, type: 'file'})	
 			} 			
 		} else {
@@ -103,15 +104,11 @@ function Filesbar({
 		setError({ error: '', left: 0, top: 0, width: 0 })
 		inputEl.current.style.outline = ""
 		
-		if (success) {					
-			if(onFileRename) {				
-				await onFileRename(fileObj)								
-				const updatedTreeData = changeFilenameAndUpdateFileList(treeData, fileObj.id, fileObj.fileName)
-				setTreeData(updatedTreeData)
-				setRenameFileNameId(0)
-			} else {
-				setRenameFileNameId(0)
-			}									
+		if (success) {											
+			onFileRename && await onFileRename(fileObj)								
+			const updatedTreeData = changeFilenameAndUpdateFileList(data, fileObj.id, fileObj.fileName)
+			setData(updatedTreeData)
+			setRenameFileNameId(0)								
 		} else {
 			setRenameFileNameId(0)
 		}
@@ -119,11 +116,9 @@ function Filesbar({
 
 	const onButtonClickModalDlgConfirmDelete = async(idButton: string) => {
 		if(idButton === 'DELETE') {			
-			if(onFileDelete) {
-				await onFileDelete(showDialogConfirmDeleteParams.fileId)
-				const updatedTreeData = deleteFileAndUpdateFileList(treeData, showDialogConfirmDeleteParams.fileId)
-				setTreeData(updatedTreeData)
-			}
+			onFileDelete && await onFileDelete(showDialogConfirmDeleteParams.fileId)
+			const updatedTreeData = deleteFileAndUpdateFileList(data, showDialogConfirmDeleteParams.fileId)
+			setData(updatedTreeData)
 		}
 	}
 
@@ -154,7 +149,7 @@ function Filesbar({
 		}
 
 		if (itemId === "DELETE_FILE") {			
-			const fileObj = getFileById(treeData, fileId)
+			const fileObj = getFileById(data, fileId)
 			setShowDialogConfirmDeleteParams({fileId: fileId, fileName: fileObj?.fileName || ''})
 			setShowDialogConfirmDelete(true)
 		}
@@ -166,7 +161,7 @@ function Filesbar({
 		inputEl: any
 	): boolean => {
 
-		const result = treeData.every(item => item.fileName !== fileName || fileId === item.id)
+		const result = data.every(item => item.fileName !== fileName || fileId === item.id)
 
 		if (!result && inputEl) {
 			inputEl.current.style.outline = "1px solid red"
@@ -192,15 +187,15 @@ function Filesbar({
 		onSelect && onSelect(file.id)
 		
 		if(file?.childNodes) {
-			const newFileList = changeIsOpenedAndUpdateFileList(treeData, file.id)		
-			setTreeData(newFileList)
+			const newFileList = changeIsOpenedAndUpdateFileList(data, file.id)		
+			setData(newFileList)
 		}
 	}
 
 	const onClickButtonNewFile = (type: typeFile) => {
 		console.log(selectedFileId)
 		if(selectedFileId !== undefined){
-			const objFile = getFileById(treeData, selectedFileId)
+			const objFile = getFileById(data, selectedFileId)
 			if(objFile) {
 				if(objFile?.childNodes) {
 					setShowInputNewFileAtParent({parentId: objFile.id, type: type})	
@@ -299,22 +294,24 @@ function Filesbar({
 			{/* <span>EXPLORER</span> */}
 			<div className="files">
 				<div className="filesTitle">
-					{title && <span>{title}</span>}
+					{title && <span>{title}</span>} 
 
 					<i
 						className="fa-regular fa-folder"
 						onClick={() => onClickButtonNewFile('folder')}
+						aria-label="Create a new file"
 					></i>					
 					<i
 						className="fa-regular fa-file"
 						onClick={() => onClickButtonNewFile('file')}
+						aria-label="Create a new folder"
 					></i>
 										
 				</div>
 
 				<div style={{ position: "relative" }}>
 
-					{renderFiles(treeData, showInputNewFileAtParent)}
+					{renderFiles(data, showInputNewFileAtParent)}
 
 					{/* dark transparent layer */}
 					{(renameFileNameId !== 0 || showInputNewFileAtParent.parentId > -1) && (

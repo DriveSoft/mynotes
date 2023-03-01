@@ -47,6 +47,9 @@ const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 			newFileList && setFileList(newFileList)
 			savedStatusOfFile(idFile, true)			
 		}
+
+		//await saveFileContentToApiAndGetUpdatedState(fileList, idFile, content)
+		//savedStatusOfFile(idFile, true)	
 	}
 
 	function savedStatusOfFile(idFile: number, saved: boolean) {
