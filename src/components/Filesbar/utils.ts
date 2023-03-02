@@ -31,13 +31,14 @@ export function changeFilenameAndUpdateFileList(fileList: files[], idFile: numbe
     const mapItems = (files: files[]): files[] => {
         return files.map((file: files) => {
             if (file?.childNodes && file.childNodes.length > 0) {
+                if(file.id === idFile) return {...file, fileName: newFilename, childNodes: mapItems(file.childNodes)}
                 return {...file, childNodes: mapItems(file.childNodes)}
-            } else {
-                if(file.id === idFile) {
-                    return {...file, fileName: newFilename}
-                }
-                return file
+            } 
+            
+            if(file.id === idFile) {
+                return {...file, fileName: newFilename}
             }
+            return file            
         })
     }
 

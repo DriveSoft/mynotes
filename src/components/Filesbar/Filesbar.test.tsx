@@ -247,6 +247,35 @@ describe('Filebar', () => {
     })
 
 
+    test('it renames a folder', async () => {
+        const title = "Dmitriy's notes"
+        user.setup()                
+        render(
+            <Filesbar
+                title={title}
+                treeData={treeData}
+                selectedFile={1}
+            />            
+        )
+
+        const folderEl = screen.getByDisplayValue('Folder1')
+        await user.pointer({target: folderEl, offset: 2, keys: '[MouseRight]'})
+        
+        const menuEditFileEl = screen.getByText('Edit file')
+        expect(menuEditFileEl).toBeInTheDocument()
+        
+        await user.click(menuEditFileEl)
+        await user.click(folderEl)
+        await user.keyboard('{Control>}A{/Control}')
+        await user.keyboard('{Backspace}')
+        await user.keyboard('Renamed folder')
+        await user.keyboard('[Enter]')
+        
+        const fileRenamedEl = screen.getByDisplayValue('Renamed folder')
+        expect(fileRenamedEl).toBeInTheDocument()
+    })
+
+
     test('it deletes a file', async () => {
         const title = "Dmitriy's notes"
         user.setup()                

@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import FileItem from "./FileItem";
+import user from "@testing-library/user-event"
 import { files, fileType } from "../../types"
-import { debug } from "console";
 
 const fileObjCreatingNewFile = {id: 0, fileName: '', content: '', parentId: 0}
 const fileObj: files = {id: 1, fileName: 'filename01.txt', content: 'hello', parentId: 0}
@@ -19,7 +19,7 @@ describe('FileItem', () => {
                 fileObj={fileObj}	
                 selected={true}
                 focused={true}				
-                onFileCreated={()=>{}}
+                //onFileCreated={async ()=>{}}
                 onChangeValidator={onChangeValidator}
                 key={'someFile'}
                 level={1}
@@ -41,7 +41,7 @@ describe('FileItem', () => {
                 fileObj={folderObj}	
                 selected={true}
                 focused={true}				
-                onFileCreated={()=>{}}
+                //onFileCreated={async ()=>{}}
                 onChangeValidator={onChangeValidator}
                 key={'someFile'}
                 level={1}
@@ -64,7 +64,7 @@ describe('FileItem', () => {
                 selected={false}
                 focused={true}		
                 mode='NEW_FILE'			
-                onFileCreated={()=>{}}
+                //onFileCreated={async ()=>{}}
                 onChangeValidator={onChangeValidator}
                 key={'newFile'}
                 level={1}
@@ -84,7 +84,7 @@ describe('FileItem', () => {
                 selected={true}
                 focused={true}		
                 mode='RENAME_FILE'			
-                onFileCreated={()=>{}}
+                //onFileCreated={()=>{}}
                 onChangeValidator={onChangeValidator}
                 key={'newFile'}
                 level={1}
@@ -95,6 +95,34 @@ describe('FileItem', () => {
         
         expect(inputEl).not.toHaveAttribute('readOnly')
         expect(inputEl).toHaveStyle({zIndex: "2"})
-    })    
+    })  
+    
+    
+    test('render wait icon when file renaming and return default icon when promise in onFileRenamed will be resolved', async () => {
+        user.setup()
+        render(
+            <FileItem
+                fileObj={fileObj}	
+                selected={true}
+                focused={true}		
+                mode='RENAME_FILE'			
+                onFileRenamed={async () => new Promise((resolve) => setInterval(()=>resolve(true), 100))}
+                onChangeValidator={onChangeValidator}
+                key={'newFile'}
+                level={1}
+            />	
+        )   
+        
+        const inputEl = screen.getByRole('textbox')
+        await user.click(inputEl)
+        await user.keyboard('[Enter]')
+        const iconWaitEl = await screen.findByTestId('iconWait')
+        expect(iconWaitEl).toBeInTheDocument()
+
+        await new Promise((resolve) => setInterval(()=>resolve(true), 100))
+
+        const iconDefaultEl = await screen.findByTestId('icon')
+        expect(iconDefaultEl).toBeInTheDocument()        
+    })
 
 })

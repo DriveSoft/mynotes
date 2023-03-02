@@ -9,11 +9,12 @@ interface FileItemProps {
     mode?: 'NEW_FILE' | 'RENAME_FILE'
 	onClick?: (file: files) => void
 	onMenu?: (e: React.MouseEvent<HTMLDivElement>, fileId: number) => void
-    onFileCreated?: (success: boolean, filename: string, inputEl: any) => void
-	onFileRenamed?: (fileObj: files, success: boolean, inputEl: any) => void
+    onFileCreated?: (success: boolean, filename: string, inputEl: any) => Promise<any>
+	onFileRenamed?: (fileObj: files, success: boolean, inputEl: any) => Promise<any>
 	onChangeValidator: (fileId: number, fileName: string, inputEl: any) => boolean
 	children?: React.ReactNode
 	level: number
+	isWaitingIcon?: boolean
 }
 
 function FileItem({
@@ -27,29 +28,31 @@ function FileItem({
     onFileRenamed,
     onChangeValidator,
 	children,
-	level
+	level,
+	isWaitingIcon
 }: FileItemProps) {
 	const [renameFilename, setRenameFilename] = useState(fileObj.fileName);
 	const [isValid, setIsValid] = useState(true);
+	const [isSaveInProgress, setIsSaveInProgress] = useState(false)
 	const fileType: fileType = fileObj?.childNodes ? "FOLDER" : "FILE";
 
 	const inputEl = useRef(null);
 
 	const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-		if (e.key === "Enter" && isValid) {
-			if (renameFilename !== "") {
-				mode === "RENAME_FILE" &&
-					onFileRenamed &&
-					//onFileRenamed(fileObj.id, true, renameFilename, inputEl);
-					onFileRenamed({...fileObj, fileName: renameFilename}, true, inputEl)
-				mode === "NEW_FILE" &&
-					onFileCreated &&
-					onFileCreated(true, renameFilename, inputEl);
+		if (e.key === "Enter" && isValid && renameFilename !== "") {
+			if(mode === "RENAME_FILE" && onFileRenamed) {
+				setIsSaveInProgress(true)
+				onFileRenamed({...fileObj, fileName: renameFilename}, true, inputEl).finally(() => setIsSaveInProgress(false))
+			}		
+			
+			if(mode === "NEW_FILE" && onFileCreated) {
+				setIsSaveInProgress(true)
+				onFileCreated(true, renameFilename, inputEl).finally(() => setIsSaveInProgress(false))
 			}
 		}
 
 		if (e.key === "Escape") {
-			setRenameFilename(fileObj.fileName);
+			setRenameFilename(fileObj.fileName)			
 			mode === "RENAME_FILE" &&
 				onFileRenamed &&
 				onFileRenamed(fileObj, false, inputEl)
@@ -83,10 +86,13 @@ function FileItem({
 	const paddingLeftTree = `${25 + level * 10}px`;
 
 	interface FileIconProps {
-		type: fileType;
-		isOpened: boolean;
+		type: fileType
+		isOpened: boolean
+		isWaiting: boolean
 	}
-	function FileIcon({ type, isOpened }: FileIconProps) {		
+	function FileIcon({ type, isOpened, isWaiting }: FileIconProps) {		
+		
+		
 		return (
 			<>
 				{type === "FOLDER" ? (
@@ -94,22 +100,22 @@ function FileItem({
 						{isOpened ? (
 							<>
 								<i className="fa-solid fa-chevron-down" data-testid={'arrow'} style={{width: "14px"}}></i>
-								<i className="fa-regular fa-folder-open" data-testid={'icon'}></i>
+								{isWaiting ? <i className="fa-solid fa-rotate" style={{zIndex: "2"}} data-testid={'iconWait'}></i> : <i className="fa-regular fa-folder-open" data-testid={'icon'}></i>}
 							</>
 						) : (
 							<>
 								<i className="fa-solid fa-chevron-right" data-testid={'arrow'} style={{width: "14px"}}></i>
-								<i className="fa-regular fa-folder" data-testid={'icon'}></i>
+								{isWaiting ? <i className="fa-solid fa-rotate" style={{zIndex: "2"}} data-testid={'iconWait'}></i> : <i className="fa-regular fa-folder" data-testid={'icon'}></i>}
 							</>
 						)}
 					</>
 				) : (
-					<i className="fa-regular fa-file" data-testid={'icon'} style={{paddingLeft: "18px"}}></i>
+					isWaiting ? <i className="fa-solid fa-rotate" style={{paddingLeft: "16px", zIndex: "2"}} data-testid={'iconWait'}></i> : <i className="fa-regular fa-file" data-testid={'icon'} style={{paddingLeft: "18px"}}></i>
 				)}
 			</>
 		);
 	}
-//<i class="fa-regular fa-folder-open"></i>
+//
 	return (
 		<div role="listitem">
 			<div
@@ -131,6 +137,7 @@ function FileItem({
 				<FileIcon
 					type={fileType}
 					isOpened={fileObj?.isOpened || false}
+					isWaiting={isSaveInProgress || (isWaitingIcon || false)}
 				/>
 
 				{mode === "RENAME_FILE" ? (
@@ -143,6 +150,7 @@ function FileItem({
 						onBlur={onBlur}
 						style={{ cursor: "auto", zIndex: "2" }}
 						ref={inputEl}
+						readOnly={isSaveInProgress}
 					/>
 				) : mode === "NEW_FILE" ? (
 					<input
@@ -154,6 +162,7 @@ function FileItem({
 						style={{ cursor: "auto", zIndex: "2" }}
 						ref={inputEl}
 						aria-label="Enter a file name"
+						readOnly={isSaveInProgress}
 					/>
 				) : (
 					<input

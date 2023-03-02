@@ -42,6 +42,7 @@ function Filesbar({
 	const [selectedFileId, setSelectedFileId] = useState<number | undefined>(undefined)
 	const [showInputNewFileAtParent, setShowInputNewFileAtParent] = useState<typeNewFileAtParent>({parentId: -2, type: 'file'})
 	const [renameFileNameId, setRenameFileNameId] = useState(0)
+	const [waitDeletingIdFile, setWaitDeletingIdFile] = useState<number | null>(null)
 
 	const [error, setError] = useState({
 		error: "",
@@ -105,7 +106,7 @@ function Filesbar({
 		inputEl.current.style.outline = ""
 		
 		if (success) {											
-			onFileRename && await onFileRename(fileObj)								
+			onFileRename && await onFileRename(fileObj)							
 			const updatedTreeData = changeFilenameAndUpdateFileList(data, fileObj.id, fileObj.fileName)
 			setData(updatedTreeData)
 			setRenameFileNameId(0)								
@@ -116,7 +117,11 @@ function Filesbar({
 
 	const onButtonClickModalDlgConfirmDelete = async(idButton: string) => {
 		if(idButton === 'DELETE') {			
-			onFileDelete && await onFileDelete(showDialogConfirmDeleteParams.fileId)
+			if(onFileDelete) {
+				setWaitDeletingIdFile(showDialogConfirmDeleteParams.fileId)
+				await onFileDelete(showDialogConfirmDeleteParams.fileId).finally(() => setWaitDeletingIdFile(null))
+			}
+						
 			const updatedTreeData = deleteFileAndUpdateFileList(data, showDialogConfirmDeleteParams.fileId)
 			setData(updatedTreeData)
 		}
@@ -192,8 +197,7 @@ function Filesbar({
 		}
 	}
 
-	const onClickButtonNewFile = (type: typeFile) => {
-		console.log(selectedFileId)
+	const onClickButtonNewFile = (type: typeFile) => {		
 		if(selectedFileId !== undefined){
 			const objFile = getFileById(data, selectedFileId)
 			if(objFile) {
@@ -212,7 +216,6 @@ function Filesbar({
 
 	const renderFiles = (files: files[], newFileAtParent: typeNewFileAtParent) => {
 		let _newFileAtParent = newFileAtParent.parentId 
-		console.log(newFileAtParent)
 
 		const render = (file: files, level: number) => {
 			const fileItemEl = (
@@ -226,7 +229,8 @@ function Filesbar({
 					onFileRenamed={_onFileRename}
 					onChangeValidator={onChangeValidator}
 					key={file.id}
-					level={level}					
+					level={level}	
+					isWaitingIcon={waitDeletingIdFile === file.id}				
 				>	
 
 					{/* In case when we are creating file inside empty folder */}
@@ -266,7 +270,7 @@ function Filesbar({
 							onFileCreated={_onFileCreate}
 							onChangeValidator={onChangeValidator}
 							key={'newFile'}
-							level={level}
+							level={level}							
 						/>
 
 						{fileItemEl}
