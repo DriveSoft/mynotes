@@ -104,9 +104,7 @@ describe('Filebar', () => {
         const listItems1 = screen.queryAllByRole('listitem')
         expect(listItems1).toHaveLength(treeData.length+1) //new item for entering name for a new file appers
 
-        await user.click(newInputFile)
-        await user.keyboard('NewFile')        
-        await user.keyboard('[Enter]')
+        await user.type(newInputFile, 'NewFile[Enter]')
         const listItems2 = screen.queryAllByRole('listitem')
         expect(listItems2).toHaveLength(treeData.length+1) //new item has been create  
         
@@ -136,9 +134,7 @@ describe('Filebar', () => {
         const listItems1 = screen.queryAllByRole('listitem')
         expect(listItems1).toHaveLength(treeData.length+1) //new item for entering name for a new file appers
 
-        await user.click(newInputFile)
-        await user.keyboard('NewFolder')        
-        await user.keyboard('[Enter]')
+        await user.type(newInputFile, 'NewFolder[Enter]')
         const listItems2 = screen.queryAllByRole('listitem')
         expect(listItems2).toHaveLength(treeData.length+1) //new item has been create  
         
@@ -172,14 +168,13 @@ describe('Filebar', () => {
         const listItems1 = screen.queryAllByRole('listitem')
         expect(listItems1).toHaveLength(treeData.length+2) //new item for entering name for a new file appers, also treeData.length don't return number of nested elements
 
-        await user.click(newInputFile)
-        await user.keyboard('NewFile')        
-        await user.keyboard('[Enter]')
+        await user.type(newInputFile, 'NewFile[Enter]')
         const listItems2 = screen.queryAllByRole('listitem')
         expect(listItems2).toHaveLength(treeData.length+2) //new item has been create  
         
         const newFileItem = screen.getByDisplayValue('NewFile')
-        expect(newFileItem).toBeInTheDocument() //new item has been create          
+        expect(newFileItem).toBeInTheDocument() //new item has been create    
+        expect(newFileItem).toHaveAttribute('readonly')
     })    
 
     test('it creates a new file in an empty subfolder', async () => {
@@ -207,14 +202,13 @@ describe('Filebar', () => {
         const listItems1 = screen.queryAllByRole('listitem')
         expect(listItems1).toHaveLength(treeData.length+1) //new item for entering name for a new file appers
 
-        await user.click(newInputFile)
-        await user.keyboard('NewFile')        
-        await user.keyboard('[Enter]')
+        await user.type(newInputFile, 'NewFile[Enter]')
         const listItems2 = screen.queryAllByRole('listitem')
         expect(listItems2).toHaveLength(treeData.length+1) //new item has been create  
         
         const newFileItem = screen.getByDisplayValue('NewFile')
-        expect(newFileItem).toBeInTheDocument() //new item has been create          
+        expect(newFileItem).toBeInTheDocument() //new item has been create  
+        expect(newFileItem).toHaveAttribute('readonly')      
     })     
 
 
@@ -236,14 +230,12 @@ describe('Filebar', () => {
         expect(menuEditFileEl).toBeInTheDocument()
         
         await user.click(menuEditFileEl)
-        await user.click(fileEl)
-        await user.keyboard('{Control>}A{/Control}')
-        await user.keyboard('{Backspace}')
-        await user.keyboard('Renamed file')
-        await user.keyboard('[Enter]')
-        
+        await user.clear(fileEl)
+        await user.type(fileEl, 'Renamed file[Enter]')
+
         const fileRenamedEl = screen.getByDisplayValue('Renamed file')
         expect(fileRenamedEl).toBeInTheDocument()
+        expect(fileRenamedEl).toHaveAttribute('readonly')
     })
 
 
@@ -265,14 +257,12 @@ describe('Filebar', () => {
         expect(menuEditFileEl).toBeInTheDocument()
         
         await user.click(menuEditFileEl)
-        await user.click(folderEl)
-        await user.keyboard('{Control>}A{/Control}')
-        await user.keyboard('{Backspace}')
-        await user.keyboard('Renamed folder')
-        await user.keyboard('[Enter]')
+        await user.clear(folderEl)
+        await user.type(folderEl, 'Renamed folder[Enter]')
         
         const fileRenamedEl = screen.getByDisplayValue('Renamed folder')
         expect(fileRenamedEl).toBeInTheDocument()
+        expect(fileRenamedEl).toHaveAttribute('readonly')
     })
 
 

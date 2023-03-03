@@ -37,8 +37,7 @@ function App() {
 			data.forEach(file => hashTable[file.id] = file.type === 'FOLDER' ? {...file, childNodes: [], isOpened: false} : {...file})
 			const dataTree: files[] = []
 
-			data.forEach(file => {
-				console.log(file.id)
+			data.forEach(file => {				
 				if(file.parentId > 0 && hashTable[file.parentId]) {     
 					if(hashTable[file.parentId]?.childNodes) hashTable[file.parentId].childNodes.push(hashTable[file.id])
 					else dataTree.push(hashTable[file.id]) // in case, if file referencing to not Folder
