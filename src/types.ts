@@ -37,6 +37,7 @@ export interface fileAPI {
 export interface tabs {
 	id: number
 	saved: boolean
+	tabName: string
 	content: string | undefined
 }
 

@@ -41,15 +41,13 @@ const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 	}
 
 	
-	async function saveFileContent(idFile: number, content: string) {
+	async function saveFileContent(idFile: number, content: string) {		
 		const newFileList = await saveFileContentToApiAndGetUpdatedState(fileList, idFile, content)
+		
 		if (newFileList) {
 			newFileList && setFileList(newFileList)
-			savedStatusOfFile(idFile, true)			
+			savedStatusOfFile(idFile, true)				
 		}
-
-		//await saveFileContentToApiAndGetUpdatedState(fileList, idFile, content)
-		//savedStatusOfFile(idFile, true)	
 	}
 
 	function savedStatusOfFile(idFile: number, saved: boolean) {
@@ -57,6 +55,7 @@ const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 			tab.id === idFile ? { ...tab, saved: true } : tab
 		);
 		setTabs(newTabs);
+		
 	}	
 
 

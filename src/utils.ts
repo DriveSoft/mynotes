@@ -95,15 +95,11 @@ export function changeContentAndUpdateFileList(fileList: files[], idFile: number
     return mapItems(fileList)
 }
 
-export async function saveFileContentToApiAndGetUpdatedState(fileList: files[], idFile: number, content: string) {
-
+export async function saveFileContentToApiAndGetUpdatedState(fileList: files[], idFile: number, content: string) {    
     const fileObj = getFileById(fileList, idFile);
     if(!fileObj) return undefined
     fileObj.content = content
- 			
-    if (await updateFilenameAPI(fileObj)) {
-        return changeContentAndUpdateFileList(fileList, idFile, content)           
-    }
-
-    return undefined     
+		
+    await updateFilenameAPI(fileObj)              
+    return changeContentAndUpdateFileList(fileList, idFile, content) 
 }

@@ -10,6 +10,8 @@ const FilesContainer = () => {
 		fileList,
 		activeFile,
 		setActiveFile,
+		tabs,
+		setTabs
 	} = useContext(AppContext) as AppContextType;
 
 
@@ -29,6 +31,7 @@ const FilesContainer = () => {
 	const onFileRename = async (fileObj: files): Promise<any> => {				
 		try {
 			await updateFilenameAPI(fileObj)
+			setTabs(tabs.map(tab => fileObj.id === tab.id ? {...tab, tabName: fileObj.fileName} : tab))
 		} catch(e) {
 			alert('onFileRename: ' + e)
 			throw new Error('API call for renaming a file has been failed')

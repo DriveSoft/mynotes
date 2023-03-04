@@ -38,7 +38,8 @@ function EditorTabs(){
 
 		if(objTab) {
 			if(!objTab.saved) {
-				setShowDlgSaveFileParams({fileId: fileToClose, fileName: getFilename(fileToClose) || ''})
+				//setShowDlgSaveFileParams({fileId: fileToClose, fileName: getFilename(fileToClose) || ''})
+				setShowDlgSaveFileParams({fileId: fileToClose, fileName: objTab.tabName})
 				setShowDlgSaveFile(true)
 			} else {
 				closeTab(fileToClose)
@@ -80,28 +81,27 @@ function EditorTabs(){
 		}
 	};	
 
-	function getFilename(id: number): string | undefined {
-		//return fileList.find((item) => item.id === id)?.fileName || undefined;
-		let result: any = undefined
+	// function getFilename(id: number): string | undefined {		
+	// 	let result: any = undefined
 
-		const findFilename = (ar: files[]) => {
-			let res = ar.find(file => {
-				if(file?.childNodes?.length && file.childNodes.length > 0) findFilename(file.childNodes)
-				return file.id === id
-			})
+	// 	const findFilename = (ar: files[]) => {
+	// 		let res = ar.find(file => {
+	// 			if(file?.childNodes?.length && file.childNodes.length > 0) findFilename(file.childNodes)
+	// 			return file.id === id
+	// 		})
 
-			if (res) result = res
-			return result
-		}
+	// 		if (res) result = res
+	// 		return result
+	// 	}
 
-		return findFilename(fileList)?.fileName || undefined;
-	}
+	// 	return findFilename(fileList)?.fileName || undefined;
+	// }
 
 	return (
 		<div className="editorTabs">
 			{tabs.map(
 				(fileTab: tabs, index: number) =>
-					getFilename(fileTab.id) && (
+					//getFilename(fileTab.id) && (
 						<div
 							key={fileTab.id}
 							className={ activeFile === fileTab.id ? "tab activeTab" : "tab" }
@@ -113,7 +113,8 @@ function EditorTabs(){
 							draggable
 						>
 							<i className="tabIcon fa-regular fa-file-lines"></i>
-							<p className="tabFilename">{getFilename(fileTab.id)}</p>
+							{/* <p className="tabFilename">{getFilename(fileTab.id)}</p> */}
+							<p className="tabFilename">{fileTab.tabName}</p>
 							<p
 								className="tabCloseButton"
 								onClick={(e) => onCloseButton(e, fileTab.id)}
@@ -121,7 +122,7 @@ function EditorTabs(){
 								<span>{fileTab.saved ? '⨉' : '⬤'}</span>	
 							</p>
 						</div>
-					)				
+					//)				
 			)}
 
 

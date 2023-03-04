@@ -63,8 +63,8 @@ function App() {
 		const onKeyDown = (e: KeyboardEvent) => {
 			if (e.ctrlKey && e.code === "KeyS") {
 				e.preventDefault();
-				let content = tabs.find(item => item.id === activeFile)?.content
-				activeFile && content && saveFileContent(activeFile, content)
+				let content = tabs.find(item => item.id === activeFile)?.content				
+				activeFile && content !== undefined && saveFileContent(activeFile, content)
 			}
 		}
 
@@ -102,9 +102,11 @@ function App() {
 
 	useEffect(() => {
 		if (!activeFile) return;
-		if (!tabs.find((tabItem) => tabItem.id === activeFile)) {
-			const content = getFileById(fileList, activeFile)?.content
-			setTabs([...tabs, { id: activeFile, saved: true, content: content}]);
+		if (!tabs.find((tabItem) => tabItem.id === activeFile)) { // if file not found in tabs, open a new tab for the activeFile
+			const objFile = getFileById(fileList, activeFile)
+			const content = objFile?.content
+			const fileName = objFile?.fileName
+			fileName && setTabs([...tabs, { id: activeFile, saved: true, tabName: fileName, content: content}]);
 		}
 	}, [activeFile]);
 
