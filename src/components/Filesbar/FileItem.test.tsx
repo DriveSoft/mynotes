@@ -7,7 +7,7 @@ const fileObjCreatingNewFile = {id: 0, fileName: '', content: '', parentId: 0}
 const fileObj: files = {id: 1, fileName: 'filename01.txt', content: 'hello', parentId: 0}
 const folderObj: files = {id: 1, fileName: 'Foldername', content: '', parentId: 0, childNodes:[], isOpened: false}
 
-const onChangeValidator = (fileId: number, fileName: string, inputEl: any): boolean => {
+const onChangeValidator = (fileId: number, parentId: number, fileName: string, inputEl: any): boolean => {
     return true
 }
 

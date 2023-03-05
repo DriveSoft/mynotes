@@ -11,7 +11,7 @@ interface FileItemProps {
 	onMenu?: (e: React.MouseEvent<HTMLDivElement>, fileId: number) => void
     onFileCreated?: (success: boolean, filename: string, inputEl: any) => Promise<any>
 	onFileRenamed?: (fileObj: files, success: boolean, inputEl: any) => Promise<any>
-	onChangeValidator: (fileId: number, fileName: string, inputEl: any) => boolean
+	onChangeValidator: (fileId: number, parentId: number, fileName: string, inputEl: any) => boolean
 	children?: React.ReactNode
 	level: number
 	isWaitingIcon?: boolean
@@ -75,7 +75,7 @@ function FileItem({
 	const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value;
 		setRenameFilename(value);
-		setIsValid(onChangeValidator(fileObj.id, value, inputEl))
+		setIsValid(onChangeValidator(fileObj.id, fileObj.parentId, value, inputEl))
 	};
 
 	useEffect(() => {

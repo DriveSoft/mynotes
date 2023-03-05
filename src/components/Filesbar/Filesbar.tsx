@@ -162,11 +162,15 @@ function Filesbar({
 
 	const onChangeValidator = (
 		fileId: number,
+		parentId: number,
 		fileName: string,
 		inputEl: any
 	): boolean => {
 
-		const result = data.every(item => item.fileName !== fileName || fileId === item.id)
+		const filesInParentFolder = parentId > 0 ? getFileById(data, parentId)?.childNodes : data
+		//const result = data.every(item => item.fileName !== fileName || fileId === item.id)
+		let result = false
+		if(filesInParentFolder) result = filesInParentFolder.every(item => item.fileName !== fileName || fileId === item.id)
 
 		if (!result && inputEl) {
 			inputEl.current.style.outline = "1px solid red"
@@ -216,8 +220,15 @@ function Filesbar({
 
 	const renderFiles = (files: files[], newFileAtParent: typeNewFileAtParent) => {
 		let _newFileAtParent = newFileAtParent.parentId 
+		
+		const sortFiles = (files: files[]) => {
+			files.sort((a, b) => a.fileName.toLowerCase() > b.fileName.toLowerCase() ? 1 : -1)
+		}
+		
+		sortFiles(files)
 
-		const render = (file: files, level: number) => {
+		const render = (file: files, level: number) => {			
+			
 			const fileItemEl = (
 				<FileItem
 					fileObj={file}
@@ -231,13 +242,14 @@ function Filesbar({
 					key={file.id}
 					level={level}	
 					isWaitingIcon={waitDeletingIdFile === file.id}				
-				>	
+				>
+				<>
 
 					{/* In case when we are creating file inside empty folder */}
 					{
 						file?.childNodes && file?.childNodes.length===0 && file.id == _newFileAtParent && 					
 						<FileItem
-							fileObj={{id: 0, fileName: '', content: '', parentId: 0}}	
+							fileObj={{id: 0, fileName: '', content: '', parentId: _newFileAtParent}}	
 							selected={false}
 							focused={focusedCmp}		
 							mode='NEW_FILE'			
@@ -252,9 +264,12 @@ function Filesbar({
 					{/* we have to open folder if we are creating file inside it */}
 					{file?.childNodes && file.id == _newFileAtParent ? file.isOpened = true : file.isOpened = file.isOpened}					
 					
-					{												
-						file?.childNodes && file.isOpened && file.childNodes.map((file: any) => render(file, level+1))						
-					}
+					{/* sorting childs files */}
+					{file?.childNodes && file.isOpened && sortFiles(file.childNodes)}
+					
+					{/* rendering */}
+					{file?.childNodes && file.isOpened && file.childNodes.map((file: any) => render(file, level+1))}
+				</>		
 				</FileItem>					
 			)
 
@@ -263,7 +278,7 @@ function Filesbar({
 				return (
 					<React.Fragment key={file.id}>
 						<FileItem
-							fileObj={{id: 0, fileName: '', content: '', parentId: 0}}	
+							fileObj={{id: 0, fileName: '', content: '', parentId: file.parentId}}	
 							selected={false}
 							focused={focusedCmp}		
 							mode='NEW_FILE'			
@@ -280,6 +295,11 @@ function Filesbar({
 
 			return (fileItemEl)			
 		}
+
+
+		//const sortFiles = (files: files[]) => {
+		//	files.sort
+		//}
 
 		return files.map((file: any) => render(file, 0))
 
