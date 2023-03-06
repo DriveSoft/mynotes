@@ -170,7 +170,7 @@ function Filesbar({
 		const filesInParentFolder = parentId > 0 ? getFileById(data, parentId)?.childNodes : data
 		//const result = data.every(item => item.fileName !== fileName || fileId === item.id)
 		let result = false
-		if(filesInParentFolder) result = filesInParentFolder.every(item => item.fileName !== fileName || fileId === item.id)
+		if(filesInParentFolder) result = filesInParentFolder.every(item => item.fileName.toLowerCase() !== fileName.toLowerCase() || fileId === item.id)
 
 		if (!result && inputEl) {
 			inputEl.current.style.outline = "1px solid red"
