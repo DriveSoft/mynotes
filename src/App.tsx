@@ -104,9 +104,11 @@ function App() {
 		if (!activeFile) return;
 		if (!tabs.find((tabItem) => tabItem.id === activeFile)) { // if file not found in tabs, open a new tab for the activeFile
 			const objFile = getFileById(fileList, activeFile)
-			const content = objFile?.content
-			const fileName = objFile?.fileName
-			fileName && setTabs([...tabs, { id: activeFile, saved: true, tabName: fileName, content: content}]);
+			if(!objFile?.childNodes) {
+				const content = objFile?.content
+				const fileName = objFile?.fileName
+				fileName && setTabs([...tabs, { id: activeFile, saved: true, tabName: fileName, content: content}])
+			}
 		}
 	}, [activeFile]);
 
