@@ -249,7 +249,8 @@ function Filesbar({
 					{
 						file?.childNodes && file?.childNodes.length===0 && file.id == _newFileAtParent && 					
 						<FileItem
-							fileObj={{id: 0, fileName: '', content: '', parentId: _newFileAtParent}}	
+							//fileObj={{id: 0, fileName: '', content: '', parentId: _newFileAtParent}}	
+							fileObj={ newFileAtParent.type === 'folder' ? {id: 0, fileName: '', content: '', parentId: file.parentId, childNodes: []} : {id: 0, fileName: '', content: '', parentId: file.parentId}}	
 							selected={false}
 							focused={focusedCmp}		
 							mode='NEW_FILE'			
@@ -278,7 +279,7 @@ function Filesbar({
 				return (
 					<React.Fragment key={file.id}>
 						<FileItem
-							fileObj={{id: 0, fileName: '', content: '', parentId: file.parentId}}	
+							fileObj={ newFileAtParent.type === 'folder' ? {id: 0, fileName: '', content: '', parentId: file.parentId, childNodes: []} : {id: 0, fileName: '', content: '', parentId: file.parentId}}	
 							selected={false}
 							focused={focusedCmp}		
 							mode='NEW_FILE'			
