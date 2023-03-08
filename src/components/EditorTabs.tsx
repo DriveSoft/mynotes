@@ -1,25 +1,17 @@
 import React, { useRef, useState, useContext } from "react";
-import { AppContext, AppContextType } from "../Context";
 import ModalDialog from "./ModalDialog";
-import { files, tabs } from "../types";
+import { tabs } from "../types";
 import "./EditorTabs.css";
 
+interface EditorTabsProps {
+	tabs: tabs[]
+	setTabs: (value: tabs[]) => void
+	activeFile: number | undefined
+	setActiveFile: (value: number | undefined) => void
+	saveFileContent: (idFile: number, content: string) => Promise<any>
+}
 
-function EditorTabs(){
-
-	const { 
-		fileList, 
-		
-		tabs,
-		setTabs,
-
-		activeFile,
-		setActiveFile,
-		
-		saveFileContent
-	} = useContext(AppContext) as AppContextType;
-
-
+function EditorTabs({tabs, setTabs, activeFile, setActiveFile, saveFileContent}: EditorTabsProps){
 	const [showDlgSaveFile, setShowDlgSaveFile] = useState(false)
 	const [showDlgSaveFileParams, setShowDlgSaveFileParams] = useState({fileId: 0, fileName: ''})
 
@@ -38,7 +30,6 @@ function EditorTabs(){
 
 		if(objTab) {
 			if(!objTab.saved) {
-				//setShowDlgSaveFileParams({fileId: fileToClose, fileName: getFilename(fileToClose) || ''})
 				setShowDlgSaveFileParams({fileId: fileToClose, fileName: objTab.tabName})
 				setShowDlgSaveFile(true)
 			} else {
@@ -81,21 +72,6 @@ function EditorTabs(){
 		}
 	};	
 
-	// function getFilename(id: number): string | undefined {		
-	// 	let result: any = undefined
-
-	// 	const findFilename = (ar: files[]) => {
-	// 		let res = ar.find(file => {
-	// 			if(file?.childNodes?.length && file.childNodes.length > 0) findFilename(file.childNodes)
-	// 			return file.id === id
-	// 		})
-
-	// 		if (res) result = res
-	// 		return result
-	// 	}
-
-	// 	return findFilename(fileList)?.fileName || undefined;
-	// }
 
 	return (
 		<div className="editorTabs">

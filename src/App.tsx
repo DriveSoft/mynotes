@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext } from "react";
 import Sidebar from "./components/Sidebar";
 import FilesContainer from "./components/FilesContainer";
+import EditorContainer from "./components/EditorContainer";
 import Searchbar from "./components/Searchbar";
 import Profilebar from "./components/Profilebar";
 import EditorTabs from "./components/EditorTabs";
@@ -143,13 +144,8 @@ function App() {
 				></div>
 
 				<div className="editorWrapper">
-					<EditorTabs/>
-					<TextEditor
-						tabs={tabs}
-						setTabs={setTabs}
-						activeFile={activeFile}
-					/>
-				</div>
+					<EditorContainer />
+				</div> 
 			</div>
 		</>
 	);
