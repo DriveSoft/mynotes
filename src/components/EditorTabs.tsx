@@ -7,11 +7,15 @@ interface EditorTabsProps {
 	tabs: tabs[]
 	setTabs: (value: tabs[]) => void
 	activeFile: number | undefined
-	setActiveFile: (value: number | undefined) => void
+	//setActiveFile: (value: number | undefined) => void
 	saveFileContent: (idFile: number, content: string) => Promise<any>
+
+	onChangeTab?: (tab: tabs | undefined) => void
+	onCloseTab?: (tab:tabs) => boolean | undefined
+
 }
 
-function EditorTabs({tabs, setTabs, activeFile, setActiveFile, saveFileContent}: EditorTabsProps){
+function EditorTabs({tabs, setTabs, activeFile, saveFileContent, onChangeTab, onCloseTab}: EditorTabsProps){
 	const [showDlgSaveFile, setShowDlgSaveFile] = useState(false)
 	const [showDlgSaveFileParams, setShowDlgSaveFileParams] = useState({fileId: 0, fileName: ''})
 
@@ -20,22 +24,27 @@ function EditorTabs({tabs, setTabs, activeFile, setActiveFile, saveFileContent}:
 
 	const closeTab = (fileId: number) => {
 		setTabs(tabs.filter((fileForClose) => fileForClose.id !== fileId));
-		if (activeFile === fileId) setActiveFile(undefined);		
+		if (activeFile === fileId) onChangeTab && onChangeTab(undefined)//setActiveFile(undefined);		
 	}
 
-	const onCloseButton = async (e: React.MouseEvent<HTMLElement>, fileToClose: number) => {
+	const onCloseButton = (e: React.MouseEvent<HTMLElement>, fileToClose: number) => {
 		e.stopPropagation();
-
 		const objTab = tabs.find((tab) => tab.id === fileToClose)
 
-		if(objTab) {
-			if(!objTab.saved) {
-				setShowDlgSaveFileParams({fileId: fileToClose, fileName: objTab.tabName})
-				setShowDlgSaveFile(true)
-			} else {
-				closeTab(fileToClose)
-			}
+		if(onCloseTab && objTab) {
+			const result = onCloseTab(objTab)
+			console.log('result', result)
+			result !== false && closeTab(objTab.id)
 		}
+
+		// if(objTab) {
+		// 	if(!objTab.saved) {
+		// 		setShowDlgSaveFileParams({fileId: fileToClose, fileName: objTab.tabName})
+		// 		setShowDlgSaveFile(true)
+		// 	} else {
+		// 		closeTab(fileToClose)
+		// 	}
+		// }
 	};
 
 	const onButtonClickModalDlgSaveFile = async (idButton: string) => {
@@ -79,9 +88,11 @@ function EditorTabs({tabs, setTabs, activeFile, setActiveFile, saveFileContent}:
 				(fileTab: tabs, index: number) =>
 					//getFilename(fileTab.id) && (
 						<div
+							role={'listitem'}	
 							key={fileTab.id}
 							className={ activeFile === fileTab.id ? "tab activeTab" : "tab" }
-							onClick={() => setActiveFile(fileTab.id)}
+							//onClick={() => setActiveFile(fileTab.id)}
+							onClick={() => {onChangeTab && onChangeTab(fileTab)}} 
 							onDragStart={(e) => onDragStart(e, index)}
 							onDragEnter={(e) => onDragEnter(e, index)}
 							onDragOver={(e) => e.preventDefault()}

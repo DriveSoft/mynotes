@@ -1,0 +1,97 @@
+.modalDialogContainer {    
+    display: flex;
+    font-size: 14px;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.3);
+    z-index: 999;
+}
+
+.modalDialog {
+    display: flex;
+    flex-direction: column;
+    width: 450px;
+    border: 1px solid black;
+    border-radius: 5px;
+    background-color: #252525;
+}
+
+.modalDialogTitle {
+    display: flex;
+    align-items: center;   
+    height: 25px; 
+    color: white;
+}
+
+.modalDialogTitle span {
+    flex: 1;
+    margin-left: 5px;
+}
+
+.modalDialogTitle div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 25px;   
+    cursor: pointer;
+    transition: background-color 0.2s; 
+}
+
+.modalDialogTitle div:hover {
+    background-color: red;    
+}
+
+.modalDialogTitle div:active {
+    background-color: rgb(255, 109, 109);    
+}
+
+.modalDialogContent {
+    display: flex;
+    align-items: flex-start;
+    color: white;
+    margin-top: 30px;
+    min-height: 50px;
+}
+
+.modalDialogContent i {
+    font-size: xx-large;
+    margin-left: 20px;
+}
+
+.modalDialogContent span {
+    margin-left: 20px;    
+}
+
+.modalDialogButtons {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    height: 48px;
+    background-color: #252525;
+    padding-right: 5px;
+}
+
+.modalDialogButtons button {
+    height: 28px;
+    margin: 0 5px 0 5px;
+    min-width: 80px;
+    border: 0px solid #252525;
+    background-color: #363636;    
+    color: white;
+    transition: background-color 0.1s;
+    font-size: 12px;
+}
+
+.modalDialogButtons button:hover {
+    background-color: hsla(204, 100%, 42%, 0.5)
+}    
+
+.modalDialogButtons button:active {
+    background-color: hsla(204, 100%, 42%, 0.3)    
+}
