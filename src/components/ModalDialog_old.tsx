@@ -1,5 +1,5 @@
 import React from "react";
-import "./ModalDialog2.css";
+import "./ModalDialog.css";
 
 interface button {
 	idButton: string;
@@ -12,29 +12,28 @@ interface ModalDialogProps {
 	paramsObj?: {[key: string]: string}
 	faIcon: string; //fa-regular fa-circle-question
 	buttons: button[];
-	onButtonClick: (idButton: string | 'SYSCLOSE', paramObj?: {[key: string]: string}) => void;
+	onButtonClick: (idButton: string, paramObj?: {[key: string]: string}) => void;
 	show: boolean;
-	//setShow: (value: boolean) => void;
+	setShow: (value: boolean) => void;
 }
 
-function ModalDialog2({
+function ModalDialog({
 	title,
 	message,
 	faIcon,
 	buttons,
 	onButtonClick,
     show, 
-    //setShow
+    setShow
 }: ModalDialogProps) {
 
 	const _onButtonClick = (idButton: string) => {
 		onButtonClick(idButton)
-        //setShow(false)
+        setShow(false)
 	};
 
     const onClose = () => {
-        onButtonClick('SYSCLOSE')
-		//setShow(false)    
+        setShow(false)    
     }
 
 	return (
@@ -71,4 +70,4 @@ function ModalDialog2({
 	);
 }
 
-export default ModalDialog2;
+export default ModalDialog;

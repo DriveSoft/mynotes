@@ -12,9 +12,9 @@ interface ModalDialogProps {
 	paramsObj?: {[key: string]: string}
 	faIcon: string; //fa-regular fa-circle-question
 	buttons: button[];
-	onButtonClick: (idButton: string, paramObj?: {[key: string]: string}) => void;
+	onButtonClick: (idButton: string | 'SYSCLOSE', paramObj?: {[key: string]: string}) => void;
 	show: boolean;
-	setShow: (value: boolean) => void;
+	//setShow: (value: boolean) => void;
 }
 
 function ModalDialog({
@@ -24,16 +24,17 @@ function ModalDialog({
 	buttons,
 	onButtonClick,
     show, 
-    setShow
+    //setShow
 }: ModalDialogProps) {
 
 	const _onButtonClick = (idButton: string) => {
 		onButtonClick(idButton)
-        setShow(false)
+        //setShow(false)
 	};
 
     const onClose = () => {
-        setShow(false)    
+        onButtonClick('SYSCLOSE')
+		//setShow(false)    
     }
 
 	return (

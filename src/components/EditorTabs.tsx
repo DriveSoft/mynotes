@@ -1,132 +1,113 @@
-import React, { useRef, useState, useContext } from "react";
-import ModalDialog from "./ModalDialog";
-import { tabs } from "../types";
-import "./EditorTabs.css";
+import React, { useRef } from "react"
+import { tabs } from "../types"
+import "./EditorTabs.css"
 
 interface EditorTabsProps {
 	tabs: tabs[]
-	setTabs: (value: tabs[]) => void
 	activeFile: number | undefined
-	//setActiveFile: (value: number | undefined) => void
-	saveFileContent: (idFile: number, content: string) => Promise<any>
-
 	onChangeTab?: (tab: tabs | undefined) => void
 	onCloseTab?: (tab:tabs) => boolean | undefined
-
+	onClosedTab?: (newStateTabs: tabs[], tabFileId: number) => void
+	onDropFinished?: (newStateTabs: tabs[]) => void
 }
 
-function EditorTabs({tabs, setTabs, activeFile, saveFileContent, onChangeTab, onCloseTab}: EditorTabsProps){
-	const [showDlgSaveFile, setShowDlgSaveFile] = useState(false)
-	const [showDlgSaveFileParams, setShowDlgSaveFileParams] = useState({fileId: 0, fileName: ''})
+function EditorTabs({
+	tabs,
+	activeFile,
+	onChangeTab,
+	onCloseTab,
+	onClosedTab,
+	onDropFinished,
+}: EditorTabsProps) {
 
-	const dragTab = useRef<number | null>(null);
-	const dragOverTab = useRef<number | null>(null);
+	const dragTab = useRef<number | null>(null)
+	const dragOverTab = useRef<number | null>(null)
 
-	const closeTab = (fileId: number) => {
-		setTabs(tabs.filter((fileForClose) => fileForClose.id !== fileId));
-		if (activeFile === fileId) onChangeTab && onChangeTab(undefined)//setActiveFile(undefined);		
+	const closeTab = (objTab: tabs) => {
+		if (onClosedTab) {
+			const newTabsState = tabs.filter(
+				(fileForClose) => fileForClose.id !== objTab.id
+			);
+			onClosedTab(newTabsState, objTab.id);
+		}
 	}
 
-	const onCloseButton = (e: React.MouseEvent<HTMLElement>, fileToClose: number) => {
-		e.stopPropagation();
+	const onCloseButton = (
+		e: React.MouseEvent<HTMLElement>,
+		fileToClose: number
+	) => {
+		e.stopPropagation()
 		const objTab = tabs.find((tab) => tab.id === fileToClose)
 
-		if(onCloseTab && objTab) {
+		if (onCloseTab && objTab) {
 			const result = onCloseTab(objTab)
-			console.log('result', result)
-			result !== false && closeTab(objTab.id)
+			result !== false && closeTab(objTab)
 		}
+	}
 
-		// if(objTab) {
-		// 	if(!objTab.saved) {
-		// 		setShowDlgSaveFileParams({fileId: fileToClose, fileName: objTab.tabName})
-		// 		setShowDlgSaveFile(true)
-		// 	} else {
-		// 		closeTab(fileToClose)
-		// 	}
-		// }
-	};
-
-	const onButtonClickModalDlgSaveFile = async (idButton: string) => {
-		if(idButton === 'SAVE') {
-			let content = tabs.find(item => item.id === activeFile)?.content
-			content && await saveFileContent(showDlgSaveFileParams.fileId, content)
-			closeTab(showDlgSaveFileParams.fileId)
-		}
-
-		if(idButton === 'DONTSAVE') {
-			closeTab(showDlgSaveFileParams.fileId)
-		}
-	}	
-
-	const onDragStart = (e: React.DragEvent<HTMLDivElement>, position: number) => {
+	const onDragStart = (
+		e: React.DragEvent<HTMLDivElement>,
+		position: number
+	) => {
 		dragTab.current = position
 	}
 
-	const onDragEnter = (e: React.DragEvent<HTMLDivElement>, position: number) => {
-		dragOverTab.current = position
+	const onDragEnter = (
+		e: React.DragEvent<HTMLDivElement>,
+		position: number
+	) => {
+		dragOverTab.current = position;
 		e.preventDefault()
-	}	
+	};
 
 	const drop = (e: React.DragEvent<HTMLDivElement>) => {
-		if (dragTab.current !== null && dragOverTab.current !== null) {
-			const copyListItems = [...tabs];
-			const dragItemContent = copyListItems[dragTab.current];
-			copyListItems.splice(dragTab.current, 1); // delete current pos
-			copyListItems.splice(dragOverTab.current, 0, dragItemContent); // insert at dragOverItem position element dragItemContent 
-			dragTab.current = null;
-			dragOverTab.current = null;
-			setTabs(copyListItems);
-			console.log(copyListItems);
+		if (
+			onDropFinished &&
+			dragTab.current !== null &&
+			dragOverTab.current !== null
+		) {
+			const copyListItems = [...tabs]
+			const dragItemContent = copyListItems[dragTab.current]
+			copyListItems.splice(dragTab.current, 1) // delete current pos
+			copyListItems.splice(dragOverTab.current, 0, dragItemContent) // insert at dragOverItem position element dragItemContent
+			dragTab.current = null
+			dragOverTab.current = null
+			onDropFinished(copyListItems)
 		}
-	};	
+	};
 
+	const onClickTab = (tab: tabs) => {
+		onChangeTab && onChangeTab(tab)
+	}
 
 	return (
 		<div className="editorTabs">
 			{tabs.map(
-				(fileTab: tabs, index: number) =>
-					//getFilename(fileTab.id) && (
-						<div
-							role={'listitem'}	
-							key={fileTab.id}
-							className={ activeFile === fileTab.id ? "tab activeTab" : "tab" }
-							//onClick={() => setActiveFile(fileTab.id)}
-							onClick={() => {onChangeTab && onChangeTab(fileTab)}} 
-							onDragStart={(e) => onDragStart(e, index)}
-							onDragEnter={(e) => onDragEnter(e, index)}
-							onDragOver={(e) => e.preventDefault()}
-							onDragEnd={drop}
-							draggable
+				(fileTab: tabs, index: number) => (
+					<div
+						role={"listitem"}
+						key={fileTab.id}
+						className={
+							activeFile === fileTab.id ? "tab activeTab" : "tab"
+						}
+						onClick={() => onClickTab(fileTab)}
+						onDragStart={(e) => onDragStart(e, index)}
+						onDragEnter={(e) => onDragEnter(e, index)}
+						onDragOver={(e) => e.preventDefault()}
+						onDragEnd={drop}
+						draggable
+					>
+						<i className="tabIcon fa-regular fa-file-lines"></i>
+						<p className="tabFilename">{fileTab.tabName}</p>
+						<p
+							className="tabCloseButton"
+							onClick={(e) => onCloseButton(e, fileTab.id)}
 						>
-							<i className="tabIcon fa-regular fa-file-lines"></i>
-							{/* <p className="tabFilename">{getFilename(fileTab.id)}</p> */}
-							<p className="tabFilename">{fileTab.tabName}</p>
-							<p
-								className="tabCloseButton"
-								onClick={(e) => onCloseButton(e, fileTab.id)}
-							>
-								<span>{fileTab.saved ? '⨉' : '⬤'}</span>	
-							</p>
-						</div>
-					//)				
+							<span>{fileTab.saved ? "⨉" : "⬤"}</span>
+						</p>
+					</div>
+				)
 			)}
-
-
-			<ModalDialog
-				title="Confirm"
-				message={`Do you want to save the changes you made to '${showDlgSaveFileParams.fileName}'?`}
-				faIcon="fa-regular fa-circle-question"
-				buttons={[
-					{ idButton: "SAVE", caption: "Save" },
-					{ idButton: "DONTSAVE", caption: "Don't save" },
-					{ idButton: "CANCEL", caption: "Cancel" },
-				]}
-				onButtonClick={onButtonClickModalDlgSaveFile}
-				show={showDlgSaveFile}
-				setShow={setShowDlgSaveFile}					
-			/>
-
 		</div>
 	);
 }

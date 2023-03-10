@@ -66,8 +66,7 @@ function Filesbar({
 		setSelectedFileId(selectedFile)
 	}, [selectedFile])
 
-	const [showDialogConfirmDelete, setShowDialogConfirmDelete] = useState(false)
-	const [showDialogConfirmDeleteParams, setShowDialogConfirmDeleteParams] = useState({fileName: '', fileId: 0})
+	const [showDialogConfirmDeleteParams, setShowDialogConfirmDeleteParams] = useState({show: false, fileName: '', fileId: 0})
 
 	const inputRenameRef = useRef(null);
 
@@ -117,14 +116,23 @@ function Filesbar({
 
 	const onButtonClickModalDlgConfirmDelete = async(idButton: string) => {
 		if(idButton === 'DELETE') {			
+			setShowDialogConfirmDeleteParams({show: false, fileId: 0, fileName: ''})
 			if(onFileDelete) {
 				setWaitDeletingIdFile(showDialogConfirmDeleteParams.fileId)
 				await onFileDelete(showDialogConfirmDeleteParams.fileId).finally(() => setWaitDeletingIdFile(null))
-			}
-						
+			}		
 			const updatedTreeData = deleteFileAndUpdateFileList(data, showDialogConfirmDeleteParams.fileId)
 			setData(updatedTreeData)
 		}
+
+		if(idButton === 'CANCEL') {	
+			setShowDialogConfirmDeleteParams({show: false, fileId: 0, fileName: ''})	
+		}
+
+		if(idButton === 'SYSCLOSE') {	
+			setShowDialogConfirmDeleteParams({show: false, fileId: 0, fileName: ''})	
+		}
+
 	}
 
 	const onContextMenu = (
@@ -155,8 +163,7 @@ function Filesbar({
 
 		if (itemId === "DELETE_FILE") {			
 			const fileObj = getFileById(data, fileId)
-			setShowDialogConfirmDeleteParams({fileId: fileId, fileName: fileObj?.fileName || ''})
-			setShowDialogConfirmDelete(true)
+			setShowDialogConfirmDeleteParams({show: true, fileId: fileId, fileName: fileObj?.fileName || ''})
 		}
 	}
 
@@ -391,8 +398,7 @@ function Filesbar({
 					{ idButton: "CANCEL", caption: "Cancel" },
 				]}
 				onButtonClick={onButtonClickModalDlgConfirmDelete}
-				show={showDialogConfirmDelete}
-				setShow={setShowDialogConfirmDelete}					
+				show={showDialogConfirmDeleteParams.show}				
 			/>
 
 		</div>

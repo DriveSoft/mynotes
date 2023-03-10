@@ -3,7 +3,7 @@ import { AppContext, AppContextType } from "../Context"
 import { tabs } from "../types"
 import EditorTabs from './EditorTabs'
 import TextEditor from './TextEditor'
-import ModalDialog2 from "./ModalDialog2"
+import ModalDialog from "./ModalDialog"
 
 function EditorContainer() {
 
@@ -26,13 +26,24 @@ function EditorContainer() {
 
     const onCloseTab = (tab: tabs) => {
         if(!tab.saved) {
-            //setShowDlgSaveFileParams({fileId: fileToClose, fileName: objTab.tabName})
-            //setShowDlgSaveFile(true)
             setShowDlgSaveFileWithParam({show: true, fileId: tab.id, fileName: tab.tabName})
             return false
-        } else {
-            //closeTab(fileToClose)
+        } 
+    }
+
+    const onClosedTab = (newStateTabs: tabs[], tabFileId: number) => {
+		setTabs(newStateTabs)
+		if (activeFile === tabFileId) {
+            if(tabs.length > 0) {
+                setActiveFile(tabs[0].id)    
+            } else {
+                setActiveFile(undefined)
+            }            
         }
+    }
+
+    const onDropFinished = (newStateTabs: tabs[]) => {
+        setTabs(newStateTabs)
     }
 
     const closeTab = (fileId: number) => {
@@ -62,19 +73,20 @@ function EditorContainer() {
         <>
             <EditorTabs 
                 tabs={tabs}
-                setTabs={setTabs} 
-                activeFile={activeFile}  
-                //setActiveFile={setActiveFile}
-                saveFileContent={saveFileContent}             
+                activeFile={activeFile}              
                 onChangeTab={onChangeTab}
                 onCloseTab={onCloseTab}
+                onClosedTab={onClosedTab}
+                onDropFinished={onDropFinished}
             />
+
             <TextEditor
                 tabs={tabs}
                 setTabs={setTabs}
                 activeFile={activeFile}
-            />    
-            <ModalDialog2
+            />  
+
+            <ModalDialog
 				title="Confirm"
 				message={`Do you want to save the changes you made to '${showDlgSaveFileWithParam.fileName}'?`}
 				faIcon="fa-regular fa-circle-question"
@@ -84,8 +96,7 @@ function EditorContainer() {
 					{ idButton: "CANCEL", caption: "Cancel" },
 				]}
 				onButtonClick={onButtonClickModalDlgSaveFile}
-				show={showDlgSaveFileWithParam.show}
-				//setShow={setShowDlgSaveFile}					
+				show={showDlgSaveFileWithParam.show}					
 			/>
         </>
     );
