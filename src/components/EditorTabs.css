@@ -38,6 +38,14 @@
     margin-right: 4px;
   }
 
+  .iconCross::after {
+    content: '⨉';  
+  }
+
+  .iconCircle::after {
+    content: '⬤';  
+  }  
+
   .tab .tabCloseButton:hover {
     background-color: hsl(0, 0%, 24%);
   }
@@ -49,3 +57,4 @@
   .tab .tabCloseButton:hover::after {
     content: '⨉';
   }
+

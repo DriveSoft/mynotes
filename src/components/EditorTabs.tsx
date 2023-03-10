@@ -103,7 +103,8 @@ function EditorTabs({
 							className="tabCloseButton"
 							onClick={(e) => onCloseButton(e, fileTab.id)}
 						>
-							<span>{fileTab.saved ? "⨉" : "⬤"}</span>
+							{/* <span>{fileTab.saved ? "⨉" : "⬤"}</span> */}
+							<span data-testid="buttonClose" className={fileTab.saved ? "iconCross" : "iconCircle"}></span>
 						</p>
 					</div>
 				)
