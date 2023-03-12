@@ -2,8 +2,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import { files, fileType } from "../../types"
 
+export interface IFileItem extends files {
+	isOpened?: boolean
+}
+
 interface FileItemProps {
-	fileObj: files
+	fileObj: IFileItem
 	selected: boolean
 	focused?: boolean
     mode?: 'NEW_FILE' | 'RENAME_FILE'

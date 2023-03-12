@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useState, useContext } from "react";
 import Filesbar from "./Filesbar/Filesbar";
 import { AppContext, AppContextType } from "../Context";
 import { files, typeFile } from "../types"
@@ -6,6 +6,8 @@ import { createFilenameAPI, updateFilenameAPI, deleteFilenameAPI } from "../util
 import "./FilesContainer.css";
 
 const FilesContainer = () => {
+	const [expanded, setExpanded] = useState<number[]>([])
+	
 	const {
 		fileList,
 		activeFile,
@@ -52,6 +54,11 @@ const FilesContainer = () => {
 		setActiveFile(fileId)						
 	}	
 
+	const onExpanded = (expandedItems: number[]) => {
+		setExpanded(expandedItems)	
+	}
+
+
 	return (
 		<div className="filesContainer">
 			<span>EXPLORER</span>
@@ -59,11 +66,12 @@ const FilesContainer = () => {
 				title="Dmitriy's notes"
 				treeData={fileList}
 				selectedFile={activeFile}
-
+				expanded={expanded}
 				onFileCreate={onFileCreate}
 				onFileRename={onFileRename}
 				onFileDelete={onFileDelete}
 				onSelect={onSelect}
+				onExpanded={(expandedItems) => onExpanded(expandedItems)}
 			/>
 		</div>
 	);

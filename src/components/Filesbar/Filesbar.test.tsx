@@ -52,6 +52,8 @@ describe('Filebar', () => {
                 title={title}
                 treeData={treeData}
                 selectedFile={1}
+                expanded={[]}
+                onExpanded={()=>{}}
             />
         )
         
@@ -71,6 +73,8 @@ describe('Filebar', () => {
                 title={title}
                 treeData={treeData}
                 selectedFile={1}
+                expanded={[]}
+                onExpanded={()=>{}}
             />
         )
         
@@ -91,6 +95,8 @@ describe('Filebar', () => {
                 title={title}
                 treeData={treeData}
                 selectedFile={1}
+                expanded={[]}
+                onExpanded={()=>{}}
             />
         )
         
@@ -121,6 +127,8 @@ describe('Filebar', () => {
                 title={title}
                 treeData={treeData}
                 selectedFile={1}
+                expanded={[]}
+                onExpanded={()=>{}}
             />
         )
         
@@ -151,6 +159,8 @@ describe('Filebar', () => {
                 title={title}
                 treeData={treeData}
                 selectedFile={1}
+                expanded={[]}
+                onExpanded={()=>{}}
             />
         )
         
@@ -185,6 +195,8 @@ describe('Filebar', () => {
                 title={title}
                 treeData={treeData}
                 selectedFile={1}
+                expanded={[]}
+                onExpanded={()=>{}}
             />
         )
         
@@ -220,6 +232,8 @@ describe('Filebar', () => {
                 title={title}
                 treeData={treeData}
                 selectedFile={1}
+                expanded={[]}
+                onExpanded={()=>{}}
             />            
         )
 
@@ -247,6 +261,8 @@ describe('Filebar', () => {
                 title={title}
                 treeData={treeData}
                 selectedFile={1}
+                expanded={[]}
+                onExpanded={()=>{}}
             />            
         )
 
@@ -274,6 +290,8 @@ describe('Filebar', () => {
                 title={title}
                 treeData={treeData}
                 selectedFile={1}
+                expanded={[]}
+                onExpanded={()=>{}}
             />            
         )
 

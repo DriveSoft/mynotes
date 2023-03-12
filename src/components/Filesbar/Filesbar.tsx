@@ -1,12 +1,11 @@
 import React, { useState, useRef, useContext, useEffect } from "react"
 import ContexMenu from "../ContexMenu"
 import ModalDialog from "../ModalDialog"
-import FileItem from "./FileItem"
+import FileItem, {IFileItem} from "./FileItem"
 import { files, typeFile } from "./types"
 import { 
 	getFileById, 
 	createFileAndUpdateFileList, 
-	changeIsOpenedAndUpdateFileList,
 	changeFilenameAndUpdateFileList,
 	deleteFileAndUpdateFileList,
 	getNewId
@@ -18,20 +17,24 @@ interface FilesbarProps {
 	title?: string
 	treeData: files[]
 	selectedFile: number | undefined
+	expanded: number[]
 	onFileCreate?: (fileName: string, type: typeFile, parentId: number) => Promise<number>
 	onFileRename?: (fileObj: files) => Promise<any>
 	onFileDelete?: (fileId: number) => Promise<any>
 	onSelect?: (fileId: number) => void
+	onExpanded: (expandedItems: number[]) => void
 }
 
 function Filesbar({
 		title, 
 		treeData, 
 		selectedFile,
+		expanded,		
 		onFileCreate,
 		onFileRename,
 		onFileDelete,
-		onSelect
+		onSelect,
+		onExpanded
 	}: FilesbarProps) {
 
 	type typeNewFileAtParent = {parentId: number, type: typeFile}
@@ -197,14 +200,17 @@ function Filesbar({
 	};
 
 
-	const onClickFileItem = (file: files) => {
-		//setActiveFile(file.id)	
+	const onClickFileItem = (file: files) => {		
 		setSelectedFileId(file.id)
 		onSelect && onSelect(file.id)
 		
 		if(file?.childNodes) {
-			const newFileList = changeIsOpenedAndUpdateFileList(data, file.id)		
-			setData(newFileList)
+			//const newFileList = changeIsOpenedAndUpdateFileList(data, file.id)		
+			//setData(newFileList)
+
+			const found = expanded.find(item => file.id === item)
+			const newExpanded = found ? expanded.filter(item => item !== file.id) : [...expanded, file.id]
+			onExpanded(newExpanded)
 		}
 	}
 
@@ -235,29 +241,31 @@ function Filesbar({
 		sortFiles(files)
 
 		const render = (file: files, level: number) => {			
-			
+			const fileItemObj: IFileItem = {...file} //IFileItem just add isOpened property
+			if (file?.childNodes) fileItemObj.isOpened = expanded.indexOf(file.id) !== -1
+
 			const fileItemEl = (
 				<FileItem
-					fileObj={file}
-					selected={selectedFileId === file.id}
+					fileObj={fileItemObj}
+					selected={selectedFileId === fileItemObj.id}
 					focused={focusedCmp}
-					mode={renameFileNameId === file.id ? 'RENAME_FILE' : undefined}
+					mode={renameFileNameId === fileItemObj.id ? 'RENAME_FILE' : undefined}
 					onClick={onClickFileItem}
 					onMenu={(e, fileId) => onContextMenu(e, fileId)}
 					onFileRenamed={_onFileRename}
 					onChangeValidator={onChangeValidator}
-					key={file.id}
+					key={fileItemObj.id}
 					level={level}	
-					isWaitingIcon={waitDeletingIdFile === file.id}				
+					isWaitingIcon={waitDeletingIdFile === fileItemObj.id}				
 				>
 				<>
 
 					{/* In case when we are creating file inside empty folder */}
 					{
-						file?.childNodes && file?.childNodes.length===0 && file.id == _newFileAtParent && 					
+						fileItemObj?.childNodes && fileItemObj?.childNodes.length===0 && fileItemObj.id == _newFileAtParent && 					
 						<FileItem
 							//fileObj={{id: 0, fileName: '', content: '', parentId: _newFileAtParent}}	
-							fileObj={ newFileAtParent.type === 'folder' ? {id: 0, fileName: '', content: '', parentId: file.parentId, childNodes: []} : {id: 0, fileName: '', content: '', parentId: file.parentId}}	
+							fileObj={ newFileAtParent.type === 'folder' ? {id: 0, fileName: '', content: '', parentId: fileItemObj.parentId, childNodes: []} : {id: 0, fileName: '', content: '', parentId: fileItemObj.parentId}}	
 							selected={false}
 							focused={focusedCmp}		
 							mode='NEW_FILE'			
@@ -270,23 +278,26 @@ function Filesbar({
 					}
 
 					{/* we have to open folder if we are creating file inside it */}
-					{file?.childNodes && file.id == _newFileAtParent ? file.isOpened = true : file.isOpened = file.isOpened}					
+					{/* {file?.childNodes && file.id == _newFileAtParent ? file.isOpened = true : file.isOpened = file.isOpened} */}
+					{fileItemObj?.childNodes && fileItemObj.id == _newFileAtParent && !fileItemObj.isOpened && onExpanded([...expanded, fileItemObj.id]) }
 					
 					{/* sorting childs files */}
-					{file?.childNodes && file.isOpened && sortFiles(file.childNodes)}
+					{ fileItemObj?.childNodes && fileItemObj.isOpened && sortFiles(fileItemObj.childNodes) }
+					{/* {file?.childNodes && expanded.indexOf(file.id) !== -1 && sortFiles(file.childNodes)} */}
 					
 					{/* rendering */}
-					{file?.childNodes && file.isOpened && file.childNodes.map((file: any) => render(file, level+1))}
+					{ fileItemObj?.childNodes && fileItemObj.isOpened && fileItemObj.childNodes.map((file: any) => render(file, level+1)) }
+					{/* {file?.childNodes && expanded.indexOf(file.id) !== -1 && file.childNodes.map((file: any) => render(file, level+1))} */}
 				</>		
 				</FileItem>					
 			)
 
-			if (file.parentId == _newFileAtParent) {
+			if (fileItemObj.parentId == _newFileAtParent) {
 				_newFileAtParent = -1
 				return (
-					<React.Fragment key={file.id}>
+					<React.Fragment key={fileItemObj.id}>
 						<FileItem
-							fileObj={ newFileAtParent.type === 'folder' ? {id: 0, fileName: '', content: '', parentId: file.parentId, childNodes: []} : {id: 0, fileName: '', content: '', parentId: file.parentId}}	
+							fileObj={ newFileAtParent.type === 'folder' ? {id: 0, fileName: '', content: '', parentId: fileItemObj.parentId, childNodes: []} : {id: 0, fileName: '', content: '', parentId: fileItemObj.parentId}}	
 							selected={false}
 							focused={focusedCmp}		
 							mode='NEW_FILE'			

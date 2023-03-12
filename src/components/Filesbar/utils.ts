@@ -2,7 +2,7 @@ import { files, typeFile } from "./types"
 
 export function createFileAndUpdateFileList(fileList: files[], newIdFile: number, idParentFile: number, fileName: string, typeFile: typeFile): files[] {
     let objNewFile: files = {id: newIdFile, parentId: idParentFile, fileName: fileName, content: ''}                    
-    if(typeFile === 'folder') objNewFile = {...objNewFile, childNodes: [], isOpened: false}    
+    if(typeFile === 'folder') objNewFile = {...objNewFile, childNodes: [] }    
 
     const mapItems = (files: files[]): files[] => {
         return files.map((file: files) => {
@@ -56,23 +56,23 @@ export function deleteFileAndUpdateFileList(fileList: files[], idFile: number): 
     return mapItems(fileList)
 }
 
-export function changeIsOpenedAndUpdateFileList(fileList: files[], idFile: number): files[] {
+// export function changeIsOpenedAndUpdateFileList(fileList: files[], idFile: number): files[] {
 
-    const mapItems = (files: files[]): files[] => {
-        return files.map((file: files) => {
-            if (file?.childNodes) {
-                if(file.id === idFile) {
-                    return {...file, childNodes: mapItems(file.childNodes), isOpened: !file.isOpened}
-                }
-                return {...file, childNodes: mapItems(file.childNodes)}
-            } else {
-                return file
-            }
-        })
-    }
+//     const mapItems = (files: files[]): files[] => {
+//         return files.map((file: files) => {
+//             if (file?.childNodes) {
+//                 if(file.id === idFile) {
+//                     return {...file, childNodes: mapItems(file.childNodes), isOpened: !file.isOpened}
+//                 }
+//                 return {...file, childNodes: mapItems(file.childNodes)}
+//             } else {
+//                 return file
+//             }
+//         })
+//     }
 
-    return mapItems(fileList)
-}
+//     return mapItems(fileList)
+// }
 
 export function getFileById(fileList: files[], id: number): files | undefined {
     let result: files | undefined = undefined

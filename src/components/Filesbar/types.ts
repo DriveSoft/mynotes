@@ -4,7 +4,7 @@ export interface files {
 	content: string	
 	parentId: number
 	childNodes?: files[]
-	isOpened?: boolean
+	//isOpened?: boolean
 }
 
 export type fileType = 'FILE' | 'FOLDER'
