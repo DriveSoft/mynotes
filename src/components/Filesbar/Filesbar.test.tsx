@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { render, screen } from "@testing-library/react"
 import user from "@testing-library/user-event"
 import Filesbar from "./Filesbar"
@@ -123,6 +124,7 @@ describe('Filebar', () => {
     test('it creates a new folder', async () => {
         const title = "Dmitriy's notes"
         user.setup()
+                
         render(
             <Filesbar
                 title={title}
@@ -155,14 +157,26 @@ describe('Filebar', () => {
     test('it creates a new file in a not empty subfolder', async () => {
         const title = "Dmitriy's notes"
         user.setup()
+
+        const TestComponent = () => {
+            const [expanded, setExpanded] = useState<number[]>([])
+
+            return (
+                <div>
+                    <Filesbar
+                        title={title}
+                        treeData={treeData}
+                        selectedFile={1}
+                        expanded={expanded}
+                        onExpanded={(value) => setExpanded(value)}
+                    />                    
+                </div>
+            )
+        }
+
+
         render(
-            <Filesbar
-                title={title}
-                treeData={treeData}
-                selectedFile={1}
-                expanded={[]}
-                onExpanded={()=>{}}
-            />
+            <TestComponent />
         )
         
 
@@ -191,17 +205,25 @@ describe('Filebar', () => {
     test('it creates a new file in an empty subfolder', async () => {
         const title = "Dmitriy's notes"
         user.setup()
+        const TestComponent = () => {
+            const [expanded, setExpanded] = useState<number[]>([])
+            return (
+                <div>
+                    <Filesbar
+                        title={title}
+                        treeData={treeData}
+                        selectedFile={1}
+                        expanded={expanded}
+                        onExpanded={(value) => setExpanded(value)}
+                    />                    
+                </div>
+            )
+        }
+
         render(
-            <Filesbar
-                title={title}
-                treeData={treeData}
-                selectedFile={1}
-                expanded={[]}
-                onExpanded={()=>{}}
-            />
+            <TestComponent />
         )
         
-
         const folder1Item = screen.getByDisplayValue('Folder2')
         await user.click(folder1Item)
 
