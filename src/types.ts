@@ -1,4 +1,4 @@
-import { StrictMode } from "react";
+import { fileType } from "./components/Filesbar/types"
 
 //https://www.youtube.com/watch?v=jjMbPt_H3RQ
 export const BUTTONS_ID = {
@@ -15,18 +15,17 @@ export interface sidebarButton {
 	icon: string
 }
 
-export interface files {
-	id: number
-	fileName: string
-	content: string	
-	parentId: number
-	childNodes?: files[]
-	//isOpened?: boolean
-}
+// export interface files {
+// 	id: number
+// 	fileName: string
+// 	content: string	
+// 	//parentId: number
+// 	childNodes?: files[]
+// }
 
-export type fileType = 'FILE' | 'FOLDER'
+//export type fileType = 'FILE' | 'FOLDER'
 
-export interface fileAPI {
+export interface IFileAPI {
 	id: number
 	fileName: string
 	content: string	

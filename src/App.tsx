@@ -1,15 +1,14 @@
-import { useState, useEffect, useContext } from "react";
-import Sidebar from "./components/Sidebar";
-import FilesContainer from "./components/FilesContainer";
-import EditorContainer from "./components/EditorContainer";
-import Searchbar from "./components/Searchbar";
-import Profilebar from "./components/Profilebar";
-import EditorTabs from "./components/EditorTabs";
-import TextEditor from "./components/TextEditor";
+import { useState, useEffect, useContext } from "react"
+import Sidebar from "./components/Sidebar"
+import FilesContainer from "./components/FilesContainer"
+import EditorContainer from "./components/EditorContainer"
+import Searchbar from "./components/Searchbar"
+import Profilebar from "./components/Profilebar"
 import { ButtonId } from "./types";
 import { sortFiles, getFileById, URL_API } from "./utils";
 import { AppContext, AppContextType } from './Context';
-import { files, fileAPI, fileType } from "./types";
+import { IFileAPI } from "./types";
+import { IFileTree } from "./components/Filesbar/types"
 
 
 function App() {
@@ -33,10 +32,10 @@ function App() {
 	});
 
 	useEffect(() => {
-		const createDataTree = (data: fileAPI[]): files[] => {
+		const createDataTree = (data: IFileAPI[]): IFileTree[] => {
 			const hashTable = Object.create(null)
-			data.forEach(file => hashTable[file.id] = file.type === 'FOLDER' ? {...file, childNodes: [], isOpened: false} : {...file})
-			const dataTree: files[] = []
+			data.forEach(file => hashTable[file.id] = file.type === 'FOLDER' ? {...file, childNodes: []} : {...file})
+			const dataTree: IFileTree[] = []
 
 			data.forEach(file => {				
 				if(file.parentId > 0 && hashTable[file.parentId]) {     
@@ -47,6 +46,7 @@ function App() {
 			  	}
 			})
 
+			console.log(dataTree)
 			return dataTree
 		  };
 

@@ -1,11 +1,12 @@
-import { files, typeFile } from "./types"
+import { IFileTree, typeFile } from "./types"
 
-export function createFileAndUpdateFileList(fileList: files[], newIdFile: number, idParentFile: number, fileName: string, typeFile: typeFile): files[] {
-    let objNewFile: files = {id: newIdFile, parentId: idParentFile, fileName: fileName, content: ''}                    
+export function createFileAndUpdateFileList(fileList: IFileTree[], newIdFile: number, idParentFile: number, fileName: string, typeFile: typeFile): IFileTree[] {
+    //let objNewFile: files = {id: newIdFile, parentId: idParentFile, fileName: fileName, content: ''}                    
+    let objNewFile: IFileTree = {id: newIdFile, fileName: fileName, content: ''}                    
     if(typeFile === 'folder') objNewFile = {...objNewFile, childNodes: [] }    
 
-    const mapItems = (files: files[]): files[] => {
-        return files.map((file: files) => {
+    const mapItems = (files: IFileTree[]): IFileTree[] => {
+        return files.map((file: IFileTree) => {
             if (file?.childNodes) {
                 if(file.id == idParentFile) {
                     file.childNodes.push(objNewFile)
@@ -26,10 +27,10 @@ export function createFileAndUpdateFileList(fileList: files[], newIdFile: number
     return result
 }
 
-export function changeFilenameAndUpdateFileList(fileList: files[], idFile: number, newFilename: string): files[] {
+export function changeFilenameAndUpdateFileList(fileList: IFileTree[], idFile: number, newFilename: string): IFileTree[] {
 
-    const mapItems = (files: files[]): files[] => {
-        return files.map((file: files) => {
+    const mapItems = (files: IFileTree[]): IFileTree[] => {
+        return files.map((file: IFileTree) => {
             if (file?.childNodes && file.childNodes.length > 0) {
                 if(file.id === idFile) return {...file, fileName: newFilename, childNodes: mapItems(file.childNodes)}
                 return {...file, childNodes: mapItems(file.childNodes)}
@@ -45,9 +46,9 @@ export function changeFilenameAndUpdateFileList(fileList: files[], idFile: numbe
     return mapItems(fileList)
 }
 
-export function deleteFileAndUpdateFileList(fileList: files[], idFile: number): files[] {
-    const mapItems = (files: files[]): files[] => {
-        return files.filter((file: files) => {            
+export function deleteFileAndUpdateFileList(fileList: IFileTree[], idFile: number): IFileTree[] {
+    const mapItems = (files: IFileTree[]): IFileTree[] => {
+        return files.filter((file: IFileTree) => {            
             if (file?.childNodes && file.childNodes.length > 0) file.childNodes = mapItems(file.childNodes)                                       
             return file.id !== idFile
         })
@@ -74,10 +75,10 @@ export function deleteFileAndUpdateFileList(fileList: files[], idFile: number): 
 //     return mapItems(fileList)
 // }
 
-export function getFileById(fileList: files[], id: number): files | undefined {
-    let result: files | undefined = undefined
+export function getFileById(fileList: IFileTree[], id: number): IFileTree | undefined {
+    let result: IFileTree | undefined = undefined
 
-    const findObj = (fileList: files[]) => {
+    const findObj = (fileList: IFileTree[]) => {
         let res = fileList.find(file => {
             if(file?.childNodes?.length && file.childNodes.length > 0) findObj(file.childNodes)
             return file.id === id
@@ -90,10 +91,10 @@ export function getFileById(fileList: files[], id: number): files | undefined {
     return findObj(fileList);
 }
 
-export function getNewId(fileList: files[]): number {
+export function getNewId(fileList: IFileTree[]): number {
     let result = 0
 
-    const findMaxId = (fileList: files[]) => {
+    const findMaxId = (fileList: IFileTree[]) => {
         fileList.forEach(file => {
             if(file?.childNodes?.length && file.childNodes.length > 0) findMaxId(file.childNodes)
             if(file.id > result) result = file.id
@@ -102,4 +103,24 @@ export function getNewId(fileList: files[]): number {
 
     findMaxId(fileList);
     return result+1
+}
+
+
+export function getParentId(dataTree: IFileTree[], fileId: number, parentId: number = 0): number {
+    let result = -1
+
+    dataTree.every(item => {        
+        if(item.id === fileId) {
+            result = parentId 
+            return false
+        } else {
+            if(item?.childNodes) {
+                result = getParentId(item?.childNodes, fileId, item.id)
+                return result === -1
+            }
+            return true
+        }
+    })  
+    
+    return result
 }

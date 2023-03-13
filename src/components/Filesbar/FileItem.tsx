@@ -1,20 +1,17 @@
 //https://codesandbox.io/s/upbeat-gould-st8dib?file=/src/App.tsx
 import React, { useState, useEffect, useRef } from "react";
-import { files, fileType } from "../../types"
+import { IFileItem, fileType } from "./types"
 
-export interface IFileItem extends files {
-	isOpened?: boolean
-}
 
 interface FileItemProps {
 	fileObj: IFileItem
 	selected: boolean
 	focused?: boolean
     mode?: 'NEW_FILE' | 'RENAME_FILE'
-	onClick?: (file: files) => void
+	onClick?: (file: IFileItem) => void
 	onMenu?: (e: React.MouseEvent<HTMLDivElement>, fileId: number) => void
     onFileCreated?: (success: boolean, filename: string, inputEl: any) => Promise<any>
-	onFileRenamed?: (fileObj: files, success: boolean, inputEl: any) => Promise<any>
+	onFileRenamed?: (fileObj: IFileItem, success: boolean, inputEl: any) => Promise<any>
 	onChangeValidator: (fileId: number, parentId: number, fileName: string, inputEl: any) => boolean
 	children?: React.ReactNode
 	level: number

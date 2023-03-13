@@ -1,11 +1,11 @@
 import { render, screen } from "@testing-library/react";
 import FileItem from "./FileItem";
 import user from "@testing-library/user-event"
-import { files, fileType } from "../../types"
+import { IFileItem } from "./types"
 
 const fileObjCreatingNewFile = {id: 0, fileName: '', content: '', parentId: 0}
-const fileObj: files = {id: 1, fileName: 'filename01.txt', content: 'hello', parentId: 0}
-const folderObj: files = {id: 1, fileName: 'Foldername', content: '', parentId: 0, childNodes:[] }
+const fileObj: IFileItem = {id: 1, fileName: 'filename01.txt', content: 'hello', parentId: 0}
+const folderObj: IFileItem = {id: 1, fileName: 'Foldername', content: '', parentId: 0, childNodes:[] }
 
 const onChangeValidator = (fileId: number, parentId: number, fileName: string, inputEl: any): boolean => {
     return true

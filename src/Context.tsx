@@ -1,12 +1,13 @@
-import React, { useState, createContext } from "react";
-import { saveFileContentToApiAndGetUpdatedState } from "./utils";
-import { files, tabs, typeFile } from "./types";
+import React, { useState, createContext } from "react"
+import { saveFileContentToApiAndGetUpdatedState } from "./utils"
+import { tabs } from "./types"
+import { IFileTree } from "./components/Filesbar/types"
 
 export const AppContext = createContext<AppContextType | null>(null);
 
 export type AppContextType = {
-	fileList: files[];
-	setFileList: (value: files[]) => void;
+	fileList: IFileTree[];
+	setFileList: (value: IFileTree[]) => void;
 
 	activeFile: number | undefined;
 	setActiveFile: (value: number | undefined) => void;
@@ -23,7 +24,7 @@ interface AppProviderProps {
 
 const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 
-	const [fileList, setFileList] = useState<files[]>([]);
+	const [fileList, setFileList] = useState<IFileTree[]>([]);
 	const [activeFile, setActiveFile] = useState<number | undefined>(undefined);
 	const [tabs, setTabs] = useState<tabs[]>([]);
 
@@ -59,7 +60,7 @@ const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 	}	
 
 
-	function getNewId(files: files[]): number {
+	function getNewId(files: IFileTree[]): number {
 		return files.reduce((acc, item) => item.id > acc ? item.id : acc, 0 )+1
 	}
 

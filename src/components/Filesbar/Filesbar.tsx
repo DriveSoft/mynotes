@@ -1,25 +1,26 @@
 import React, { useState, useRef, useContext, useEffect } from "react"
 import ContexMenu from "../ContexMenu"
 import ModalDialog from "../ModalDialog"
-import FileItem, {IFileItem} from "./FileItem"
-import { files, typeFile } from "./types"
+import FileItem from "./FileItem"
+import { IFileTree, typeFile, IFileItem } from "./types"
 import { 
 	getFileById, 
 	createFileAndUpdateFileList, 
 	changeFilenameAndUpdateFileList,
 	deleteFileAndUpdateFileList,
-	getNewId
+	getNewId,
+	getParentId
 } from "./utils"
 import "./Filesbar.css"
 
 
 interface FilesbarProps {
 	title?: string
-	treeData: files[]
+	treeData: IFileTree[]
 	selectedFile: number | undefined
 	expanded: number[]
 	onFileCreate?: (fileName: string, type: typeFile, parentId: number) => Promise<number>
-	onFileRename?: (fileObj: files) => Promise<any>
+	onFileRename?: (fileObj: IFileTree, parentId: number) => Promise<any>
 	onFileDelete?: (fileId: number) => Promise<any>
 	onSelect?: (fileId: number) => void
 	onExpanded: (expandedItems: number[]) => void
@@ -39,7 +40,7 @@ function Filesbar({
 
 	type typeNewFileAtParent = {parentId: number, type: typeFile}
 
-	const [data, setData] = useState<files[]>([])
+	const [data, setData] = useState<IFileTree[]>([])
 	
 	const [focusedCmp, setFocusedCmp] = useState(false)
 	const [selectedFileId, setSelectedFileId] = useState<number | undefined>(undefined)
@@ -100,7 +101,7 @@ function Filesbar({
 	}
 
 	const _onFileRename = async(
-		fileObj: files,
+		fileObj: IFileItem,
 		success: boolean,
 		inputEl: any
 	) => {		
@@ -108,7 +109,9 @@ function Filesbar({
 		inputEl.current.style.outline = ""
 		
 		if (success) {											
-			onFileRename && await onFileRename(fileObj)							
+			//onFileRename && await onFileRename(fileObj)							
+			const objFile: IFileTree = {id: fileObj.id, fileName: fileObj.fileName, content: fileObj.content}
+			onFileRename && await onFileRename(objFile, fileObj.parentId)							
 			const updatedTreeData = changeFilenameAndUpdateFileList(data, fileObj.id, fileObj.fileName)
 			setData(updatedTreeData)
 			setRenameFileNameId(0)								
@@ -200,7 +203,7 @@ function Filesbar({
 	};
 
 
-	const onClickFileItem = (file: files) => {		
+	const onClickFileItem = (file: IFileItem) => {		
 		setSelectedFileId(file.id)
 		onSelect && onSelect(file.id)
 		
@@ -217,11 +220,16 @@ function Filesbar({
 	const onClickButtonNewFile = (type: typeFile) => {		
 		if(selectedFileId !== undefined){
 			const objFile = getFileById(data, selectedFileId)
+
+			objFile?.id && console.log('getParentId', getParentId(data, objFile?.id, 0))
+			
+
 			if(objFile) {
 				if(objFile?.childNodes) {
 					setShowInputNewFileAtParent({parentId: objFile.id, type: type})	
 				} else {
-					setShowInputNewFileAtParent({parentId: objFile.parentId, type: type})	
+					//setShowInputNewFileAtParent({parentId: objFile.parentId, type: type})	
+					setShowInputNewFileAtParent({parentId: getParentId(data, objFile.id, 0), type: type})					
 				}
 			} else {
 				setShowInputNewFileAtParent({parentId: 0, type: type})	
@@ -231,17 +239,18 @@ function Filesbar({
 		setShowInputNewFileAtParent({parentId: 0, type: type})
 	}
 
-	const renderFiles = (files: files[], newFileAtParent: typeNewFileAtParent) => {
+
+	const renderFiles = (files: IFileTree[], newFileAtParent: typeNewFileAtParent) => {
 		let _newFileAtParent = newFileAtParent.parentId 
 		
-		const sortFiles = (files: files[]) => {
+		const sortFiles = (files: IFileTree[]) => {
 			files.sort((a, b) => a.fileName.toLowerCase() > b.fileName.toLowerCase() ? 1 : -1)
 		}
 		
 		sortFiles(files)
 
-		const render = (file: files, level: number) => {			
-			const fileItemObj: IFileItem = {...file} //IFileItem just add isOpened property
+		const render = (file: IFileTree, level: number, parentId: number) => {			
+			const fileItemObj: IFileItem = {...file, parentId} //IFileItem just add isOpened property
 			if (file?.childNodes) fileItemObj.isOpened = expanded.indexOf(file.id) !== -1
 
 			const fileItemEl = (
@@ -265,7 +274,7 @@ function Filesbar({
 						fileItemObj?.childNodes && fileItemObj?.childNodes.length===0 && fileItemObj.id == _newFileAtParent && 					
 						<FileItem
 							//fileObj={{id: 0, fileName: '', content: '', parentId: _newFileAtParent}}	
-							fileObj={ newFileAtParent.type === 'folder' ? {id: 0, fileName: '', content: '', parentId: fileItemObj.parentId, childNodes: []} : {id: 0, fileName: '', content: '', parentId: fileItemObj.parentId}}	
+							fileObj={ newFileAtParent.type === 'folder' ? {id: 0, fileName: '', content: '', parentId: parentId, childNodes: []} : {id: 0, fileName: '', content: '', parentId: parentId}}	
 							selected={false}
 							focused={focusedCmp}		
 							mode='NEW_FILE'			
@@ -286,18 +295,18 @@ function Filesbar({
 					{/* {file?.childNodes && expanded.indexOf(file.id) !== -1 && sortFiles(file.childNodes)} */}
 					
 					{/* rendering */}
-					{ fileItemObj?.childNodes && fileItemObj.isOpened && fileItemObj.childNodes.map((file: any) => render(file, level+1)) }
+					{ fileItemObj?.childNodes && fileItemObj.isOpened && fileItemObj.childNodes.map((file: any) => render(file, level+1, fileItemObj.id)) }
 					{/* {file?.childNodes && expanded.indexOf(file.id) !== -1 && file.childNodes.map((file: any) => render(file, level+1))} */}
 				</>		
 				</FileItem>					
 			)
 
-			if (fileItemObj.parentId == _newFileAtParent) {
+			if (parentId == _newFileAtParent) {
 				_newFileAtParent = -1
 				return (
 					<React.Fragment key={fileItemObj.id}>
 						<FileItem
-							fileObj={ newFileAtParent.type === 'folder' ? {id: 0, fileName: '', content: '', parentId: fileItemObj.parentId, childNodes: []} : {id: 0, fileName: '', content: '', parentId: fileItemObj.parentId}}	
+							fileObj={ newFileAtParent.type === 'folder' ? {id: 0, fileName: '', content: '', parentId: parentId, childNodes: []} : {id: 0, fileName: '', content: '', parentId: parentId}}	
 							selected={false}
 							focused={focusedCmp}		
 							mode='NEW_FILE'			
@@ -320,7 +329,7 @@ function Filesbar({
 		//	files.sort
 		//}
 
-		return files.map((file: any) => render(file, 0))
+		return files.map((file: any) => render(file, 0, 0))
 
 	}	
 
