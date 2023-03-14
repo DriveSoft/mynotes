@@ -10,18 +10,21 @@ const tabsData: tabs[] = [
 		saved: true,
 		tabName: "Tab1",
 		content: "",
+		isLoading: false
 	},
 	{
 		id: 2,
 		saved: false,
 		tabName: "Tab2",
 		content: "",
+		isLoading: false
 	},
 	{
 		id: 3,
 		saved: true,
 		tabName: "Tab3",
 		content: "",
+		isLoading: false
 	},
 ];
 

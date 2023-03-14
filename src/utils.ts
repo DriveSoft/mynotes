@@ -33,15 +33,6 @@ export async function createFilenameAPI(file: IFileAPI): Promise<number>{
 }
 
 export async function updateFilenameAPI(file: IFileAPI): Promise<any>{
-
-    // const fileObjApi: fileAPI = {
-    //     id: file.id,
-    //     fileName: file.fileName,
-    //     content: file.content,
-    //     parentId: file.parentId,
-    //     type: file?.childNodes ? 'FOLDER' : 'FILE'
-    // };
-
     const response = await fetch(`${URL_API}/${file.id}`, {...fetchOptions, method: 'PUT', body: JSON.stringify(file)})
 
     if(!response.ok) throw new Error(response.status.toString())
@@ -99,7 +90,6 @@ export async function saveFileContentToApiAndGetUpdatedState(fileList: IFileTree
         id: fileObj.id,
         fileName: fileObj.fileName,
         content: fileObj.content,
-        //parentId: fileObj.parentId,
         parentId: getParentId(fileList, fileObj.id),
         type: fileObj?.childNodes ? 'FOLDER' : 'FILE'
     }

@@ -38,6 +38,7 @@ export interface tabs {
 	saved: boolean
 	tabName: string
 	content: string | undefined
+	isLoading: boolean
 }
 
 export type typeFile = 'file' | 'folder'

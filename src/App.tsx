@@ -7,7 +7,7 @@ import Profilebar from "./components/Profilebar"
 import { ButtonId } from "./types";
 import { sortFiles, getFileById, URL_API } from "./utils";
 import { AppContext, AppContextType } from './Context';
-import { IFileAPI } from "./types";
+import { IFileAPI, tabs } from "./types";
 import { IFileTree } from "./components/Filesbar/types"
 
 
@@ -104,14 +104,50 @@ function App() {
 	useEffect(() => {
 		if (!activeFile) return;
 		if (!tabs.find((tabItem) => tabItem.id === activeFile)) { // if file not found in tabs, open a new tab for the activeFile
-			const objFile = getFileById(fileList, activeFile)
-			if(!objFile?.childNodes) {
-				const content = objFile?.content
-				const fileName = objFile?.fileName
-				fileName && setTabs([...tabs, { id: activeFile, saved: true, tabName: fileName, content: content}])
-			}
+			getContentById(activeFile)
+			// const objFile = getFileById(fileList, activeFile)			
+			// if(!objFile?.childNodes) {
+			// 	//const content = objFile?.content
+			// 	const fileName = objFile?.fileName
+			// 	//fileName && setTabs([...tabs, { id: activeFile, saved: true, tabName: fileName, content: content}])
+			// 	fileName && setTabs([...tabs, { id: activeFile, saved: true, tabName: fileName, content: undefined, isLoading: true}])
+			// }
+
 		}
 	}, [activeFile]);
+
+
+	async function getContentById(idFile: number) {		
+		const objFile = getFileById(fileList, idFile)	
+		const fileName = objFile?.fileName	
+
+		if(!objFile?.childNodes && fileName) {						
+			const newTab: tabs = { id: idFile, saved: true, tabName: fileName, content: undefined, isLoading: true}
+			setTabs([...tabs, newTab])
+
+			try {
+				const response = await fetch(`${URL_API}/${idFile}`)				
+				if(!response.ok) {
+					if(response.status === 404) newTab.content = "File not found."
+					else newTab.content = response.statusText	
+					return			
+				} 
+
+				const result = await response.json()
+				if(result?.content) {
+					newTab.content = result.content
+					return
+				}
+				
+				newTab.content = "Fetch failed, can't find 'content' property."				
+			} catch(e) {
+				newTab.content = e+''			
+			} finally {
+				newTab.isLoading = false
+				setTabs([...tabs, newTab])	
+			}
+		}		
+	}
 
 	return (
 		<>
