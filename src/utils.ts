@@ -116,3 +116,20 @@ function getParentId(dataTree: IFileTree[], fileId: number, parentId: number = 0
     
     return result
 }
+
+
+export async function getFileContent(objFile: IFileTree): Promise<string> {		
+    const id = objFile.id	 			      
+    const response = await fetch(`${URL_API}/${id}`)				
+    if(!response.ok) {
+        if(response.status === 404) throw new Error("File not found")
+        throw new Error(response.statusText)		
+    } 
+
+    const result = await response.json()
+    if(result?.content === undefined) {
+        throw new Error('Property `content` not found')
+    }
+            
+	return result.content		  		
+}

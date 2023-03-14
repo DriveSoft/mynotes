@@ -5,7 +5,7 @@ import EditorContainer from "./components/EditorContainer"
 import Searchbar from "./components/Searchbar"
 import Profilebar from "./components/Profilebar"
 import { ButtonId } from "./types";
-import { sortFiles, getFileById, URL_API } from "./utils";
+import { sortFiles, getFileById, getFileContent, URL_API } from "./utils";
 import { AppContext, AppContextType } from './Context';
 import { IFileAPI, tabs } from "./types";
 import { IFileTree } from "./components/Filesbar/types"
@@ -104,20 +104,13 @@ function App() {
 	useEffect(() => {
 		if (!activeFile) return;
 		if (!tabs.find((tabItem) => tabItem.id === activeFile)) { // if file not found in tabs, open a new tab for the activeFile
-			getContentById(activeFile)
-			// const objFile = getFileById(fileList, activeFile)			
-			// if(!objFile?.childNodes) {
-			// 	//const content = objFile?.content
-			// 	const fileName = objFile?.fileName
-			// 	//fileName && setTabs([...tabs, { id: activeFile, saved: true, tabName: fileName, content: content}])
-			// 	fileName && setTabs([...tabs, { id: activeFile, saved: true, tabName: fileName, content: undefined, isLoading: true}])
-			// }
-
+			loadContentById(activeFile)
 		}
 	}, [activeFile]);
 
 
-	async function getContentById(idFile: number) {		
+
+	async function loadContentById(idFile: number) {		
 		const objFile = getFileById(fileList, idFile)	
 		const fileName = objFile?.fileName	
 
@@ -126,28 +119,17 @@ function App() {
 			setTabs([...tabs, newTab])
 
 			try {
-				const response = await fetch(`${URL_API}/${idFile}`)				
-				if(!response.ok) {
-					if(response.status === 404) newTab.content = "File not found."
-					else newTab.content = response.statusText	
-					return			
-				} 
-
-				const result = await response.json()
-				if(result?.content) {
-					newTab.content = result.content
-					return
-				}
-				
-				newTab.content = "Fetch failed, can't find 'content' property."				
+				const content = await getFileContent(objFile)			
+				newTab.content = content			
 			} catch(e) {
-				newTab.content = e+''			
+				newTab.content = String(e)
 			} finally {
 				newTab.isLoading = false
 				setTabs([...tabs, newTab])	
 			}
 		}		
 	}
+
 
 	return (
 		<>
