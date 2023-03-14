@@ -26,16 +26,24 @@ function TextEditor({ tabs, setTabs, activeFile }: TextEditorProps) {
 	return (
 		<div className="mainEditor">
 			{tabs.map((tabFile) => (
-				<textarea
-					key={tabFile.id}
-					name="note"
-					style={{
-						display: tabFile.id === activeFile ? "block" : "none",
-					}}
-					value={tabFile.content}
-					onChange={e => onChange(e, tabFile.id)}
-
-				></textarea>
+				<React.Fragment key={tabFile.id}>				
+				{
+					tabFile.isLoading ? 
+						<div className="wrapperLoading">
+							<div className="lds-dual-ring"></div>
+						</div>
+						
+					:
+					<textarea						
+						name="note"
+						style={{
+							display: tabFile.id === activeFile ? "block" : "none",
+						}}
+						value={tabFile.content}
+						onChange={e => onChange(e, tabFile.id)}
+					></textarea>				
+				}				
+				</React.Fragment>
 			))}
 		</div>
 	);
