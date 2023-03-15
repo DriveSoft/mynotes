@@ -313,7 +313,7 @@ describe('Filebar', () => {
                 title={title}
                 treeData={treeData}
                 selectedFile={1}
-                expanded={[]}
+                expanded={[]} 
                 onExpanded={()=>{}}
             />            
         )

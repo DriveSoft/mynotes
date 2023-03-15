@@ -26,11 +26,11 @@ function App() {
 
 	const [widthSidebar, setWidthSidebar] = useState(260);
 	const [dragSizeSidebar, setDragSizeSidebar] = useState({
-		draggable: false,
+		draggable: false, 
 		xMouseStart: 0,
 		initPosX: 0,
 	});
-
+ 
 	useEffect(() => {
 		const createDataTree = (data: IFileAPI[]): IFileTree[] => {
 			const hashTable = Object.create(null)

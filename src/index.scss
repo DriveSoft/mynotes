@@ -1,3 +1,5 @@
+@use "./sass/variables" as vars;
+
 html {
   box-sizing: border-box;
 }
@@ -9,12 +11,12 @@ html {
 body {
   margin: 0;
   padding: 0;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-family: vars.$font; 
 }
 
 .wrapper {
-  display: flex;
-  height: 100vh;
+  display: flex;   
+  height: 100vh; 
 }
 
 .editorWrapper {
@@ -26,7 +28,7 @@ body {
 .dragBar {
   width: 4px;
   cursor: col-resize;
-  background-color: #252525;
+  background-color: #252525;  
   transition: background-color 0.3s;
   transition-delay: 0.1s;
 }
@@ -34,4 +36,4 @@ body {
 .dragBar:hover {
   background-color: hsl(204, 100%, 42%);
   width: 4px;
-}/*# sourceMappingURL=index.css.map */
+}

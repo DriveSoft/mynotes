@@ -20,7 +20,7 @@ describe('FileItem', () => {
                 selected={true}
                 focused={true}				
                 //onFileCreated={async ()=>{}}
-                onChangeValidator={onChangeValidator}
+                onChangeValidator={onChangeValidator} 
                 key={'someFile'}
                 level={1}
             />	

@@ -178,7 +178,7 @@ function Filesbar({
 		parentId: number,
 		fileName: string,
 		inputEl: any
-	): boolean => {
+	): boolean => { 
 
 		const filesInParentFolder = parentId > 0 ? getFileById(data, parentId)?.childNodes : data
 		//const result = data.every(item => item.fileName !== fileName || fileId === item.id)
