@@ -1,5 +1,5 @@
 import React from "react";
-import { tabs } from "../types";
+import { tabs } from "../../types";
 import "./TextEditor.css";
 
 interface TextEditorProps {

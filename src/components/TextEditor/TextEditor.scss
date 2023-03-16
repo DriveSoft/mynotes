@@ -1,0 +1,54 @@
+@use "../../sass/variables";
+
+.mainEditor {
+    background-color: variables.$textEditorBg; 
+    height: 100%;      
+    textarea {
+      color: variables.$fontColor;
+      background-color: variables.$textEditorBg;
+      width: 100%;
+      height: 98%; 
+      box-sizing: border-box;
+      border: none;
+      resize: none; 
+      padding: 16px 8px 0 24px;
+      margin: 0;
+      &:focus {
+        outline: none;
+      }      
+    }    
+}
+  
+.wrapperLoading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+.lds-dual-ring {
+  display: inline-block;
+  width: 80px;
+  height: 80px;    
+}
+  
+.lds-dual-ring:after {
+  content: " ";
+  display: block;
+  width: 64px;
+  height: 64px;
+  margin: 8px;
+  border-radius: 50%;
+  border: 6px solid variables.$fontColor;
+  border-color: variables.$fontColor transparent variables.$fontColor transparent;
+  animation: lds-dual-ring 1.2s linear infinite;
+}
+@keyframes lds-dual-ring {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

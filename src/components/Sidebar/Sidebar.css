@@ -1,0 +1,30 @@
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  background-color: #333;
+  color: hsl(0, 0%, 86%);
+}
+
+.sidebar button {
+  padding: 10px 14px;
+  text-decoration: none;
+  font-size: 21px;
+  color: #858578;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  border-left: 2px solid #333;
+}
+
+.sidebar button:hover {
+  color: hsl(0, 0%, 86%);
+}
+
+.sidebar button:active {
+  border-left: 2px solid hsl(204, 100%, 42%) !important;
+}
+
+.activeSidebarButton {
+  color: hsl(0, 0%, 86%) !important;
+  border-left: 2px solid hsl(0, 0%, 86%) !important;
+}/*# sourceMappingURL=Sidebar.css.map */

@@ -1,0 +1,14 @@
+@use "../../sass/variables";
+
+.profilebar {
+    display: flex;
+    flex-direction: column;
+    background-color: variables.$bgFilesContainer; 
+    font-size: 11px;   
+    width: 100%;      
+    height: 100%; 
+    span {
+      color: variables.$fontColor;
+      padding: 14px 14px;
+    }       
+  }

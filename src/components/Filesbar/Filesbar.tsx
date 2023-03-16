@@ -1,6 +1,6 @@
-import React, { useState, useRef, useContext, useEffect } from "react"
-import ContexMenu from "../ContexMenu"
-import ModalDialog from "../ModalDialog"
+import React, { useState, useRef, useEffect } from "react"
+import ContexMenu from "../ContexMenu/ContexMenu"
+import ModalDialog from "../ModalDialog/ModalDialog"
 import FileItem from "./FileItem"
 import { IFileTree, typeFile, IFileItem } from "./types"
 import { 

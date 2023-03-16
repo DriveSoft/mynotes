@@ -1,1 +1,50 @@
 $font: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+$fontColor: hsl(0, 0%, 86%);
+
+$activeItemColor: hsl(204, 100%, 42%);
+$activeItemColorDark: hsl(204, 100%, 20%);
+
+//Sidebar
+$sidebarButtonColor: #858578;
+$sidebarButtonFontSize: 21px;
+$bgColorSidebar: #333;
+
+//FilesContainer
+$bgFilesContainer: #252525;
+
+//FilesBar
+$filesBarBgButtonHover: hsl(0, 0%, 24%);
+$filesBarBgSelectedItem: #37373d;
+$filesBarBgSelectedItemHover: #2a2d2e;
+$filesBarBorderError: red;
+$filesBarBgError: #5a1d1d;
+
+//ContexMenu
+$bgColorMenu: #252525;
+$borderColorMenu: #353535;
+$disableItemColor: gray;
+
+//EditorTabs
+$bgEditorTabs: #252525;
+$bgActiveEditorTabs: #1e1e1e;
+$bgTabEditorTabs: #2d2d2d;
+$colorTab: hsl(0, 0%, 60%);
+$tabCloseButtonHover: hsl(0, 0%, 24%);
+$iconTabClose: '⨉';
+$iconTabCloseNotSaved: '⬤';
+
+//TextEditor
+$textEditorBg: #1e1e1e;
+
+//ModalDialog
+$modalDialogBgCover: rgba(0, 0, 0, 0.3);
+$modalDialogBorder: black;
+$modalDialogButtonColorHover: red;
+$modalDialogButtonColorActive: rgb(255, 109, 109);
+
+//Buttons
+$buttonBorder: #252525;
+$buttonBg: #363636;
+$buttonColor: hsl(0, 0%, 86%);
+$buttonBgHover: hsla(204, 100%, 42%, 0.5);
+$buttonBgActive: hsla(204, 100%, 42%, 0.3);

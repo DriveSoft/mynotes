@@ -1,11 +1,13 @@
+@use "../../sass/variables";
+
 .containerMenu {
     position: fixed;
-    border: 1px solid #353535;
-    background-color: #252525;
+    border: 1px solid variables.$borderColorMenu;
+    background-color: variables.$bgColorMenu;
     border-radius: 5px;
-    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: variables.$font;
     font-size: 14px;
-    color: white;
+    color: variables.$fontColor;
 }
 
 .containerMenu ul {
@@ -20,11 +22,11 @@
 } 
 
 .menuItem:hover {
-    background-color: hsl(204, 100%, 20%);
+    background-color: variables.$activeItemColorDark;
 }  
 
 .menuItemDisabled {
     cursor: default;
-    color: gray;
+    color: variables.$disableItemColor;
 }
 

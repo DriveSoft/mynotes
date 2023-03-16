@@ -1,13 +1,13 @@
 import { useState, useEffect, useContext } from "react"
-import Sidebar from "./components/Sidebar"
-import FilesContainer from "./components/FilesContainer"
+import Sidebar from "./components/Sidebar/Sidebar"
+import FilesContainer from "./components/FilesContainer/FilesContainer"
 import EditorContainer from "./components/EditorContainer"
-import Searchbar from "./components/Searchbar"
-import Profilebar from "./components/Profilebar"
+import Searchbar from "./components/Searchbar/Searchbar"
+import Profilebar from "./components/Profilebar/Profilebar"
 import { ButtonId } from "./types";
-import { sortFiles, getFileById, getFileContent, URL_API } from "./utils";
-import { AppContext, AppContextType } from './Context';
-import { IFileAPI, tabs } from "./types";
+import { sortFiles, getFileById, getFileContent, URL_API } from "./utils"
+import { AppContext, AppContextType } from './Context'
+import { IFileAPI, tabs } from "./types"
 import { IFileTree } from "./components/Filesbar/types"
 
 
@@ -139,15 +139,17 @@ function App() {
 					setActiveSidebarButton={setActiveSidebarButton}
 				/>
 
-				<div className="sidebar2" style={{ width: widthSidebar }}>
-					{activeSidebarButton === "FILES" && (
-						<FilesContainer />
-					)}
+				{activeSidebarButton !== "NONE" &&
+					<div className="sidebar2" style={{ width: widthSidebar }}>
+						{activeSidebarButton === "FILES" && (
+							<FilesContainer />
+						)}
 
-					{activeSidebarButton === "SEARCH" && <Searchbar />}
+						{activeSidebarButton === "SEARCH" && <Searchbar />}
 
-					{activeSidebarButton === "PROFILE" && <Profilebar />}
-				</div>
+						{activeSidebarButton === "PROFILE" && <Profilebar />}
+					</div>
+				}
 
 				<div
 					className="dragBar"

@@ -1,0 +1,29 @@
+.containerMenu {
+  position: fixed;
+  border: 1px solid #353535;
+  background-color: #252525;
+  border-radius: 5px;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 14px;
+  color: hsl(0, 0%, 86%);
+}
+
+.containerMenu ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.menuItem {
+  padding: 4px 25px 4px 25px;
+  cursor: pointer;
+}
+
+.menuItem:hover {
+  background-color: hsl(204, 100%, 20%);
+}
+
+.menuItemDisabled {
+  cursor: default;
+  color: gray;
+}/*# sourceMappingURL=ContexMenu.css.map */

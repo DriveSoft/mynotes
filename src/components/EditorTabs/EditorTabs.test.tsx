@@ -1,7 +1,7 @@
 
 import { render, screen, fireEvent } from "@testing-library/react";
 import user from "@testing-library/user-event";
-import { tabs } from "../types";
+import { tabs } from "../../types";
 import EditorTabs from "./EditorTabs";
 
 const tabsData: tabs[] = [

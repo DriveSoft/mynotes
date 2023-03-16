@@ -1,0 +1,32 @@
+@use "../../sass/variables";
+
+.sidebar {
+    display: flex;
+    flex-direction: column;    
+    background-color: variables.$bgColorSidebar;
+    color: variables.$fontColor;    
+  }    
+  
+  .sidebar button {
+    padding: 10px 14px;
+    text-decoration: none;
+    font-size: variables.$sidebarButtonFontSize;
+    color: variables.$sidebarButtonColor;  
+    background-color: transparent;
+    border: none;  
+    cursor: pointer;  
+    border-left: 2px solid variables.$bgColorSidebar;
+  } 
+  
+  .sidebar button:hover {
+    color: variables.$fontColor;
+  }
+
+  .sidebar button:active {
+    border-left: 2px solid variables.$activeItemColor !important;
+  }
+  
+  .activeSidebarButton {
+    color: variables.$fontColor !important;
+    border-left: 2px solid variables.$fontColor !important;
+  }

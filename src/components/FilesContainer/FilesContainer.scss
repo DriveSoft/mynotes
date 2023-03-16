@@ -1,12 +1,14 @@
+@use "../../sass/variables";
+
 .filesContainer {
     display: flex;
     flex-direction: column;    
-    background-color: #252525; 
+    background-color: variables.$bgFilesContainer; 
     height: 100%;
 }
 
 .filesContainer>span {
     font-size: 11px;
-    color: hsl(0, 0%, 86%);
+    color: variables.$fontColor;
     padding: 14px 14px;
   }

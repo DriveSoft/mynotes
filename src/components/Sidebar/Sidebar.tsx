@@ -1,6 +1,6 @@
 import React from "react"
 import "./Sidebar.css"
-import { ButtonId, sidebarButton } from "../types";
+import { ButtonId, sidebarButton } from "../../types";
 
 const sidebarButtons: sidebarButton[] = [
 	{
@@ -22,7 +22,7 @@ interface SidebarProps {
 	setActiveSidebarButton: (value: ButtonId) => void;
 }
 
-function Sidebar({
+function Sidebar({ 
 	activeButton,
 	setActiveSidebarButton,
 }: SidebarProps) {

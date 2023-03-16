@@ -1,5 +1,5 @@
 import React, { useRef } from "react"
-import { tabs } from "../types"
+import { tabs } from "../../types"
 import "./EditorTabs.css"
 
 interface EditorTabsProps {

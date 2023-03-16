@@ -1,0 +1,90 @@
+@use "../../sass/variables";
+
+.modalDialogContainer {    
+    display: flex;
+    font-size: 14px;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: variables.$modalDialogBgCover;
+    z-index: 999;
+}
+
+.modalDialog {
+    display: flex;
+    flex-direction: column;
+    width: 450px;
+    border: 1px solid variables.$modalDialogBorder;
+    border-radius: 5px;
+    background-color: variables.$bgFilesContainer;
+}
+
+.modalDialogTitle {
+    display: flex;
+    align-items: center;   
+    height: 25px; 
+    color: variables.$fontColor;
+    span {
+        flex: 1;
+        margin-left: 5px;
+    }  
+    div {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+        width: 25px;   
+        cursor: pointer;
+        transition: background-color 0.2s; 
+        &:hover {
+            background-color: variables.$modalDialogButtonColorHover;    
+        }  
+        &:active {
+            background-color: variables.$modalDialogButtonColorActive;    
+        }              
+    }      
+}
+
+.modalDialogContent {
+    display: flex;
+    align-items: flex-start;
+    color: variables.$fontColor;
+    margin-top: 30px;
+    min-height: 50px;
+    i {
+        font-size: xx-large;
+        margin-left: 20px;
+    }   
+    span {
+        margin-left: 20px;    
+    }     
+}
+
+.modalDialogButtons {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    height: 48px;
+    background-color: variables.$bgFilesContainer;
+    padding-right: 5px;
+    button {
+        height: 28px;
+        margin: 0 5px 0 5px;
+        min-width: 80px;
+        border: 0px solid variables.$buttonBorder;
+        background-color: variables.$buttonBg;    
+        color: variables.$buttonColor;
+        transition: background-color 0.1s;
+        font-size: 12px;
+        &:hover {
+            background-color: variables.$buttonBgHover;
+        }    
+        &:active {
+            background-color: hsla(204, 100%, 42%, 0.3)    
+        }              
+    }    
+}

@@ -1,9 +1,9 @@
 import React, { useState, useContext } from "react"
 import { AppContext, AppContextType } from "../Context"
 import { tabs } from "../types"
-import EditorTabs from './EditorTabs'
-import TextEditor from './TextEditor'
-import ModalDialog from "./ModalDialog"
+import EditorTabs from './EditorTabs/EditorTabs'
+import TextEditor from './TextEditor/TextEditor'
+import ModalDialog from "./ModalDialog/ModalDialog"
 
 function EditorContainer() {
 

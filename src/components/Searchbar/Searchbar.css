@@ -1,0 +1,13 @@
+.searchbar {
+  display: flex;
+  flex-direction: column;
+  background-color: #252525;
+  font-size: 11px;
+  width: 100%;
+  height: 100%;
+}
+
+.searchbar span {
+  color: hsl(0, 0%, 86%);
+  padding: 14px 14px;
+}/*# sourceMappingURL=Searchbar.css.map */

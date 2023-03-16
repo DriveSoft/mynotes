@@ -1,9 +1,9 @@
 import { useState, useContext } from "react"
-import Filesbar from "./Filesbar/Filesbar"
-import { AppContext, AppContextType } from "../Context"
-import { IFileAPI, typeFile } from "../types"
-import { IFileTree } from "./Filesbar/types"
-import { createFilenameAPI, updateFilenameAPI, deleteFilenameAPI } from "../utils"
+import Filesbar from "../Filesbar/Filesbar"
+import { AppContext, AppContextType } from "../../Context"
+import { IFileAPI, typeFile } from "../../types"
+import { IFileTree } from "../Filesbar/types"
+import { createFilenameAPI, updateFilenameAPI, deleteFilenameAPI } from "../../utils"
 import "./FilesContainer.css"
 
 const FilesContainer = () => {
