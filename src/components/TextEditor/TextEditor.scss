@@ -19,6 +19,39 @@
     }    
 }
   
+
+textarea {
+  cursor: auto;
+  &::-webkit-scrollbar {
+    width: 14px;
+    cursor: pointer;
+  }
+
+  /* Track */
+  &::-webkit-scrollbar-track {
+    background: variables.$textEditorBg;
+    border-left: 1px solid hsl(0, 0%, 20%);
+  }  
+
+/* Handle */
+  &::-webkit-scrollbar-thumb {
+  background: variables.$scrollbarThumbColor; 
+  &:hover {
+    background: variables.$scrollbarThumbHoverColor; 
+  }
+}  
+}
+
+
+
+
+ 
+
+
+
+
+
+
 .wrapperLoading {
   display: flex;
   justify-content: center;

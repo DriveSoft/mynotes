@@ -17,6 +17,26 @@
   outline: none;
 }
 
+textarea {
+  cursor: auto;
+  /* Track */
+  /* Handle */
+}
+textarea::-webkit-scrollbar {
+  width: 14px;
+  cursor: pointer;
+}
+textarea::-webkit-scrollbar-track {
+  background: #1e1e1e;
+  border-left: 1px solid hsl(0, 0%, 20%);
+}
+textarea::-webkit-scrollbar-thumb {
+  background: hsl(0, 0%, 25%);
+}
+textarea::-webkit-scrollbar-thumb:hover {
+  background: hsl(0, 0%, 30%);
+}
+
 .wrapperLoading {
   display: flex;
   justify-content: center;
