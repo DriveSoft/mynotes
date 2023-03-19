@@ -78,12 +78,39 @@
 }
   
 .files {
+  .fileItems {
+    position: relative;
+    height: 85vh;
+    overflow: auto;
+  }
+
   li {
     padding: 1px 0 1px 36px;
     i {
       margin-right: 4px;
     }    
   }
+}
+
+.fileItems  {
+  cursor: auto;
+  &::-webkit-scrollbar {
+    width: 14px;
+    cursor: pointer;
+  }
+
+  /* Track */
+  &::-webkit-scrollbar-track {
+    background: variables.$bgFilesContainer;
+  }  
+
+  /* Handle */
+  &::-webkit-scrollbar-thumb {
+  background: variables.$scrollbarThumbColor; 
+  &:hover {
+    background: variables.$scrollbarThumbHoverColor; 
+  }
+}  
 }
 
 .fileItem i {

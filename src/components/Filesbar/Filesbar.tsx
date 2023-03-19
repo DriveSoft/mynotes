@@ -361,7 +361,7 @@ function Filesbar({
 										
 				</div>
 
-				<div style={{ position: "relative" }}>
+				<div className="fileItems">
 
 					{renderFiles(data, showInputNewFileAtParent)}
 

@@ -33,7 +33,7 @@ textarea {
     border-left: 1px solid hsl(0, 0%, 20%);
   }  
 
-/* Handle */
+  /* Handle */
   &::-webkit-scrollbar-thumb {
   background: variables.$scrollbarThumbColor; 
   &:hover {

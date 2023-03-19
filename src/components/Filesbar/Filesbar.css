@@ -70,11 +70,35 @@
   background-color: #37373d;
 }
 
+.files .fileItems {
+  position: relative;
+  height: 85vh;
+  overflow: auto;
+}
 .files li {
   padding: 1px 0 1px 36px;
 }
 .files li i {
   margin-right: 4px;
+}
+
+.fileItems {
+  cursor: auto;
+  /* Track */
+  /* Handle */
+}
+.fileItems::-webkit-scrollbar {
+  width: 14px;
+  cursor: pointer;
+}
+.fileItems::-webkit-scrollbar-track {
+  background: #252525;
+}
+.fileItems::-webkit-scrollbar-thumb {
+  background: hsl(0, 0%, 25%);
+}
+.fileItems::-webkit-scrollbar-thumb:hover {
+  background: hsl(0, 0%, 30%);
 }
 
 .fileItem i {
