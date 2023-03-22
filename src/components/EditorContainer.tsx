@@ -79,6 +79,7 @@ function EditorContainer() {
                 onClosedTab={onClosedTab}
                 onDropFinished={onDropFinished}
             />
+       
 
             <TextEditor
                 tabs={tabs}

@@ -7,6 +7,7 @@
   font-size: 11px;   
   width: 100%;      
   height: 100%;
+  position: relative;
 
   .error {
     color: variables.$fontColor;    
@@ -43,6 +44,22 @@
   visibility: visible;
 }
   
+.files {
+  .fileItems {
+    position: absolute;
+    top: 20px;
+    bottom: 0;
+    overflow: auto;
+  }
+
+  li {
+    padding: 1px 0 1px 36px;
+    i {
+      margin-right: 4px;
+    }    
+  }
+}
+
 .fileItem {
   display: flex;
   color: variables.$fontColor;
@@ -76,26 +93,13 @@
 .selectedFile {
   background-color: variables.$filesBarBgSelectedItem;
 }
-  
-.files {
-  .fileItems {
-    position: relative;
-    height: 85vh;
-    overflow: auto;
-  }
 
-  li {
-    padding: 1px 0 1px 36px;
-    i {
-      margin-right: 4px;
-    }    
-  }
-}
+
 
 .fileItems  {
   cursor: auto;
   &::-webkit-scrollbar {
-    width: 14px;
+    width: 10px;
     cursor: pointer;
   }
 
@@ -116,51 +120,6 @@
 .fileItem i {
   margin-right: 5px;
 }
-
-  // .files li i {
-  //   margin-right: 4px;
-  // }
-  
-  // .files li {
-  //   padding: 1px 0 1px 36px;
-  // }
-  
-
-  
-  // .wrapperNewFile {
-  //   display: flex;
-  //   align-items: baseline;
-  //   font-size: 14px;
-  //   margin-left: 37px;
-  //   color: variables.$fontColor;
-  //   margin-top: 4px;
-  // }
-  
-  // .inputNewFile {
-  //   font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  //   color: variables.$fontColor;
-  //   margin-left: 7px;
-  //   background-color: rgb(37, 37, 37);
-  //   border: 1px solid variables.$activeItemColor;
-  //   outline: none;
-  //   width: 100%;
-  // }
-  
-  // .inputNewFileError {
-  //   border: 1px solid variables.$filesBarBorderError !important;   
-  // }
-  
-  // .errorNewFile {
-  //   position: relative;
-  //   border: 1px solid variables.$filesBarBorderError;
-  //   background-color: variables.$filesBarBgError;  
-  //   color: white;
-  //   padding: 5px 5px 5px 5px;  
-  //   margin-left: 55px;
-  //   top: -1px;
-  // }
-  
-  
 
   
   

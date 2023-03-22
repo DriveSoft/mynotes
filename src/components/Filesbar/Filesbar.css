@@ -5,6 +5,7 @@
   font-size: 11px;
   width: 100%;
   height: 100%;
+  position: relative;
 }
 .filesbar .error {
   color: hsl(0, 0%, 86%);
@@ -36,6 +37,19 @@
 
 .filesbar:hover .filesTitle i {
   visibility: visible;
+}
+
+.files .fileItems {
+  position: absolute;
+  top: 20px;
+  bottom: 0;
+  overflow: auto;
+}
+.files li {
+  padding: 1px 0 1px 36px;
+}
+.files li i {
+  margin-right: 4px;
 }
 
 .fileItem {
@@ -70,25 +84,13 @@
   background-color: #37373d;
 }
 
-.files .fileItems {
-  position: relative;
-  height: 85vh;
-  overflow: auto;
-}
-.files li {
-  padding: 1px 0 1px 36px;
-}
-.files li i {
-  margin-right: 4px;
-}
-
 .fileItems {
   cursor: auto;
   /* Track */
   /* Handle */
 }
 .fileItems::-webkit-scrollbar {
-  width: 14px;
+  width: 10px;
   cursor: pointer;
 }
 .fileItems::-webkit-scrollbar-track {
